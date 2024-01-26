@@ -1,20 +1,24 @@
 package com.mymerit.mymerit;
 
+import com.mymerit.mymerit.domain.entity.User;
+import com.mymerit.mymerit.domain.repository.UserRepository;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-@RestController
 public class MymeritApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(MymeritApplication.class, args);
 	}
 
-	@GetMapping("/")
-	public String apiRoot() {
-		return "Hello World!";
+	@Bean
+	CommandLineRunner runner(UserRepository userRepository) {
+		return args -> {
+			User user = new User();
+
+			userRepository.insert(user);
+		};
 	}
 }
