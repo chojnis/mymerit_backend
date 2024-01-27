@@ -1,4 +1,4 @@
-package com.mymerit.mymerit.domain.payload.response;
+package com.mymerit.mymerit.api.payload.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

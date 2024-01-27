@@ -1,4 +1,4 @@
-package com.mymerit.mymerit.domain.payload.request;
+package com.mymerit.mymerit.api.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.mymerit.mymerit.domain.repository;
+package com.mymerit.mymerit.infrastructure.repository;
 
 import com.mymerit.mymerit.domain.entity.User;
 import org.springframework.data.mongodb.repository.MongoRepository;

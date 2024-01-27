@@ -1,9 +1,9 @@
 package com.mymerit.mymerit.api.controller;
 
-import com.mymerit.mymerit.domain.payload.request.SignInRequest;
-import com.mymerit.mymerit.domain.payload.response.JwtResponse;
-import com.mymerit.mymerit.domain.repository.UserRepository;
-import com.mymerit.mymerit.domain.repository.UserRoleRepository;
+import com.mymerit.mymerit.api.payload.request.SignInRequest;
+import com.mymerit.mymerit.api.payload.response.JwtResponse;
+import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import com.mymerit.mymerit.infrastructure.repository.UserRoleRepository;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.utils.JwtUtils;
 import jakarta.validation.Valid;

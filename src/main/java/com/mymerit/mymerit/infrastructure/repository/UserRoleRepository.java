@@ -1,4 +1,4 @@
-package com.mymerit.mymerit.domain.repository;
+package com.mymerit.mymerit.infrastructure.repository;
 
 import com.mymerit.mymerit.domain.entity.UserRole;
 import com.mymerit.mymerit.domain.models.Role;

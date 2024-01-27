@@ -1,7 +1,7 @@
 package com.mymerit.mymerit.domain.service;
 
 import com.mymerit.mymerit.domain.entity.User;
-import com.mymerit.mymerit.domain.repository.UserRepository;
+import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
