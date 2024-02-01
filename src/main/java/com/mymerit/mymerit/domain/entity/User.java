@@ -5,11 +5,8 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Data
-@Document
+@Document("users")
 public class User {
     @Id
     private String id;
@@ -21,5 +18,4 @@ public class User {
     private String password;
     private String point;
     private String description;
-    private Set<UserRole> roles = new HashSet<>();
 }
