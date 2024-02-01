@@ -1,0 +1,46 @@
+server:
+  port:
+    8080
+
+spring:
+  data:
+    mongodb:
+      authentication-database: admin
+      username: root
+      password: password
+      database: mymerit
+      port: 27017
+      host: localhost
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: a446935ece96249d5d22
+            client-secret: e1ab422c3a7faac427ace88c0f38ebb264b6e960
+          google:
+            client-id: 899578246174-akvbo1tf5lkhpdauisvbivc3unn5oljn.apps.googleusercontent.com
+            client-secret: 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
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: vectronpl@gmail.com
+    password: bywjluxbzebpkyxz
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+
+mymerit:
+  app:
+    jwtSecret: ""
+    jwtExpirationMs: "900000"
+
+
