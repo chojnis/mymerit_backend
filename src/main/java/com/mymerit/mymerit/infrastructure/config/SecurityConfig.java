@@ -38,9 +38,11 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new RestAuthenticationEntryPoint()))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/","/users", "/sign-in", "/sign-up").permitAll()
-                        .anyRequest().authenticated()
-                );
+                        .requestMatchers("/", "/auth/**")
+                            .permitAll()
+                        .anyRequest()
+                            .authenticated())
+        ;
 
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
