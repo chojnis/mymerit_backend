@@ -3,7 +3,6 @@ package com.mymerit.mymerit.api.controller;
 import com.mymerit.mymerit.api.payload.request.SignInRequest;
 import com.mymerit.mymerit.api.payload.response.ApiResponse;
 import com.mymerit.mymerit.api.payload.response.JwtResponse;
-import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.utils.JwtUtils;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -36,13 +35,10 @@ public class SignInController {
 
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        //UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
         return ResponseEntity.ok(new ApiResponse(
                 true,
                 "Successfully logged in",
                 new JwtResponse(jwt)
         ));
-
     }
 }

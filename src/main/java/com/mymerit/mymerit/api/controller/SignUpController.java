@@ -39,6 +39,7 @@ public class SignUpController {
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(signUpRequest.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole("user");
 
         User result = userRepository.insert(user);
 
