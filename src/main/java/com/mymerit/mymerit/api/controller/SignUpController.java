@@ -39,6 +39,7 @@ public class SignUpController {
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(signUpRequest.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole("user");
 
         User result = userRepository.insert(user);
 
@@ -48,6 +49,6 @@ public class SignUpController {
 
         return ResponseEntity
                 .created(location)
-                .body(new ApiResponse(true, "User registered successfully"));
+                .body(new ApiResponse(true, "User registered successfully", null));
     }
 }
