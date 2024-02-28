@@ -21,6 +21,17 @@ spring:
           google:
             client-id: 899578246174-akvbo1tf5lkhpdauisvbivc3unn5oljn.apps.googleusercontent.com
             client-secret: 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
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: vectronpl@gmail.com
+    password: bywjluxbzebpkyxz
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 logging:
   level:
