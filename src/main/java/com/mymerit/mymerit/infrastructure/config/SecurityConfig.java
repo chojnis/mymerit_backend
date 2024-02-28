@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new RestAuthenticationEntryPoint()))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/", "/auth/**")
+                        .requestMatchers("/", "/auth/**","**")
                             .permitAll()
                         .anyRequest()
                             .authenticated())
