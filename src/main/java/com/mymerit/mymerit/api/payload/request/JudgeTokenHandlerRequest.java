@@ -14,10 +14,10 @@ public class JudgeTokenHandlerRequest implements Serializable {
     private String stdout;
     private String status_id;
     private int language_id;
-    private int stderr;
+    private String stderr;
     private String compile_output;
 
-    public JudgeTokenHandlerRequest(String stdout, String status_id, int language_id, int stderr, String compile_output) {
+    public JudgeTokenHandlerRequest(String stdout, String status_id, int language_id, String stderr, String compile_output) {
         this.stdout = stdout;
         this.status_id = status_id;
         this.language_id = language_id;
