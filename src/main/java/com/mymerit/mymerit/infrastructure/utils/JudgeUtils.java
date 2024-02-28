@@ -2,8 +2,8 @@ package com.mymerit.mymerit.infrastructure.utils;
 
 public class JudgeUtils {
 
-    public int getLanguageNumber(String filename){
-        int langNumber;
+    public static int getLanguageNumber(String filename){
+
         int lastFullStopIndex = filename.lastIndexOf(".");
 
         String lang = filename.substring(lastFullStopIndex + 1);
@@ -11,8 +11,12 @@ public class JudgeUtils {
         switch(lang){
             case "c" :
                 return 75;
+            case "cpp" :
+                return 54;
+            case "java":
+                return 62;
             default:
-                return 0;
+                return 43;
 
     }
 

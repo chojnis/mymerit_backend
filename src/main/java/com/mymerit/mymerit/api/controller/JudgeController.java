@@ -2,6 +2,7 @@ package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.api.payload.request.JudgeTokenHandlerRequest;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
+import com.mymerit.mymerit.api.payload.request.SingleFileJudgeRequest;
 import com.mymerit.mymerit.domain.entity.File;
 import com.mymerit.mymerit.domain.service.JudgeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,22 +17,12 @@ public class JudgeController {
     }
 
     @PostMapping("/token")
-    private String getToken(@RequestBody File file){
-
-
-
-        return judgeService.generateTokenRequest(file);
-
+    private String getToken(@RequestBody SingleFileJudgeRequest fileRequest){
+        return judgeService.generateTokenRequest(fileRequest);
     }
 
-    @GetMapping("/tokenResponse/{token}")
+    @GetMapping("/token/{token}")
     private JudgeTokenHandlerRequest requestHandler(@PathVariable String token){
-
         return judgeService.generateRequestResponse(token);
     }
-
-
-
-
-
 }
