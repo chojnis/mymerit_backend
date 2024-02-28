@@ -1,9 +1,8 @@
 package com.mymerit.mymerit.domain.service;
 
-import com.mymerit.mymerit.api.payload.request.JudgeTokenHandlerRequest;
+import com.mymerit.mymerit.api.payload.request.JudgeCompilationResponse;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
 import com.mymerit.mymerit.api.payload.request.SingleFileJudgeRequest;
-import com.mymerit.mymerit.domain.entity.File;
 import com.mymerit.mymerit.infrastructure.utils.JudgeUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -11,8 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Base64;
 
 @Service
 public class JudgeService {
@@ -40,13 +37,13 @@ public class JudgeService {
     }
 
 
-    public JudgeTokenHandlerRequest generateRequestResponse(String token){
+    public JudgeCompilationResponse generateRequestResponse(String token){
 
         RestTemplate restTemplate = new RestTemplate();
-        String apiUrl = "http://localhost:2358/submissions/"+token+"?base64_encoded=true";
+        String apiUrl = "http://localhost:2358/submissions/"+token+"?base64_encoded=true&stdout";
 
 
-        ResponseEntity<JudgeTokenHandlerRequest> response = restTemplate.getForEntity(apiUrl, JudgeTokenHandlerRequest.class);
+        ResponseEntity<JudgeCompilationResponse> response = restTemplate.getForEntity(apiUrl, JudgeCompilationResponse.class);
         System.out.println(response.getBody().getStatus_id());
 
         return response.getBody();

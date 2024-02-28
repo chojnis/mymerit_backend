@@ -1,12 +1,8 @@
 package com.mymerit.mymerit.api.controller;
 
-import com.mymerit.mymerit.api.payload.request.JudgeTokenHandlerRequest;
-import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
+import com.mymerit.mymerit.api.payload.request.JudgeCompilationResponse;
 import com.mymerit.mymerit.api.payload.request.SingleFileJudgeRequest;
-import com.mymerit.mymerit.domain.entity.File;
 import com.mymerit.mymerit.domain.service.JudgeService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,7 +18,7 @@ public class JudgeController {
     }
 
     @GetMapping("/token/{token}")
-    private JudgeTokenHandlerRequest requestHandler(@PathVariable String token){
+    private JudgeCompilationResponse requestHandler(@PathVariable String token){
         return judgeService.generateRequestResponse(token);
     }
 }
