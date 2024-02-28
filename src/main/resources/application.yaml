@@ -40,7 +40,5 @@ logging:
 
 mymerit:
   app:
-    jwtSecret: ""
+    jwtSecret: "tw1oqyxkbjg1bmgn5ociiasmdo41xg3qx5q88w19scmazo90nfjslmxdsmgkzy04i3aicwgbjtyesrftnby9wwj3ydey3g6zegh1cjk9wgov5rvwb7zafxgn74ooebz0"
     jwtExpirationMs: "900000"
-
-

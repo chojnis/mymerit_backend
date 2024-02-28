@@ -14,7 +14,4 @@ public class HomeController {
     public String secured() {
         return "logged in";
     }
-
-
-
 }
