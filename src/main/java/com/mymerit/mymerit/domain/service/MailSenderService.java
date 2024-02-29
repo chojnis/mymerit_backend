@@ -1,4 +1,4 @@
-package com.mymerit.mymerit.mail;
+package com.mymerit.mymerit.domain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
