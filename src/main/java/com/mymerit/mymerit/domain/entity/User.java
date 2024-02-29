@@ -16,7 +16,7 @@ public class User {
     private String email;
     @NotBlank
     private String password;
-    private String point;
+    private String points;
     private String description;
     private String role;
 }
