@@ -4,18 +4,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-@Getter
 @Setter
-public class JudgeTokenRequest implements Serializable {
-
+@Getter
+public class JudgeTokenRequest {
     @NotBlank
-    private String token;
+    String fileName;
     @NotBlank
-    private String error;
-
-    public JudgeTokenRequest(String token, String error) {
-        this.token = token;
-        this.error = error;
-    }
+    String fileContentBase64;
+    @NotBlank
+    Boolean isMultiFile;
 }

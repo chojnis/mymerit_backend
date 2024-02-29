@@ -1,4 +1,4 @@
-package com.mymerit.mymerit.api.payload.request;
+package com.mymerit.mymerit.api.payload.response;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,7 +1,7 @@
 package com.mymerit.mymerit.api.controller;
 
-import com.mymerit.mymerit.api.payload.request.JudgeCompilationResponse;
-import com.mymerit.mymerit.api.payload.request.SingleFileJudgeRequest;
+import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
+import com.mymerit.mymerit.api.payload.response.JudgeCompilationResponse;
 import com.mymerit.mymerit.domain.service.JudgeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +13,7 @@ public class JudgeController {
     }
 
     @PostMapping("/token")
-    private String getToken(@RequestBody SingleFileJudgeRequest fileRequest){
+    private String getToken(@RequestBody JudgeTokenRequest fileRequest){
         return judgeService.generateTokenRequest(fileRequest);
     }
 
