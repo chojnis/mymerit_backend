@@ -31,7 +31,7 @@ public class SignUpController {
         if(userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Email address already in use."));
+                    .body(new ApiResponse(false, "Email address already in use"));
         }
 
         User user = new User();
@@ -49,6 +49,6 @@ public class SignUpController {
 
         return ResponseEntity
                 .created(location)
-                .body(new ApiResponse(true, "User registered successfully", null));
+                .body(new ApiResponse(true, "User registered successfully"));
     }
 }
