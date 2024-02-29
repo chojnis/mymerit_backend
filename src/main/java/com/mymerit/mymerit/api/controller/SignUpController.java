@@ -31,7 +31,7 @@ public class SignUpController {
         if(userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ApiResponse(false, "Email address already in use."));
+                    .body(new ApiResponse(false, "Email address already in use"));
         }
 
         User user = new User();
@@ -39,6 +39,7 @@ public class SignUpController {
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(signUpRequest.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole("user");
 
         User result = userRepository.insert(user);
 
