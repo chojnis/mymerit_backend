@@ -37,7 +37,7 @@ public class SignInController {
 
         return ResponseEntity.ok(new ApiResponse(
                 true,
-                "Logged in successfully.",
+                "Logged in successfully",
                 new JwtResponse(jwt)
         ));
     }
