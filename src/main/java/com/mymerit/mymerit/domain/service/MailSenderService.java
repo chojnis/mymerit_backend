@@ -45,7 +45,7 @@ public class MailSenderService {
         return matcher.matches();
     }
 
-    private Integer generateVerificationCode(){
+    public Integer generateVerificationCode(){
         int min = 1000; // Minimum value of range
         int max = 9999; // Maximum value of range
 
