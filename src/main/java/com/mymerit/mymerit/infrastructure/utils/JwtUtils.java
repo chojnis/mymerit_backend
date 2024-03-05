@@ -1,18 +1,19 @@
 package com.mymerit.mymerit.infrastructure.utils;
 
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-
-import java.security.Key;
-import java.util.Date;
-
-import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
 
 @Service
 public class JwtUtils {
@@ -24,45 +25,47 @@ public class JwtUtils {
     @Value("${mymerit.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
+    private SecretKey key() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
     public String generateJwtToken(Authentication authentication) {
 
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
         return Jwts.builder()
-                .setSubject((userPrincipal.getId()))
+                .subject(userPrincipal.getId())
                 .claim("role", userPrincipal.getRole())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(SignatureAlgorithm.HS256, key())
+                .issuedAt(new Date())
+                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key())
                 .compact();
     }
 
-    private Key key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
-    }
-
     public String getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(key())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            Claims claim = Jwts.parser()
+                    .verifyWith(key())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
 
-        return claims.getSubject();
+            return claim.getSubject();
+        } catch (JwtException ex) {
+            logger.error("JWT exception: {}", ex.getMessage());
+
+            return null;
+        }
     }
 
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(key()).build().parse(authToken);
+            Jwts.parser().verifyWith(key()).build().parseSignedClaims(authToken);
+
             return true;
-        } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
+        } catch (JwtException e) {
+            logger.error("JWT exception: {}", e.getMessage());
         }
 
         return false;
