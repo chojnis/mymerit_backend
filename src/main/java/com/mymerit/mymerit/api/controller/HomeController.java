@@ -9,9 +9,4 @@ public class HomeController {
     public String home() {
         return "home page";
     }
-
-    @GetMapping("/secured-resource")
-    public String secured() {
-        return "logged in";
-    }
 }
