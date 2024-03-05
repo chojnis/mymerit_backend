@@ -79,7 +79,11 @@ public class SignUpController {
         AuthenticationCode authenticationCode = new AuthenticationCode();
 
         authenticationCode.setEmail(emailVerification.getEmail());
-        authenticationCode.setCode(mailSenderService.generateVerificationCode());
+
+        do {
+            authenticationCode.setCode(mailSenderService.generateVerificationCode());
+        } while (authenticationCodeRepository.existsByCode(authenticationCode.getCode()));
+
         authenticationCode.setExpiration(LocalDateTime.now().plusMinutes(30));
 
         authenticationCodeRepository.insert(authenticationCode);
