@@ -16,7 +16,7 @@
 ## Installation
 
 ### Database
-1. ```cd database ```
+1. ```cd database```
 2. ```docker-compose up -d```
 
 **Note:** The database is available at [http://localhost:8081](http://localhost:8081). You need to create a database named _**mymerit**_.
