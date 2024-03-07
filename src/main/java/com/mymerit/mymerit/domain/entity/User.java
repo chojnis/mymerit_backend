@@ -19,4 +19,14 @@ public class User {
     private String points;
     private String description;
     private String role;
+    private Company company;
+
+
+
+
+public boolean isWorkingInCompany(){
+    return company != null;
+
+}
+
 }
