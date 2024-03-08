@@ -28,6 +28,8 @@ public class TaskService {
 
     public Optional<Task> findById(String id){
 
+
+        System.out.println("NIGER");
        return taskRepository.findById(id);
 
     }
@@ -40,7 +42,7 @@ public class TaskService {
 
 
             return solutions.stream()
-                    .filter(solution -> solution.getId().equals(solutionId))
+                    .filter(solution -> solution.getTaskId().equals(solutionId))
                     .findFirst();
         });
     }
