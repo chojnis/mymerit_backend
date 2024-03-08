@@ -4,10 +4,12 @@ import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.entity.Task;
 import com.mymerit.mymerit.infrastructure.repository.SolutionRepository;
 import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class SolutionService {
 
     TaskRepository taskRepository;
@@ -19,7 +21,9 @@ public class SolutionService {
         this.taskRepository = taskRepository;
     }
 
-
+    public List<Solution> getSolutionsForUser(String userId){
+        return this.solutionRepository.findAllByUserId(userId);
+    }
 
 
 
