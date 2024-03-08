@@ -11,6 +11,4 @@ public class JudgeTokenRequest {
     String fileName;
     @NotBlank
     String fileContentBase64;
-    @NotBlank
-    Boolean isMultiFile;
 }

@@ -22,17 +22,12 @@ public class JudgeService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         String requestBody;
-        if(judgeTokenRequest.getIsMultiFile()){
-            requestBody  = "{\n" +
-                    "  \"additional_files\": \"" + judgeTokenRequest.getFileContentBase64() + "\",\n" +
-                    "  \"language_id\": " + 89 + "\n" +
-                    "}";
-        }else{
-            requestBody  = "{\n" +
-                    "  \"source_code\": \"" + judgeTokenRequest.getFileContentBase64() + "\",\n" +
-                    "  \"language_id\": " + JudgeUtils.getLanguageNumber(judgeTokenRequest.getFileName()) + "\n" +
-                    "}";
-        }
+
+        requestBody  = "{\n" +
+                "  \"additional_files\": \"" + judgeTokenRequest.getFileContentBase64() + "\",\n" +
+                "  \"language_id\": " + 89 + "\n" +
+                "}";
+
 
         System.out.println(requestBody);
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
