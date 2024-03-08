@@ -77,11 +77,16 @@ public class TaskService {
 
 
 
-    public Page<Task> getTasks(Pageable pageable){
+    public Page<Task> getTasks(List<String> allowedTechnologies, Pageable pageable){
         return taskRepository.findAll(pageable);
     }
 
 
+    public Task addTask(Task task){
+        System.out.println(task);
+       return taskRepository.save(task);
+
+    }
 
 
 }

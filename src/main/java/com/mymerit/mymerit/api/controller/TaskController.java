@@ -6,6 +6,8 @@ import com.mymerit.mymerit.domain.entity.Task;
 
 import com.mymerit.mymerit.domain.service.TaskService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,25 +74,22 @@ public class TaskController {
 
 
 
- /*   @GetMapping("/tasks")
+    @GetMapping("")
     public ResponseEntity<List<Task>> getTasks(
             @RequestParam(required = false) List<String> languages,
-            @RequestParam(required = false) Integer minCredits,
-            @RequestParam(required = false) Integer maxCredits,
-            @RequestParam(required = false) Integer timeLeft,
-            @RequestParam(required = false) String order,
+
+           // @RequestParam(required = false) Integer timeLeft,
+            // @RequestParam(required = false) String order,
             @RequestParam(defaultValue = "0") int page) {
 
 
-          // jak to zrobic ?
 
-        Page<Task> taskPage = taskService.getTasks(languages, minCredits, maxCredits, timeLeft, order, PageRequest.of(page, 10));
+
+        Page<Task> taskPage = taskService.getTasks(languages,  PageRequest.of(page, 10));
         List<Task> tasks = taskPage.getContent();
 
         return ResponseEntity.ok(tasks);
     }
-
-*/
     @PostMapping("/{id}/solution")
     public ResponseEntity<String> addSolutionToTask(@PathVariable String id, @RequestBody Solution solutionX) {
 
@@ -105,6 +104,13 @@ public class TaskController {
         return ResponseEntity.ok("ok");
     }
 
+
+    @PostMapping("")
+    public ResponseEntity<Task> addTask(@RequestBody Task task){
+       return  ResponseEntity.ok(taskService.addTask(task));
+
+
+    }
 
 
 
