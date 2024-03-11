@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -106,18 +107,29 @@ public class TaskController {
 
     @GetMapping("/tasks")
     public ResponseEntity<List<Task>> getTasks(
-            @RequestParam(required = false) List<String> languages,
-
-           // @RequestParam(required = false) Integer timeLeft,
-            // @RequestParam(required = false) String order,
+            @RequestParam(required = false) Collection<List<String>> languages,
+            @RequestParam(defaultValue = "0") Integer minCredits,
+            @RequestParam(defaultValue = "9999") Integer maxCredits,
+            @RequestParam(defaultValue = "asc") String order,
             @RequestParam(defaultValue = "0") int page) {
 
+        Page<Task> taskPage;
 
 
+        System.out.println(languages);
+        System.out.println(minCredits);
+        System.out.println(maxCredits);
+        System.out.println(order);
 
-        Page<Task> taskPage = taskService.getTasks(languages,  PageRequest.of(page, 10));
+        if ("desc".equals(order)) {
+            taskPage = taskService.getTasksByOrderDesc(languages, minCredits, maxCredits, PageRequest.of(page, 10));
+        } else if ("asc".equals(order)) {
+            taskPage = taskService.getTasksByOrderAsc(languages, minCredits, maxCredits, PageRequest.of(page, 10));
+        } else {
+            taskPage = taskService.getTasks(languages, minCredits, maxCredits, PageRequest.of(page, 10));
+        }
+
         List<Task> tasks = taskPage.getContent();
-        System.out.println(tasks);
         return ResponseEntity.ok(tasks);
     }
     @PostMapping("/task/{id}/solution")

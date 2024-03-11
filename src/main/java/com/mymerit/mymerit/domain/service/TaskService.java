@@ -5,12 +5,15 @@ import com.mymerit.mymerit.domain.entity.Task;
 import com.mymerit.mymerit.domain.entity.TaskDTO;
 import com.mymerit.mymerit.infrastructure.repository.SolutionRepository;
 import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +30,6 @@ public class TaskService {
     }
 
     public Optional<Task> findById(String id){
-
-
         System.out.println("NIGER");
        return taskRepository.findById(id);
 
@@ -44,7 +45,8 @@ public class TaskService {
             return solutions.stream()
                     .filter(solution -> solution.getTaskId().equals(solutionId))
                     .findFirst();
-        });
+           }
+        );
     }
 
     public boolean deleteById(String id) {
@@ -65,29 +67,40 @@ public class TaskService {
         if(optionalTask.isPresent()){
 
            Task task = optionalTask.get();
-
            return task.getSolutions();
-
         }
-
        else return null;
-
-
     }
 
-
-
-
-
-    public Page<Task> getTasks(List<String> allowedTechnologies, Pageable pageable){
-        return taskRepository.findAll(pageable);
+    public Page<Task> getTasks(Collection<List<String>> allowedTechnologies,Integer minReward, Integer maxReward , Pageable pageable) {
+        return taskRepository.findAllByAllowedTechnologiesInAndRewardBetween(allowedTechnologies,minReward,maxReward,pageable);
     }
-
 
     public Task addTask(Task task){
         System.out.println(task);
        return taskRepository.save(task);
 
+    }
+
+    public Page<Task> getTasksByOrderDesc(Collection<@NotEmpty List<String>> allowedTechnologies,
+                                          Integer minReward,
+                                          Integer maxReward,
+                                          Pageable pageable){
+
+        return taskRepository.findAllByAllowedTechnologiesInAndRewardBetweenOrderByRewardDesc(allowedTechnologies,minReward,maxReward,pageable);
+    }
+    public Page<Task> getTasksByOrderAsc(Collection<@NotEmpty List<String>> allowedTechnologies,
+                                          Integer minReward,
+                                          Integer maxReward,
+                                          Pageable pageable){
+
+        System.out.println(taskRepository.findAllByAllowedTechnologiesInAndRewardBetweenOrderByRewardAsc(allowedTechnologies,minReward,maxReward,pageable));
+
+        return taskRepository.findAllByAllowedTechnologiesInAndRewardBetweenOrderByRewardAsc(allowedTechnologies,minReward,maxReward,pageable);
+    }
+
+    public Page<Task> getAll(Pageable pageable){
+        return taskRepository.findAll(pageable);
     }
 
 
