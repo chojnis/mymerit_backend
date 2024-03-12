@@ -109,13 +109,10 @@ public class TaskController {
             @RequestParam(defaultValue = "0") int page,
             @SortDefault(sort = "reward", direction = Sort.Direction.DESC) Sort sort
     ) {
-        List<String> normalizedTechnologies =  technologies.stream()
-                                                           .map(String::toLowerCase)
-                                                           .toList();
         PageRequest pageRequest = PageRequest.of(page, 10, sort);
         Range<Integer> rewardRange = Range.of(Range.Bound.inclusive(minCredits), Range.Bound.inclusive(maxCredits));
 
-        return ResponseEntity.ok(taskService.getTasks(normalizedTechnologies, rewardRange, pageRequest));
+        return ResponseEntity.ok(taskService.getTasks(technologies, rewardRange, pageRequest));
     }
 
 
