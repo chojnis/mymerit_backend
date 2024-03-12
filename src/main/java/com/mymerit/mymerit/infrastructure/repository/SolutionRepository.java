@@ -2,7 +2,6 @@ package com.mymerit.mymerit.infrastructure.repository;
 
 import com.mymerit.mymerit.domain.entity.Solution;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
@@ -12,6 +11,6 @@ public interface SolutionRepository extends MongoRepository<Solution, String> {
 
     public Optional<Solution> getSolutionById(String idTask, String idSolution);
 
-    Page<Solution> findAllByTaskId(String taskId, Pageable pageable);
+    
     List<Solution> findAllByUserId(String userId);
 }

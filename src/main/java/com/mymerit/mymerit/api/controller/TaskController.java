@@ -21,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -29,15 +28,14 @@ public class TaskController {
     TaskService taskService;
     UserDetailsServiceImpl userDetailsService;
     SolutionService solutionService;
-
-    TaskController(TaskService taskService, UserDetailsServiceImpl userDetailsService, SolutionService solutionService) {
+    TaskController(TaskService taskService, UserDetailsServiceImpl userDetailsService, SolutionService solutionService){
         this.taskService = taskService;
         this.userDetailsService = userDetailsService;
         this.solutionService = solutionService;
     }
 
     @GetMapping("/task/{id}")
-    ResponseEntity<UserTaskResponse> getTaskById(@PathVariable String id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    ResponseEntity<UserTaskResponse> getTaskById(@PathVariable String id, @AuthenticationPrincipal UserDetailsImpl userDetails){
         String userId = userDetails.getId();
         List<Solution> solutionList = solutionService.getSolutionsForUser(userId);
 
@@ -66,9 +64,9 @@ public class TaskController {
         return ResponseEntity.ok().body(taskResponse);
     }
 
-    @GetMapping("/task/{taskId}/solutions/{solutionId}")
-    ResponseEntity<Solution> getSolutionById(@PathVariable String taskId, @PathVariable String solutionId) {
-        return taskService.findSolutionById(taskId, solutionId).map(solution -> ResponseEntity.ok().body(solution))
+    @GetMapping("/task/{taskId}/solution/{solutionId}")
+    ResponseEntity<Solution> getSolutionById(@PathVariable String taskId, @PathVariable String solutionId){
+        return taskService.findSolutionById(taskId,solutionId).map(solution -> ResponseEntity.ok().body(solution))
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -102,7 +100,7 @@ public class TaskController {
         }
     }
 
-
+    //np http://localhost:8080/tasks?technologies=Python&page=0&sort=releaseDate,desc
     @GetMapping("/tasks")
     public ResponseEntity<Page<Task>> getTasks(
             @RequestParam(defaultValue = "") ArrayList<String> technologies,
@@ -118,26 +116,9 @@ public class TaskController {
     }
 
 
+
     @PostMapping("/task")
-    public ResponseEntity<Task> addTask(@RequestBody Task task) {
-        return ResponseEntity.ok(taskService.addTask(task));
+    public ResponseEntity<Task> addTask(@RequestBody Task task){
+       return  ResponseEntity.ok(taskService.addTask(task));
     }
-
-    @GetMapping("/task/{taskId}/solutions")
-    public ResponseEntity<Page<Solution>> getSolutionsByTaskId(@PathVariable(required = false) String taskId,
-                                                               @RequestParam(defaultValue = "0") int page) {
-
-        PageRequest pageRequest = PageRequest.of(page, 10);
-        return ResponseEntity.ok(solutionService.getSolutionsByTaskId(taskId, pageRequest));
-
-
-    }
-
-    @PostMapping("/addTask/{taskId}")
-    public ResponseEntity<Solution> addSolution(@PathVariable String taskId,@RequestBody Solution solution){
-
-        return  ResponseEntity.ok(taskService.addSolution(taskId,solution));
-    }
-
 }
-

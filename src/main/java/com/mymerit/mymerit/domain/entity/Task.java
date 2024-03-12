@@ -39,10 +39,10 @@ public class Task {
 
     private Integer timeLeft;
 
-    public Task(String topic, String description,LocalDateTime releaseDate, LocalDateTime expiryDate, Integer reward, Company company, List<String> allowedTechnologies) {
+    public Task(String topic, String description, LocalDateTime expiryDate, Integer reward, Company company, List<String> allowedTechnologies) {
         this.topic = topic;
         this.description = description;
-        this.releaseDate = releaseDate;
+        this.releaseDate = LocalDateTime.now();
         this.expiryDate = expiryDate;
         this.company = company;
         this.allowedTechnologies = allowedTechnologies;
@@ -52,9 +52,5 @@ public class Task {
 
     public Integer getSolutionCount() {
         return solutions.size();
-    }
-
-    public void addSolution(Solution solution){
-        solutions.add(solution);
     }
 }
