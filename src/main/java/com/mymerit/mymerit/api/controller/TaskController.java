@@ -11,15 +11,17 @@ import com.mymerit.mymerit.domain.service.TaskService;
 
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.domain.service.UserDetailsServiceImpl;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class TaskController {
@@ -98,41 +100,25 @@ public class TaskController {
         }
     }
 
+    //np http://localhost:8080/tasks?technologies=Python&page=0&sort=releaseDate,desc
     @GetMapping("/tasks")
-    public ResponseEntity<List<Task>> getTasks(
-            @RequestParam(required = false) Collection<List<String>> languages,
+    public ResponseEntity<Page<Task>> getTasks(
+            @RequestParam(defaultValue = "") ArrayList<String> technologies,
             @RequestParam(defaultValue = "0") Integer minCredits,
             @RequestParam(defaultValue = "9999") Integer maxCredits,
-            @RequestParam(defaultValue = "asc") String order,
-            @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page,
+            @SortDefault(sort = "reward", direction = Sort.Direction.DESC) Sort sort
+    ) {
+        List<String> normalizedTechnologies =  technologies.stream()
+                                                           .map(String::toLowerCase)
+                                                           .toList();
+        PageRequest pageRequest = PageRequest.of(page, 10, sort);
+        Range<Integer> rewardRange = Range.of(Range.Bound.inclusive(minCredits), Range.Bound.inclusive(maxCredits));
 
-        Page<Task> taskPage;
-
-
-        System.out.println(languages);
-        System.out.println(minCredits);
-        System.out.println(maxCredits);
-        System.out.println(order);
-
-        if ("desc".equals(order)) {
-            taskPage = taskService.getTasksByOrderDesc(languages, minCredits, maxCredits, PageRequest.of(page, 10));
-        } else if ("asc".equals(order)) {
-            taskPage = taskService.getTasksByOrderAsc(languages, minCredits, maxCredits, PageRequest.of(page, 10));
-        } else {
-            taskPage = taskService.getTasks(languages, minCredits, maxCredits, PageRequest.of(page, 10));
-        }
-
-        List<Task> tasks = taskPage.getContent();
-        return ResponseEntity.ok(tasks);
+        return ResponseEntity.ok(taskService.getTasks(normalizedTechnologies, rewardRange, pageRequest));
     }
 
-    @PostMapping("/task/{id}/solution")
-    public ResponseEntity<Solution> addSolutionToTask(@PathVariable String id, @RequestBody SolutionRequest solution, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        String userId = userDetails.getId();
-        //jakies gety
-        Solution solutionRes = new Solution(id, userId,solution.getFiles());
-        return ResponseEntity.ok(solutionRes);
-    }
+
 
     @PostMapping("/task")
     public ResponseEntity<Task> addTask(@RequestBody Task task){

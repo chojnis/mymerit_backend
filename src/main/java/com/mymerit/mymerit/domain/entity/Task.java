@@ -1,74 +1,56 @@
 package com.mymerit.mymerit.domain.entity;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.bson.codecs.jsr310.LocalDateTimeCodec;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-
 
 @Data
-
 @Document("tasks")
 public class Task {
 
-    @Id        public String id;
+    @Id
+    private String id;
 
-    @NotNull   public String topic;
+    @NotNull
+    private String topic;
 
-    @NotNull   public String description;
+    @NotNull
+    private String description;
 
-               public LocalDateTime releaseDate;
+    private LocalDateTime releaseDate;
 
-               public LocalDateTime expiryDate;
+    @NotNull
+    private LocalDateTime expiryDate;
 
-    @NotNull  public Integer reward;
+    @NotNull
+    private Integer reward;
 
-    @NotNull   public Company company;
+    @NotNull
+    private Company company;
 
+    @NotEmpty
+    private List<String> allowedTechnologies;
 
+    private List<Solution> solutions;
 
-    @NotEmpty  public List<String> allowedTechnologies;
+    private Integer timeLeft;
 
-               public List<Solution> solutions;
+    public Task(String topic, String description, LocalDateTime expiryDate, Integer reward, Company company, List<String> allowedTechnologies) {
+        this.topic = topic;
+        this.description = description;
+        this.releaseDate = LocalDateTime.now();
+        this.expiryDate = expiryDate;
+        this.company = company;
+        this.allowedTechnologies = allowedTechnologies;
+        this.reward = reward;
+        this.solutions = new ArrayList<>();
+    }
 
-               public Integer timeLeft;
-
-
-
-
-        public Task(String topic, String description, LocalDateTime expiryDate, Integer reward, Company company,
-                    List<String> allowedTechnologies
-                 ){
-
-            this.topic = topic;
-            this.description = description;
-            this.releaseDate = LocalDateTime.now();
-            this.expiryDate  = expiryDate;
-            this.company = company;
-
-            this.allowedTechnologies = allowedTechnologies;
-
-            this.reward = reward;
-            this.solutions = new ArrayList<>();
-
-
-
-        }
-
-        public Integer getSolutionCount(){
-            return  solutions.size();
-        }
-
+    public Integer getSolutionCount() {
+        return solutions.size();
+    }
 }
