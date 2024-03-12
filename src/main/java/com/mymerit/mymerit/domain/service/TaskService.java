@@ -89,4 +89,17 @@ public class TaskService {
         return taskRepository.findAll(pageable);
     }
 
+
+
+
+
+    public Solution addSolution(String taskId, Solution solution) {
+        if(findById(taskId).isPresent()) {
+            Task task = findById(taskId).get();
+            task.addSolution(solution);
+           taskRepository.save(task);
+       }
+      return solution;
+   }
+
 }

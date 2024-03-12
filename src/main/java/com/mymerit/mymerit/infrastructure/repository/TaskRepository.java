@@ -15,9 +15,9 @@ import java.util.List;
 public interface TaskRepository extends MongoRepository<Task, String> {
 
 
-    Page<Task> findAllByAllowedTechnologiesContainingIgnoreCaseAndRewardBetween( //  IN => Containing
+    Page<Task> findAllByAllowedTechnologiesContainingIgnoreCaseAndRewardBetween(
             @NotEmpty List<String> allowedTechnologies,
-            Range<Integer> range, //bo, nie bylo >= x <= tylko > x <
+            Range<Integer> range,
             Pageable pageable
     );
 
@@ -25,6 +25,7 @@ public interface TaskRepository extends MongoRepository<Task, String> {
             Range<Integer> range,
             Pageable pageable
     );
+
 
 
 
