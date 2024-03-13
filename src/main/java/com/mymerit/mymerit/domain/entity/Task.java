@@ -11,46 +11,44 @@ import java.util.List;
 @Data
 @Document("tasks")
 public class Task {
-
     @Id
     private String id;
 
-    @NotNull
-    private String topic;
+    @NotBlank(message = "Title is required")
+    private String title;
 
-    @NotNull
-    private String description;
+    @NotBlank(message = "Instructions are required")
+    private String instructions;
 
-    private LocalDateTime releaseDate;
+    @NotNull(message = "Opening time is required")
+    private LocalDateTime opensAt;
 
-    @NotNull
-    private LocalDateTime expiryDate;
+    @NotNull(message = "Closing time is required")
+    private LocalDateTime closesAt;
 
-    @NotNull
+    @NotNull(message = "Reward is required")
     private Integer reward;
 
-    @NotNull
-    private Company company;
+    @NotEmpty(message = "Allowed languages are required")
+    private List<String> allowedLanguages;
 
-    @NotEmpty
-    private List<String> allowedTechnologies;
+    private List<Solution> solutions = new ArrayList<>();
 
-    private List<Solution> solutions;
-
-    private Integer timeLeft;
-
-    public Task(String topic, String description, LocalDateTime expiryDate, Integer reward, Company company, List<String> allowedTechnologies) {
-        this.topic = topic;
-        this.description = description;
-        this.releaseDate = LocalDateTime.now();
-        this.expiryDate = expiryDate;
-        this.company = company;
-        this.allowedTechnologies = allowedTechnologies;
+    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, List<String> allowedLanguages) {
+        this.title = title;
+        this.instructions = instructions;
+        this.opensAt = opensAt;
+        this.closesAt = closesAt;
         this.reward = reward;
-        this.solutions = new ArrayList<>();
+        this.allowedLanguages = allowedLanguages;
     }
 
     public Integer getSolutionCount() {
         return solutions.size();
+    }
+
+    public Boolean isOpen(){
+        var now = LocalDateTime.now();
+        return this.getClosesAt().isAfter(now) && this.getOpensAt().isBefore(now);
     }
 }

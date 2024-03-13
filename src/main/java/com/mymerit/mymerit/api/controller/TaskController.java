@@ -1,8 +1,6 @@
 package com.mymerit.mymerit.api.controller;
 
 
-import com.mymerit.mymerit.api.payload.request.SolutionRequest;
-import com.mymerit.mymerit.api.payload.response.UserTaskResponse;
 import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.entity.Task;
 
@@ -11,7 +9,6 @@ import com.mymerit.mymerit.domain.service.TaskService;
 
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.domain.service.UserDetailsServiceImpl;
-import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Range;
@@ -51,13 +48,12 @@ public class TaskController {
                 foundTask.getId(),
                 foundTask.getTopic(),
                 foundTask.getDescription(),
-                foundTask.getReleaseDate(),
-                foundTask.getExpiryDate(),
+                foundTask.getOpensAt(),
+                foundTask.getClosesAt(),
                 foundTask.getReward(),
                 foundTask.getCompany(),
                 foundTask.getAllowedTechnologies(),
-                foundSolution,
-                foundTask.getTimeLeft()
+                foundSolution
         );
 
 
@@ -103,16 +99,16 @@ public class TaskController {
     //np http://localhost:8080/tasks?technologies=Python&page=0&sort=releaseDate,desc
     @GetMapping("/tasks")
     public ResponseEntity<Page<Task>> getTasks(
-            @RequestParam(defaultValue = "") ArrayList<String> technologies,
+            @RequestParam(defaultValue = "") ArrayList<String> languages,
             @RequestParam(defaultValue = "0") Integer minCredits,
             @RequestParam(defaultValue = "9999") Integer maxCredits,
             @RequestParam(defaultValue = "0") int page,
             @SortDefault(sort = "reward", direction = Sort.Direction.DESC) Sort sort
     ) {
-        PageRequest pageRequest = PageRequest.of(page, 10, sort);
+        PageRequest pageRequest = PageRequest.of(page, 3, sort);
         Range<Integer> rewardRange = Range.of(Range.Bound.inclusive(minCredits), Range.Bound.inclusive(maxCredits));
 
-        return ResponseEntity.ok(taskService.getTasks(technologies, rewardRange, pageRequest));
+        return ResponseEntity.ok(taskService.getTasks(languages, rewardRange, pageRequest));
     }
 
 
