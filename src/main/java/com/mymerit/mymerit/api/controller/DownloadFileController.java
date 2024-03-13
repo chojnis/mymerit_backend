@@ -15,7 +15,7 @@ import com.mymerit.mymerit.api.payload.response.ApiResponse;
 
 import java.io.IOException;
 
-@RestController // @CrossOrigin("*")
+@RestController 
 @RequestMapping("/auth")
 public class DownloadFileController {
 
@@ -23,17 +23,9 @@ public class DownloadFileController {
     private DownloadFileService fileService;
 
     @PostMapping("/file/upload")
-    public ResponseEntity<?> upload(@RequestParam("file")MultipartFile file) throws IOException {
-        return new ResponseEntity<>(fileService.addFile(file), HttpStatus.OK);
+    public ResponseEntity<?> upload(@RequestParam("file")MultipartFile file, @RequestParam("filename") String filename ) throws IOException {
+        return new ResponseEntity<>(fileService.addFile(file, filename), HttpStatus.OK);
     }
-
-    /*
-    @PostMapping("/upload")
-    public ResponseEntity<?> upload(@RequestParam("file")MultipartFile file) throws IOException {
-        fileService.addFile(file);
-        return ResponseEntity.body(new ApiResponse(true, "User registered successfully"));
-    }
-    */
 
     @GetMapping("/file/download/{id}")
     public ResponseEntity<ByteArrayResource> download(@PathVariable String id) throws IOException {

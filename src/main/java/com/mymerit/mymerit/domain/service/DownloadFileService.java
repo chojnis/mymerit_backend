@@ -24,12 +24,12 @@ public class DownloadFileService {
     @Autowired
     private GridFsOperations operations;
 
-    public String addFile(MultipartFile upload) throws IOException {
+    public String addFile(MultipartFile upload, String filename) throws IOException {
 
         DBObject metadata = new BasicDBObject();
         metadata.put("fileSize", upload.getSize());
 
-        Object fileID = template.store(upload.getInputStream(), upload.getOriginalFilename(), upload.getContentType(), metadata);
+        Object fileID = template.store(upload.getInputStream(), filename, upload.getContentType(), metadata);
 
         return fileID.toString();
     }
