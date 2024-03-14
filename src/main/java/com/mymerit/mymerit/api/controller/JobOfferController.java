@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 public class JobOfferController {
@@ -32,27 +33,24 @@ public class JobOfferController {
     ResponseEntity<JobOffer> addJobOffer(@RequestBody @Valid JobOffer jobOffer){
         return ResponseEntity.ok(jobOfferService.addJobOffer(jobOffer));
     }
+
     @GetMapping("/jobs")
     ResponseEntity<Page<JobOfferListResponse>> jobOffers(
-            @RequestParam(defaultValue = "*") List<String> technologies,
+            @RequestParam(defaultValue = "*") Set<String> languages,
             @RequestParam(defaultValue = "0") int page ,
-            @RequestParam(defaultValue = "0") Integer salaryMin,
-            @RequestParam(defaultValue = "99999")Integer salaryMax,
-            @RequestParam(defaultValue = "0")Integer creditsMin,
-            @RequestParam(defaultValue = "99999")Integer creditsMax){
+            @RequestParam(defaultValue = "0") Integer minSalary,
+            @RequestParam(defaultValue = "99999")Integer maxSalary,
+            @RequestParam(defaultValue = "0")Integer minCredits,
+            @RequestParam(defaultValue = "99999")Integer maxCredits){
 
-        Range<Integer> salaryRange = Range.of(Range.Bound.inclusive(salaryMin), Range.Bound.inclusive(salaryMax));
-        Range<Integer> creditsRange = Range.of(Range.Bound.inclusive(creditsMin), Range.Bound.inclusive(creditsMax));
+        Range<Integer> salaryRange = Range.of(Range.Bound.inclusive(minSalary), Range.Bound.inclusive(maxSalary));
+        Range<Integer> creditsRange = Range.of(Range.Bound.inclusive(minCredits), Range.Bound.inclusive(maxCredits));
         PageRequest pageRequest = PageRequest.of(page, 10);
 
-        Page<JobOfferListResponse> jobOffersPage = jobOfferService.getJobOffers(technologies,salaryRange,creditsRange, pageRequest);
+        Page<JobOfferListResponse> jobOffersPage = jobOfferService.getJobOffers(languages,salaryRange,creditsRange, pageRequest);
 
         return ResponseEntity.ok(jobOffersPage);
     }
-
-
-
-
 
 }
 

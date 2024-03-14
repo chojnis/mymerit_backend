@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -71,8 +72,8 @@ public class JobOfferService {
         );
     }
 
-    public Page<JobOfferListResponse> getJobOffers(List<String> technologies, Range<Integer> salaryRange, Range<Integer> creditsRange, Pageable pageable) {
-        return jobOfferRepository.findAllByTechnologiesContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(technologies,salaryRange,creditsRange, pageable)
+    public Page<JobOfferListResponse> getJobOffers(Set<String> languages, Range<Integer> salaryRange, Range<Integer> creditsRange, Pageable pageable) {
+        return jobOfferRepository.findAllByTaskAllowedLanguagesContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(languages,salaryRange,creditsRange, pageable)
                 .map(this::createJobOfferListResponse);
     }
 

@@ -57,7 +57,6 @@ public class JobOffer {
         this.preferredSkills = preferredSkills;
         this.workLocations = workLocations;
         this.technologies = technologies;
-        this.technologies.add("*");
         this.company = company;
         this.task = task;
         this.experience = experience;

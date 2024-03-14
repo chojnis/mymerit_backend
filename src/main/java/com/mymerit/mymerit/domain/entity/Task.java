@@ -42,6 +42,7 @@ public class Task {
         this.closesAt = closesAt;
         this.reward = reward;
         this.allowedLanguages = allowedLanguages;
+        this.allowedLanguages.add("*");
     }
 
     public Integer getSolutionCount() {
