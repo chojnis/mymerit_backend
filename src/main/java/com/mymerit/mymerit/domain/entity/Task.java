@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Document("tasks")
@@ -30,11 +31,11 @@ public class Task {
     private Integer reward;
 
     @NotEmpty(message = "Allowed languages are required")
-    private List<String> allowedLanguages;
+    private Set<String> allowedLanguages;
 
     private List<Solution> solutions = new ArrayList<>();
 
-    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, List<String> allowedLanguages) {
+    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages) {
         this.title = title;
         this.instructions = instructions;
         this.opensAt = opensAt;

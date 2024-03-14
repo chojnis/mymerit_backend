@@ -20,7 +20,6 @@ public interface JobOfferRepository extends MongoRepository<JobOffer, String> {
     Optional<JobOffer> findById(String id);
 
 
-
     Page<JobOffer> findAllByTechnologiesContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(List<String> technologies,
                                                                              Range<Integer> salaryRange ,
                                                                              Range<Integer> creditsRange,

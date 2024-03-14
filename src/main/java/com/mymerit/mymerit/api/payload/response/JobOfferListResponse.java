@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -20,10 +21,10 @@ public class JobOfferListResponse {
     private String jobTitle;
 
     @NotEmpty
-    private List<String> workLocations;
+    private Set<String> workLocations;
 
     @NotEmpty
-    private List<String> technologies;
+    private Set<String> technologies;
 
     @NotNull
     private Integer reward;

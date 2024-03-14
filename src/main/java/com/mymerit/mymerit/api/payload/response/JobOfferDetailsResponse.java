@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -23,16 +24,16 @@ public class JobOfferDetailsResponse {
     private String description;
 
     @NotEmpty
-    private List<String> requiredSkills;
+    private Set<String> requiredSkills;
 
     @NotEmpty
-    private List<String> preferredSkills;
+    private Set<String> preferredSkills;
 
     @NotEmpty
-    private List<String> workLocations;
+    private Set<String> workLocations;
 
     @NotEmpty
-    private List<String> technologies;
+    private Set<String> technologies;
 
     @NotNull
     @Valid

@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Range;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Document("job_offers")
@@ -21,16 +22,16 @@ public class JobOffer {
     private String description;
 
     @NotEmpty(message = "Required skills are required")
-    private List<String> requiredSkills;
+    private Set<String> requiredSkills;
 
     @NotEmpty(message = "Preferred skills are required")
-    private List<String> preferredSkills;
+    private Set<String> preferredSkills;
 
     @NotEmpty(message = "Work locations are required")
-    private List<String> workLocations;
+    private Set<String> workLocations;
 
     @NotEmpty(message = "Technologies are required")
-    private List<String> technologies;
+    private Set<String> technologies;
 
     @NotNull(message = "Experience is required")
     private Experience experience;
@@ -49,7 +50,7 @@ public class JobOffer {
     @NotNull(message = "Mode is required")
     private WorkMode mode;
 
-    public JobOffer(String jobTitle, String description, List<String> requiredSkills, List<String> preferredSkills, List<String> workLocations, List<String> technologies, Company company, Task task, Experience experience,WorkMode mode) {
+    public JobOffer(String jobTitle, String description, Set<String> requiredSkills, Set<String> preferredSkills, Set<String> workLocations, Set<String> technologies, Company company, Task task, Experience experience, WorkMode mode, Integer salary) {
         this.jobTitle = jobTitle;
         this.description = description;
         this.requiredSkills = requiredSkills;
@@ -61,6 +62,7 @@ public class JobOffer {
         this.task = task;
         this.experience = experience;
         this.mode = mode;
+        this.salary = salary;
     }
 
 
