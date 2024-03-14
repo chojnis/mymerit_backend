@@ -37,4 +37,9 @@ public class JobOfferListResponse {
     @NotNull
     @Valid
     private Company company;
+
+    @NotNull
+    private Integer salary;
+
+
 }

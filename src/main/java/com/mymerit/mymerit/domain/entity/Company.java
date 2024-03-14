@@ -14,6 +14,6 @@ public class Company {
     public  List<User> employees;
     private Integer creditsAmount;
     public  List<String> technologies;
-    public List<Task> tasks;
+    public List<JobOffer> jobOffers;
 
 }

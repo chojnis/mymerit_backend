@@ -39,4 +39,7 @@ public class JobOfferDetailsResponse {
     private Company company;
 
     private Task task; //w zaleznosci od isOpen : null lub Task
+
+    @NotEmpty
+    private Integer salary;
 }

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Range;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
@@ -42,19 +43,35 @@ public class JobOffer {
     @Valid
     private Task task;
 
-    public JobOffer(String jobTitle, String description, List<String> requiredSkills, List<String> preferredSkills, List<String> workLocations, List<String> technologies, Company company, Task task) {
+    @NotNull(message = "Salary is required")
+    private Integer salary;
+
+    @NotNull(message = "Mode is required")
+    private WorkMode mode;
+
+    public JobOffer(String jobTitle, String description, List<String> requiredSkills, List<String> preferredSkills, List<String> workLocations, List<String> technologies, Company company, Task task, Experience experience,WorkMode mode) {
         this.jobTitle = jobTitle;
         this.description = description;
         this.requiredSkills = requiredSkills;
         this.preferredSkills = preferredSkills;
         this.workLocations = workLocations;
         this.technologies = technologies;
+        this.technologies.add("*");
         this.company = company;
         this.task = task;
+        this.experience = experience;
+        this.mode = mode;
     }
+
+
+
 }
 
 
 enum Experience{
     INTERN, JUNIOR, REGULAR, SENIOR, EXPERT
+}
+
+enum WorkMode{
+    STATIONARY,REMOTE,MIXED
 }
