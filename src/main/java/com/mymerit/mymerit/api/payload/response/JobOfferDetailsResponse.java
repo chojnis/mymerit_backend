@@ -2,7 +2,7 @@ package com.mymerit.mymerit.api.payload.response;
 
 import com.mymerit.mymerit.domain.entity.Company;
 import com.mymerit.mymerit.domain.entity.EmploymentType;
-import com.mymerit.mymerit.domain.entity.Experience;
+import com.mymerit.mymerit.domain.entity.Experience1;
 import com.mymerit.mymerit.domain.entity.Task;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -49,7 +48,7 @@ public class JobOfferDetailsResponse {
     private Integer salary;
 
     @NotNull
-    private Experience experience;
+    private Experience1 experience;
 
     @NotNull
     private EmploymentType employmentType;

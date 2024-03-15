@@ -8,6 +8,8 @@ import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.entity.Task;
 import com.mymerit.mymerit.domain.entity.User;
 import com.mymerit.mymerit.infrastructure.repository.JobOfferRepository;
+import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
@@ -22,9 +24,11 @@ import java.util.Set;
 @Service
 public class JobOfferService {
     JobOfferRepository jobOfferRepository;
+    UserRepository userRepository;
 
-    JobOfferService(JobOfferRepository jobOfferRepository){
+    JobOfferService(JobOfferRepository jobOfferRepository,UserRepository userRepository){
         this.jobOfferRepository = jobOfferRepository;
+        this.userRepository = userRepository;
     }
 
     public JobOffer addJobOffer(JobOffer jobOffer){
@@ -82,9 +86,14 @@ public class JobOfferService {
     }
 
 
-    public JobOffer addSolution(String jobOfferId,Solution solution){
+    public JobOffer addSolution(String jobOfferId,SolutionRequest solutionRequest, String userId){
+
+
 
         if(jobOfferRepository.findById(jobOfferId).isPresent()) {
+            Task task = jobOfferRepository.findById(jobOfferId).get().getTask();
+            Solution solution = new Solution(task,userRepository.findById(userId).get(),solutionRequest.getFiles());
+
             JobOffer jobOffer = jobOfferRepository.findById(jobOfferId).get();
             jobOffer.getTask().addSolution(solution);
 

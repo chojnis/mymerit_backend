@@ -1,10 +1,12 @@
 package com.mymerit.mymerit.api.controller;
 
+import com.mymerit.mymerit.api.payload.request.SolutionRequest;
 import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
 import com.mymerit.mymerit.domain.entity.JobOffer;
 import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.service.JobOfferService;
+import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Range;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -48,7 +51,7 @@ public class JobOfferController {
             @RequestParam(defaultValue = "99999") Integer maxCredits,
             @SortDefault(sort = "openDate", direction = Sort.Direction.DESC) Sort sort){
 
-        
+
 
 
         Range<Integer> salaryRange = Range.of(Range.Bound.inclusive(minSalary), Range.Bound.inclusive(maxSalary));
@@ -62,9 +65,9 @@ public class JobOfferController {
 
 
     @PostMapping("/job/solution/{jobOfferId}")
-    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestBody Solution solution){
+    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestBody SolutionRequest solutionRequest,@AuthenticationPrincipal UserDetailsImpl userDetails){
 
-        return ResponseEntity.ok(jobOfferService.addSolution(jobOfferId,solution));
+        return ResponseEntity.ok(jobOfferService.addSolution(jobOfferId,solutionRequest,userDetails.getId()));
 
     }
 

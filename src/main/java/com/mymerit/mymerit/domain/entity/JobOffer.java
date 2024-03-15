@@ -34,7 +34,7 @@ public class JobOffer {
     private Set<String> technologies;
 
     @NotNull(message = "Experience is required")
-    private Experience experience;
+    private Experience1 experience;
 
     @NotNull(message = "Company is required")
     @Valid
@@ -51,7 +51,7 @@ public class JobOffer {
     @NotNull(message = "Employment Type is required")
     private EmploymentType mode;
 
-    public JobOffer(String jobTitle, String description, Set<String> requiredSkills, Set<String> preferredSkills, Set<String> workLocations, Set<String> technologies, Company company, Task task, Experience experience, EmploymentType mode, Integer salary) {
+    public JobOffer(String jobTitle, String description, Set<String> requiredSkills, Set<String> preferredSkills, Set<String> workLocations, Set<String> technologies, Company company, Task task, Experience1 experience, EmploymentType mode, Integer salary) {
         this.jobTitle = jobTitle;
         this.description = description;
         this.requiredSkills = requiredSkills;
