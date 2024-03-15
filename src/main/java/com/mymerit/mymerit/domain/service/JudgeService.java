@@ -43,7 +43,7 @@ public class JudgeService {
     public JudgeCompilationResponse generateRequestResponse(String token){
 
         RestTemplate restTemplate = new RestTemplate();
-        String apiUrl = "http://localhost:2358/submissions/"+token+"?base64_encoded=true&stdout";
+        String apiUrl = "http://localhost:2358/submissions/"+token+"?base64_encoded=true";
 
 
         ResponseEntity<JudgeCompilationResponse> response = restTemplate.getForEntity(apiUrl, JudgeCompilationResponse.class);

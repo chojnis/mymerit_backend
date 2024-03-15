@@ -54,7 +54,11 @@ public class JobOfferService {
                 jobOffer.getTechnologies(),
                 jobOffer.getCompany(),
                 jobOffer.getTask().isOpen() ? jobOffer.getTask() : null,
-                jobOffer.getSalary()
+                jobOffer.getSalary(),
+                jobOffer.getExperience(),
+                jobOffer.getMode(),
+                jobOffer.getTask().getOpensAt(),
+                jobOffer.getTask().getClosesAt()
         );
     }
 

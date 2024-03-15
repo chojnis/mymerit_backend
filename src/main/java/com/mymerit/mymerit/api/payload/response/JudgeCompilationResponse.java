@@ -8,12 +8,6 @@ import java.io.Serializable;
 @Setter
 public class JudgeCompilationResponse implements Serializable {
 
-    @Getter @Setter
-    private static class Status {
-        private int id;
-        private String description;
-    }
-
     private String stdout;
     private String status_id;
     private int language_id;

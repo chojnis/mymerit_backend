@@ -1,6 +1,8 @@
 package com.mymerit.mymerit.api.payload.response;
 
 import com.mymerit.mymerit.domain.entity.Company;
+import com.mymerit.mymerit.domain.entity.EmploymentType;
+import com.mymerit.mymerit.domain.entity.Experience;
 import com.mymerit.mymerit.domain.entity.Task;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +10,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -43,4 +47,16 @@ public class JobOfferDetailsResponse {
 
     @NotEmpty
     private Integer salary;
+
+    @NotNull
+    private Experience experience;
+
+    @NotNull
+    private EmploymentType employmentType;
+
+    @NotNull
+    private LocalDateTime opensAt;
+
+    @NotNull
+    private LocalDateTime closesAt;
 }
