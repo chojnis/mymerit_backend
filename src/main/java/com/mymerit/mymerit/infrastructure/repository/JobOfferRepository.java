@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface JobOfferRepository extends MongoRepository<JobOffer, String> {
@@ -20,19 +21,10 @@ public interface JobOfferRepository extends MongoRepository<JobOffer, String> {
     Optional<JobOffer> findById(String id);
 
 
-
-
-    Page<JobOffer> findAllByTechnologiesContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(List<String> technologies,
-                                                                             Range<Integer> salaryRange ,
-                                                                             Range<Integer> creditsRange,
-                                                                             Pageable pageable);
+    Page<JobOffer> findAllByTaskAllowedLanguagesContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(Set<String> languages,
+                                                                                                  Range<Integer> salaryRange ,
+                                                                                                  Range<Integer> creditsRange,
+                                                                                                  Pageable pageable);
 
 
 }
-
-
-
-
-
-
-

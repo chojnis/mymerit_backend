@@ -16,34 +16,26 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Service
 public class JobOfferService {
-
     JobOfferRepository jobOfferRepository;
 
     JobOfferService(JobOfferRepository jobOfferRepository){
         this.jobOfferRepository = jobOfferRepository;
     }
 
-
     public JobOffer addJobOffer(JobOffer jobOffer){
-
         Integer companyCredits = jobOffer.getCompany().getCreditsAmount();
 
         if(companyCredits > jobOffer.getTask().getReward()) {
-
             jobOffer.getCompany().setCreditsAmount(companyCredits - jobOffer.getTask().getReward());
-
             return jobOfferRepository.save(jobOffer);
         }
 
         return null;
-    }
-
-    public Optional<JobOffer> getById(String id){
-        return jobOfferRepository.findById(id);
     }
 
     public Optional<JobOfferDetailsResponse> getJobOfferDetailsResponse(String id) {
@@ -52,7 +44,6 @@ public class JobOfferService {
     }
 
     private JobOfferDetailsResponse createJobOfferDetailsResponse(JobOffer jobOffer) {
-        Task task = jobOffer.getTask().isOpen() ? jobOffer.getTask() : null;
         return new JobOfferDetailsResponse(
                 jobOffer.getId(),
                 jobOffer.getJobTitle(),
@@ -62,18 +53,17 @@ public class JobOfferService {
                 jobOffer.getWorkLocations(),
                 jobOffer.getTechnologies(),
                 jobOffer.getCompany(),
-                jobOffer.getTask(),
-                jobOffer.getSalary()
-
-
+                jobOffer.getTask().isOpen() ? jobOffer.getTask() : null,
+                jobOffer.getSalary(),
+                jobOffer.getExperience(),
+                jobOffer.getMode(),
+                jobOffer.getTask().getOpensAt(),
+                jobOffer.getTask().getClosesAt()
         );
     }
 
     private JobOfferListResponse createJobOfferListResponse(JobOffer jobOffer){
-
-
         return new JobOfferListResponse(
-
                 jobOffer.getId(),
                 jobOffer.getJobTitle(),
                 jobOffer.getWorkLocations(),
@@ -83,14 +73,11 @@ public class JobOfferService {
                 jobOffer.getTask().getClosesAt(),
                 jobOffer.getCompany(),
                 jobOffer.getSalary()
-
         );
     }
 
-    public Page<JobOfferListResponse> getJobOffers(List<String> technologies, Range<Integer> salaryRange, Range<Integer> creditsRange, Pageable pageable) {
-
-
-        return jobOfferRepository.findAllByTechnologiesContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(technologies,salaryRange,creditsRange, pageable)
+    public Page<JobOfferListResponse> getJobOffers(Set<String> languages, Range<Integer> salaryRange, Range<Integer> creditsRange, Pageable pageable) {
+        return jobOfferRepository.findAllByTaskAllowedLanguagesContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(languages,salaryRange,creditsRange, pageable)
                 .map(this::createJobOfferListResponse);
     }
 
