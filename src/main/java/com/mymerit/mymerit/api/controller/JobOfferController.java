@@ -62,9 +62,7 @@ public class JobOfferController {
 
     @PostMapping("/job/solution/{jobOfferId}")
     ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestBody SolutionRequest solutionRequest,@AuthenticationPrincipal UserDetailsImpl userDetails){
-
         return ResponseEntity.ok(jobOfferService.addSolution(jobOfferId,solutionRequest,userDetails.getId()));
-
     }
 
 

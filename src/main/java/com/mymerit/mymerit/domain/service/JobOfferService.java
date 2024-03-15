@@ -72,7 +72,7 @@ public class JobOfferService {
                 jobOffer.getId(),
                 jobOffer.getJobTitle(),
                 jobOffer.getWorkLocations(),
-                jobOffer.getTechnologies(),
+                jobOffer.getTask().getAllowedLanguages(),
                 jobOffer.getTask().getReward(),
                 jobOffer.getTask().getOpensAt(),
                 jobOffer.getTask().getClosesAt(),
@@ -81,7 +81,7 @@ public class JobOfferService {
         );
     }
 
-    public Page<JobOfferListResponse> getJobOffers(Set<String> languages, Range<Integer> salaryRange, Range<Integer> creditsRange, Pageable pageable, Sort sort) {
+    public Page<JobOfferListResponse> getJobOffers(Set<String> languages, Range<Integer> salaryRange, Range<Integer> creditsRange, Pageable pageable) {
         return jobOfferRepository.findAllByTaskAllowedLanguagesContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(languages,salaryRange,creditsRange, pageable)
                 .map(this::createJobOfferListResponse);
     }
