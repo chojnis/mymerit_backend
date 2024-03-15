@@ -12,5 +12,7 @@ public interface SolutionRepository extends MongoRepository<Solution, String> {
     public Optional<Solution> getSolutionById(String idTask, String idSolution);
 
     
-    List<Solution> findAllByUserId(String userId);
+
+
+
 }

@@ -3,10 +3,13 @@ package com.mymerit.mymerit.api.controller;
 import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
 import com.mymerit.mymerit.domain.entity.JobOffer;
+import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.service.JobOfferService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +43,8 @@ public class JobOfferController {
             @RequestParam(defaultValue = "0") Integer rangeSalaryMin,
             @RequestParam(defaultValue = "99999")Integer rangeSalaryMax,
             @RequestParam(defaultValue = "0")Integer rangeCreditsMin,
-            @RequestParam(defaultValue = "99999")Integer rangeCreditsMax){
+            @RequestParam(defaultValue = "99999")Integer rangeCreditsMax,
+            @SortDefault(sort = "openDate", direction = Sort.Direction.DESC) Sort sort){
 
         System.out.println(technologies);
 
@@ -55,6 +59,12 @@ public class JobOfferController {
     }
 
 
+    @PostMapping("/job/solution/{jobOfferId}")
+    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestBody Solution solution){
+
+        return ResponseEntity.ok(jobOfferService.addSolution(jobOfferId,solution));
+
+    }
 
 
 

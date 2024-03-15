@@ -21,6 +21,7 @@ public interface JobOfferRepository extends MongoRepository<JobOffer, String> {
 
 
 
+
     Page<JobOffer> findAllByTechnologiesContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(List<String> technologies,
                                                                              Range<Integer> salaryRange ,
                                                                              Range<Integer> creditsRange,

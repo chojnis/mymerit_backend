@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Range;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class JobOffer {
     private Company company;
 
     @NotNull(message = "Task is required")
+
     @Valid
     private Task task;
 
@@ -61,6 +63,7 @@ public class JobOffer {
         this.task = task;
         this.experience = experience;
         this.mode = mode;
+
     }
 
 

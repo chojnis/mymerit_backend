@@ -71,7 +71,7 @@ public class JobOfferService {
 
     private JobOfferListResponse createJobOfferListResponse(JobOffer jobOffer){
 
-        System.out.println("imhere");
+
         return new JobOfferListResponse(
 
                 jobOffer.getId(),
@@ -94,6 +94,19 @@ public class JobOfferService {
                 .map(this::createJobOfferListResponse);
     }
 
+
+    public JobOffer addSolution(String jobOfferId,Solution solution){
+
+        if(jobOfferRepository.findById(jobOfferId).isPresent()) {
+            JobOffer jobOffer = jobOfferRepository.findById(jobOfferId).get();
+            jobOffer.getTask().addSolution(solution);
+
+            return jobOfferRepository.save(jobOffer);
+
+        }
+
+        else return null;
+    }
 
 
 }

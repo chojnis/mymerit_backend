@@ -3,6 +3,7 @@ package com.mymerit.mymerit.domain.entity;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ public class Task {
 
     @NotBlank(message = "Title is required")
     private String title;
+
 
     @NotBlank(message = "Instructions are required")
     private String instructions;
@@ -50,5 +52,12 @@ public class Task {
     public Boolean isOpen(){
         var now = LocalDateTime.now();
         return this.getClosesAt().isAfter(now) && this.getOpensAt().isBefore(now);
+    }
+
+    public void addSolution(Solution solution){
+        if(isOpen()){
+            solutions.add(solution);
+        }
+
     }
 }
