@@ -3,11 +3,10 @@ package com.mymerit.mymerit.domain.service;
 import com.mymerit.mymerit.api.payload.request.SolutionRequest;
 import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
-import com.mymerit.mymerit.domain.entity.JobOffer;
-import com.mymerit.mymerit.domain.entity.Solution;
-import com.mymerit.mymerit.domain.entity.Task;
-import com.mymerit.mymerit.domain.entity.User;
+import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.infrastructure.repository.JobOfferRepository;
+import com.mymerit.mymerit.infrastructure.repository.SolutionRepository;
+import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.data.domain.Page;
@@ -27,17 +26,28 @@ public class JobOfferService {
     JobOfferRepository jobOfferRepository;
     UserRepository userRepository;
     DownloadFileService fileService;
+    TaskRepository taskRepository;
+    SolutionRepository solutionRepository;
 
-    JobOfferService(JobOfferRepository jobOfferRepository,UserRepository userRepository,DownloadFileService fileService) {
+    JobOfferService(
+            JobOfferRepository jobOfferRepository,
+            UserRepository userRepository,
+            DownloadFileService fileService,
+            TaskRepository taskRepository,
+            SolutionRepository solutionRepository
+    ) {
         this.jobOfferRepository = jobOfferRepository;
         this.userRepository = userRepository;
         this.fileService = fileService;
+        this.taskRepository = taskRepository;
+        this.solutionRepository = solutionRepository;
+
 
     }
 
     public JobOffer addJobOffer(JobOffer jobOffer){
         Integer companyCredits = jobOffer.getCompany().getCreditsAmount();
-
+        taskRepository.save(jobOffer.getTask());
         if(companyCredits > jobOffer.getTask().getReward()) {
             jobOffer.getCompany().setCreditsAmount(companyCredits - jobOffer.getTask().getReward());
             return jobOfferRepository.save(jobOffer);
@@ -103,11 +113,11 @@ public class JobOfferService {
                 }
             });
 
-            Solution solution = new Solution(task,userRepository.findById(userId).get(),ids);
+            Solution solution = new Solution(task, userRepository.findById(userId).get(),ids);
+            solutionRepository.save(solution);
 
             JobOffer jobOffer = jobOfferRepository.findById(jobOfferId).get();
-            jobOffer.getTask().addSolution(solution);
-
+            
             return jobOfferRepository.save(jobOffer);
 
         }

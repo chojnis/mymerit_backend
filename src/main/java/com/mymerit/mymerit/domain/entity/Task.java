@@ -1,5 +1,6 @@
 package com.mymerit.mymerit.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -19,7 +20,6 @@ public class Task {
     @NotBlank(message = "Title is required")
     private String title;
 
-
     @NotBlank(message = "Instructions are required")
     private String instructions;
 
@@ -35,6 +35,8 @@ public class Task {
     @NotEmpty(message = "Allowed languages are required")
     private Set<String> allowedLanguages;
 
+    @DBRef
+    @JsonIgnore
     private List<Solution> solutions = new ArrayList<>();
 
     public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages) {
