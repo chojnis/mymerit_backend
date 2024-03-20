@@ -16,20 +16,23 @@ import org.springframework.data.domain.Range;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 
 
 @Service
 public class JobOfferService {
     JobOfferRepository jobOfferRepository;
     UserRepository userRepository;
+    DownloadFileService fileService;
 
-    JobOfferService(JobOfferRepository jobOfferRepository,UserRepository userRepository){
+    JobOfferService(JobOfferRepository jobOfferRepository,UserRepository userRepository,DownloadFileService fileService) {
         this.jobOfferRepository = jobOfferRepository;
         this.userRepository = userRepository;
+        this.fileService = fileService;
+
     }
 
     public JobOffer addJobOffer(JobOffer jobOffer){
@@ -87,13 +90,20 @@ public class JobOfferService {
     }
 
 
-    public JobOffer addSolution(String jobOfferId,SolutionRequest solutionRequest, String userId){
-
-
+    public JobOffer addSolution(String jobOfferId, MultipartFile [] files, String userId){
 
         if(jobOfferRepository.findById(jobOfferId).isPresent()) {
             Task task = jobOfferRepository.findById(jobOfferId).get().getTask();
-            Solution solution = new Solution(task,userRepository.findById(userId).get(),solutionRequest.getFiles());
+            List<String> ids = new ArrayList<>();
+            Arrays.stream(files).toList().forEach(f -> {
+                try {
+                    ids.add(fileService.addFile(f));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            Solution solution = new Solution(task,userRepository.findById(userId).get(),ids);
 
             JobOffer jobOffer = jobOfferRepository.findById(jobOfferId).get();
             jobOffer.getTask().addSolution(solution);

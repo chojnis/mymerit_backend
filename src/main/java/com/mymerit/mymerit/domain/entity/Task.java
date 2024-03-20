@@ -57,9 +57,6 @@ public class Task {
     }
 
     public void addSolution(Solution solution){
-        if(isOpen()){
-            solutions.add(solution);
-        }
-
+        solutions.add(solution);
     }
 }

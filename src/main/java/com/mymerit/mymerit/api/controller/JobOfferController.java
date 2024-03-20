@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Set;
 
@@ -61,8 +63,8 @@ public class JobOfferController {
 
 
     @PostMapping("/job/solution/{jobOfferId}")
-    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestBody SolutionRequest solutionRequest,@AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseEntity.ok(jobOfferService.addSolution(jobOfferId,solutionRequest,userDetails.getId()));
+    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam MultipartFile [] files, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(jobOfferService.addSolution(jobOfferId,files,userDetails.getId()));
     }
 
 

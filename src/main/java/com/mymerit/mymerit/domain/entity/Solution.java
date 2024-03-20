@@ -11,18 +11,16 @@ import java.util.List;
 @Data
 @Getter
 @Setter
-@Document
+@Document("solutions")
 public class Solution {
-
-
     @Id
     public String id;
     public Task taskId;
     public User user;
-    public List<SolutionFile> files;
+    public List<String> files;
 
 
-    public Solution(Task taskId, User user, List<SolutionFile> files) {
+    public Solution(Task taskId, User user, List<String> files) {
         this.taskId = taskId;
         this.user = user;
         this.files = files;
