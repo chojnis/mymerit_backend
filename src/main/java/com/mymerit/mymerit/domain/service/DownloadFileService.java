@@ -54,4 +54,10 @@ public class DownloadFileService {
         return downloadFile;
     }
 
+    public void DeleteFile(String id) throws IOException {
+
+        template.delete(new Query(Criteria.where("_id").is(id)));
+
+    }
+
 }

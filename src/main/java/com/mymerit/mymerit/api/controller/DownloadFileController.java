@@ -37,4 +37,10 @@ public class DownloadFileController {
                 .body(new ByteArrayResource(loadFile.getFile()));
     }
 
+    @DeleteMapping("/file/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable String id) throws IOException {
+        fileService.DeleteFile(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
