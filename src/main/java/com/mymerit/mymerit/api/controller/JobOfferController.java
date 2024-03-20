@@ -54,7 +54,7 @@ public class JobOfferController {
         Range<Integer> creditsRange = Range.of(Range.Bound.inclusive(minCredits), Range.Bound.inclusive(maxCredits));
         PageRequest pageRequest = PageRequest.of(page, 4, sort);
 
-        Page<JobOfferListResponse> jobOffersPage = jobOfferService.getJobOffers(languages,salaryRange,creditsRange, pageRequest, sort);
+        Page<JobOfferListResponse> jobOffersPage = jobOfferService.getJobOffers(languages,salaryRange,creditsRange, pageRequest);
 
         return ResponseEntity.ok(jobOffersPage);
     }
