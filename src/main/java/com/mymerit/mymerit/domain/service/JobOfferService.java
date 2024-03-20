@@ -85,7 +85,7 @@ public class JobOfferService {
                 jobOffer.getId(),
                 jobOffer.getJobTitle(),
                 jobOffer.getWorkLocations(),
-                jobOffer.getTask().getAllowedLanguages(),
+                jobOffer.getTechnologies(),
                 jobOffer.getTask().getReward(),
                 jobOffer.getTask().getOpensAt(),
                 jobOffer.getTask().getClosesAt(),
@@ -101,12 +101,13 @@ public class JobOfferService {
 
 
     public JobOffer addSolution(String jobOfferId, MultipartFile [] files, String userId){
-
+        System.out.println(Arrays.toString(files));
         if(jobOfferRepository.findById(jobOfferId).isPresent()) {
             Task task = jobOfferRepository.findById(jobOfferId).get().getTask();
             List<String> ids = new ArrayList<>();
             Arrays.stream(files).toList().forEach(f -> {
                 try {
+                    System.out.println("abc");
                     ids.add(fileService.addFile(f));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -114,10 +115,11 @@ public class JobOfferService {
             });
 
             Solution solution = new Solution(task, userRepository.findById(userId).get(),ids);
-            solutionRepository.save(solution);
 
+            solutionRepository.save(solution);
+            task.addSolution(solution);
             JobOffer jobOffer = jobOfferRepository.findById(jobOfferId).get();
-            
+
             return jobOfferRepository.save(jobOffer);
 
         }

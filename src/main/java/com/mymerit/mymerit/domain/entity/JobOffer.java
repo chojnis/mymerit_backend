@@ -44,7 +44,6 @@ public class JobOffer {
     @NotNull(message = "Task is required")
 
     @Valid
-    @DBRef
     private Task task;
 
     @NotNull(message = "Salary is required")

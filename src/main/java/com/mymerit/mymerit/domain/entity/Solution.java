@@ -18,10 +18,8 @@ public class Solution {
     @Id
     public String id;
 
-    @JsonIgnore
     public Task taskId;
 
-    @JsonIgnore
     public User user;
 
     public List<String> files;

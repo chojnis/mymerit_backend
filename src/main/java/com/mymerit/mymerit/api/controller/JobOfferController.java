@@ -19,6 +19,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -63,7 +65,7 @@ public class JobOfferController {
 
 
     @PostMapping("/job/solution/{jobOfferId}")
-    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam MultipartFile [] files, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam MultipartFile [] files, @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
         return ResponseEntity.ok(jobOfferService.addSolution(jobOfferId,files,userDetails.getId()));
     }
 
