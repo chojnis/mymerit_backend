@@ -8,6 +8,7 @@ import com.mymerit.mymerit.infrastructure.repository.JobOfferRepository;
 import com.mymerit.mymerit.infrastructure.repository.SolutionRepository;
 import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import org.bson.types.ObjectId;
 import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -104,10 +105,9 @@ public class JobOfferService {
         System.out.println(files);
         if(jobOfferRepository.findById(jobOfferId).isPresent()) {
             Task task = jobOfferRepository.findById(jobOfferId).get().getTask();
-            List<String> ids = new ArrayList<>();
+            List<ObjectId> ids = new ArrayList<>();
             files.forEach(f -> {
                 try {
-                    System.out.println("abc");
                     ids.add(fileService.addFile(f));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -115,7 +115,6 @@ public class JobOfferService {
             });
 
             Solution solution = new Solution(task, userRepository.findById(userId).get(),ids);
-
             solutionRepository.save(solution);
             task.addSolution(solution);
             taskRepository.save(task);
