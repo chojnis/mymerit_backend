@@ -65,7 +65,7 @@ public class JobOfferController {
 
 
     @PostMapping("/job/solution/{jobOfferId}")
-    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam MultipartFile [] files, @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam List<MultipartFile> files, @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
         return ResponseEntity.ok(jobOfferService.addSolution(jobOfferId,files,userDetails.getId()));
     }
 

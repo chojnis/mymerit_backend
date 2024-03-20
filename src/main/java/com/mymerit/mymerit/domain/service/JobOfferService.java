@@ -100,12 +100,12 @@ public class JobOfferService {
     }
 
 
-    public JobOffer addSolution(String jobOfferId, MultipartFile [] files, String userId){
-        System.out.println(Arrays.toString(files));
+    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId){
+        System.out.println(files);
         if(jobOfferRepository.findById(jobOfferId).isPresent()) {
             Task task = jobOfferRepository.findById(jobOfferId).get().getTask();
             List<String> ids = new ArrayList<>();
-            Arrays.stream(files).toList().forEach(f -> {
+            files.forEach(f -> {
                 try {
                     System.out.println("abc");
                     ids.add(fileService.addFile(f));
@@ -118,13 +118,19 @@ public class JobOfferService {
 
             solutionRepository.save(solution);
             task.addSolution(solution);
+            taskRepository.save(task);
             JobOffer jobOffer = jobOfferRepository.findById(jobOfferId).get();
 
             return jobOfferRepository.save(jobOffer);
 
         }
 
-        else return null;
+        else {
+            //zmienic na error
+            System.out.println("XD");
+            return null;
+
+        }
     }
 
 
