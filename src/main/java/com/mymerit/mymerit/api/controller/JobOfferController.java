@@ -13,15 +13,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Range;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Controller
@@ -66,8 +69,10 @@ public class JobOfferController {
 
     @PostMapping("/job/solution/{jobOfferId}")
     ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam List<MultipartFile> files, @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        return ResponseEntity.ok(jobOfferService.addSolution(jobOfferId,files,userDetails.getId()));
-    }
+        return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId()))
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + jobOfferId));
 
+    }
 
 }

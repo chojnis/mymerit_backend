@@ -20,6 +20,7 @@ public class Solution {
     public String id;
 
     @DBRef
+    @JsonIgnore
     public Task taskId;
 
     public User user;
@@ -30,5 +31,15 @@ public class Solution {
         this.taskId = taskId;
         this.user = user;
         this.files = files;
+    }
+
+    @Override
+    public String toString() {
+        return "Solution{" +
+                "id='" + id + '\'' +
+                ", taskId=" + taskId.getId() +
+                ", user=" + user +
+                ", files=" + files +
+                '}';
     }
 }

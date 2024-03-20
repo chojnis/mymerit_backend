@@ -101,36 +101,33 @@ public class JobOfferService {
     }
 
 
-    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId){
-        System.out.println(files);
-        if(jobOfferRepository.findById(jobOfferId).isPresent()) {
-            Task task = jobOfferRepository.findById(jobOfferId).get().getTask();
-            List<ObjectId> ids = new ArrayList<>();
-            files.forEach(f -> {
-                try {
-                    ids.add(fileService.addFile(f));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId) throws IOException {
+        Optional<JobOffer> optionalJobOffer = jobOfferRepository.findById(jobOfferId);
 
-            Solution solution = new Solution(task, userRepository.findById(userId).get(),ids);
+        if (optionalJobOffer.isPresent()) {
+            JobOffer jobOffer = optionalJobOffer.get();
+            Task task = jobOffer.getTask();
+
+            List<ObjectId> fileIDs = new ArrayList<>();
+            for (MultipartFile file : files) {
+                try {
+                    fileIDs.add(fileService.addFile(file));
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to add file for solution", e);
+                }
+            }
+
+            Solution solution = new Solution(task, userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found")), fileIDs);
             solutionRepository.save(solution);
+            System.out.println(solution);
             task.addSolution(solution);
             taskRepository.save(task);
-            JobOffer jobOffer = jobOfferRepository.findById(jobOfferId).get();
-
             return jobOfferRepository.save(jobOffer);
-
-        }
-
-        else {
-            //zmienic na error
-            System.out.println("XD");
-            return null;
-
+        } else {
+            throw new IllegalArgumentException("Job offer not found for id: " + jobOfferId);
         }
     }
+
 
 
 }
