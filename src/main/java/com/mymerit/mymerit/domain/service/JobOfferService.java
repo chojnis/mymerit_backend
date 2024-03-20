@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
@@ -71,7 +72,7 @@ public class JobOfferService {
                 jobOffer.getId(),
                 jobOffer.getJobTitle(),
                 jobOffer.getWorkLocations(),
-                jobOffer.getTechnologies(),
+                jobOffer.getTask().getAllowedLanguages(),
                 jobOffer.getTask().getReward(),
                 jobOffer.getTask().getOpensAt(),
                 jobOffer.getTask().getClosesAt(),

@@ -42,23 +42,19 @@ public class JobOfferController {
 
     @GetMapping("/jobs")
     ResponseEntity<Page<JobOfferListResponse>> jobOffers(
-
             @RequestParam(defaultValue = "*") Set<String> languages,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "0") Integer minSalary,
             @RequestParam(defaultValue = "99999") Integer maxSalary,
             @RequestParam(defaultValue = "0") Integer minCredits,
             @RequestParam(defaultValue = "99999") Integer maxCredits,
-            @SortDefault(sort = "openDate", direction = Sort.Direction.DESC) Sort sort){
-
-
-
+            @SortDefault(sort = "opensAt", direction = Sort.Direction.DESC) Sort sort){
 
         Range<Integer> salaryRange = Range.of(Range.Bound.inclusive(minSalary), Range.Bound.inclusive(maxSalary));
         Range<Integer> creditsRange = Range.of(Range.Bound.inclusive(minCredits), Range.Bound.inclusive(maxCredits));
-        PageRequest pageRequest = PageRequest.of(page, 10);
+        PageRequest pageRequest = PageRequest.of(page, 4, sort);
 
-        Page<JobOfferListResponse> jobOffersPage = jobOfferService.getJobOffers(languages,salaryRange,creditsRange, pageRequest);
+        Page<JobOfferListResponse> jobOffersPage = jobOfferService.getJobOffers(languages,salaryRange,creditsRange, pageRequest, sort);
 
         return ResponseEntity.ok(jobOffersPage);
     }
@@ -66,12 +62,8 @@ public class JobOfferController {
 
     @PostMapping("/job/solution/{jobOfferId}")
     ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestBody SolutionRequest solutionRequest,@AuthenticationPrincipal UserDetailsImpl userDetails){
-
         return ResponseEntity.ok(jobOfferService.addSolution(jobOfferId,solutionRequest,userDetails.getId()));
-
     }
 
 
 }
-
-
