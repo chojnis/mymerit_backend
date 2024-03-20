@@ -21,13 +21,27 @@ public class JudgeService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
+        //  String requestBody = "{\n" +
+        //          "  \"additional_files\": \"" + judgeTokenRequest.getFileContentBase64() + "\",\n" +
+        //         "  \"language_id\": " + 89 + "\n" +
+       //         "  \"command_line_arguments\": + judgeTokenRequest.getCommandLineArguments() + "\n" +
+        //        "  \"cpu_time_limit\":  "
+//
+         //       "}";
+//
         String requestBody = "{\n" +
                 "  \"additional_files\": \"" + judgeTokenRequest.getFileContentBase64() + "\",\n" +
-                "  \"language_id\": " + 89 + "\n" +
+                "  \"language_id\": " + 89 + ",\n" +
+                "  \"command_line_arguments\": \"" + judgeTokenRequest.getCommandLineArguments() + "\",\n" +
+                "  \"memory_limit\": \"" + judgeTokenRequest.getMemoryLimit() + "\",\n" +
+                "  \"stdin\": \"" + judgeTokenRequest.getStdin() + "\",\n" +
+                "  \"cpu_time_limit\": " + judgeTokenRequest.getCpuTimeLimit() + "\n" +
                 "}";
 
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
         ResponseEntity<JudgeTokenEntity> response = restTemplate.postForEntity(apiUrl, request, JudgeTokenEntity.class);
+
+        
 
         return response.getBody().getToken();
     }

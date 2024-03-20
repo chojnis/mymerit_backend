@@ -11,4 +11,10 @@ public class JudgeTokenRequest {
     String fileName;
     @NotBlank
     String fileContentBase64;
+
+    String commandLineArguments;
+
+    Float cpuTimeLimit;
+    Float memoryLimit;
+    String stdin;
 }

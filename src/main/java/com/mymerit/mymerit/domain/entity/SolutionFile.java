@@ -9,13 +9,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class SolutionFile {
     @Id
     String solutionId;
-    String fileId;
     String name;
     String content;
     Boolean isMain;
 
-    public SolutionFile(String fileId, String name, String content, Boolean isMain) {
-        this.fileId = fileId;
+    public SolutionFile( String name, String content, Boolean isMain) {
+
         this.name = name;
         this.content = content;
         this.isMain = isMain;
