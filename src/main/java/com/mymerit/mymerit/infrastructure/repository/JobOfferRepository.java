@@ -22,10 +22,20 @@ public interface JobOfferRepository extends MongoRepository<JobOffer, String> {
     Optional<JobOffer> findById(String id);
 
 
-    Page<JobOffer> findAllByTaskAllowedLanguagesContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(Set<String> languages,
-                                                                                                  Range<Integer> salaryRange ,
-                                                                                                  Range<Integer> creditsRange,
-                                                                                                  Pageable pageable);
+    Page<JobOffer> findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(
+            String jobTitle,
+            Range<Integer> salaryRange ,
+            Range<Integer> creditsRange,
+            Pageable pageable
+    );
+
+    Page<JobOffer> findByJobTitleContainingIgnoreCaseAndTaskAllowedLanguagesInIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(
+            String jobTitle,
+            Set<String> languages,
+            Range<Integer> salaryRange ,
+            Range<Integer> creditsRange,
+            Pageable pageable
+    );
 
 
 }

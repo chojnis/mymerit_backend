@@ -10,10 +10,7 @@ import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.boot.autoconfigure.batch.BatchProperties;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Range;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -86,7 +83,7 @@ public class JobOfferService {
                 jobOffer.getId(),
                 jobOffer.getJobTitle(),
                 jobOffer.getWorkLocations(),
-                jobOffer.getTechnologies(),
+                jobOffer.getTask().getAllowedLanguages(),
                 jobOffer.getTask().getReward(),
                 jobOffer.getTask().getOpensAt(),
                 jobOffer.getTask().getClosesAt(),
@@ -95,9 +92,27 @@ public class JobOfferService {
         );
     }
 
-    public Page<JobOfferListResponse> getJobOffers(Set<String> languages, Range<Integer> salaryRange, Range<Integer> creditsRange, Pageable pageable) {
-        return jobOfferRepository.findAllByTaskAllowedLanguagesContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(languages,salaryRange,creditsRange, pageable)
-                .map(this::createJobOfferListResponse);
+    public Page<JobOfferListResponse> getJobOffers(
+            String q,
+            Set<String> languages,
+            Integer page,
+            Integer minCredits,
+            Integer maxCredits,
+            Integer minSalary,
+            Integer maxSalary,
+            Sort sort
+    ) {
+        Range<Integer> salaryRange = Range.of(Range.Bound.inclusive(minSalary), Range.Bound.inclusive(maxSalary));
+        Range<Integer> creditsRange = Range.of(Range.Bound.inclusive(minCredits), Range.Bound.inclusive(maxCredits));
+        PageRequest pageRequest = PageRequest.of(page, 4, sort);
+
+        if (languages.isEmpty()) {
+            return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(q, salaryRange, creditsRange, pageRequest)
+                    .map(this::createJobOfferListResponse);
+        } else {
+            return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndTaskAllowedLanguagesInIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(q, languages, salaryRange, creditsRange, pageRequest)
+                    .map(this::createJobOfferListResponse);
+        }
     }
 
 

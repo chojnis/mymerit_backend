@@ -49,19 +49,19 @@ public class JobOfferController {
 
     @GetMapping("/jobs")
     ResponseEntity<Page<JobOfferListResponse>> jobOffers(
-            @RequestParam(defaultValue = "*") Set<String> languages,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "") Set<String> languages,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "") String q,
             @RequestParam(defaultValue = "0") Integer minSalary,
-            @RequestParam(defaultValue = "99999") Integer maxSalary,
+            @RequestParam(defaultValue = "40000") Integer maxSalary,
             @RequestParam(defaultValue = "0") Integer minCredits,
-            @RequestParam(defaultValue = "99999") Integer maxCredits,
-            @SortDefault(sort = "opensAt", direction = Sort.Direction.DESC) Sort sort){
+            @RequestParam(defaultValue = "10000") Integer maxCredits,
+            @SortDefault(sort = "taskOpensAt", direction = Sort.Direction.DESC) Sort sort
+    ){
 
-        Range<Integer> salaryRange = Range.of(Range.Bound.inclusive(minSalary), Range.Bound.inclusive(maxSalary));
-        Range<Integer> creditsRange = Range.of(Range.Bound.inclusive(minCredits), Range.Bound.inclusive(maxCredits));
-        PageRequest pageRequest = PageRequest.of(page, 4, sort);
-
-        Page<JobOfferListResponse> jobOffersPage = jobOfferService.getJobOffers(languages,salaryRange,creditsRange, pageRequest);
+        Page<JobOfferListResponse> jobOffersPage = jobOfferService.getJobOffers(
+                q, languages, page, minCredits, maxCredits, minSalary, maxSalary, sort
+        );
 
         return ResponseEntity.ok(jobOffersPage);
     }
