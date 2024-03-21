@@ -5,6 +5,8 @@ import com.mymerit.mymerit.api.payload.request.SignUpRequest;
 import com.mymerit.mymerit.api.payload.response.ApiResponse;
 import com.mymerit.mymerit.domain.entity.AuthenticationCode;
 import com.mymerit.mymerit.domain.entity.User;
+import com.mymerit.mymerit.domain.models.AuthProvider;
+import com.mymerit.mymerit.domain.models.Role;
 import com.mymerit.mymerit.domain.service.MailSenderService;
 import com.mymerit.mymerit.infrastructure.repository.AuthenticationCodeRepository;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
@@ -125,7 +127,8 @@ public class SignUpController {
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(signUpRequest.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole("user");
+        user.setProvider(AuthProvider.local);
+        user.setRole(Role.user.name());
 
         User result = userRepository.insert(user);
 
