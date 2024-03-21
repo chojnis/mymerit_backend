@@ -2,13 +2,15 @@ package com.mymerit.mymerit.domain.entity;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.springframework.data.annotation.AccessType;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static org.springframework.data.annotation.AccessType.Type.PROPERTY;
 
 @Data
 @Document("tasks")
@@ -43,15 +45,14 @@ public class Task {
         this.closesAt = closesAt;
         this.reward = reward;
         this.allowedLanguages = allowedLanguages;
-        this.allowedLanguages.add("*");
     }
 
     public Integer getSolutionCount() {
         return solutions.size();
     }
 
-
-    public TaskStatus getTaskStatus() {
+    //@AccessType(PROPERTY)
+    public TaskStatus getStatus() {
         LocalDateTime now = LocalDateTime.now();
 
         if (this.getClosesAt().isBefore(now)) {
@@ -63,10 +64,8 @@ public class Task {
         }
     }
 
-
-
     public void addSolution(Solution solution){
-        if(getTaskStatus() == TaskStatus.OPEN) {
+        if(getStatus() == TaskStatus.OPEN) {
             solutions.add(solution);
         }
     }

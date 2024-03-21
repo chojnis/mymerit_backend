@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,19 +22,20 @@ public interface JobOfferRepository extends MongoRepository<JobOffer, String> {
 
     Optional<JobOffer> findById(String id);
 
-
-    Page<JobOffer> findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(
+    Page<JobOffer> findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskOpensAtBetween(
             String jobTitle,
-            Range<Integer> salaryRange ,
+            Range<Integer> salaryRange,
             Range<Integer> creditsRange,
+            Range<Date> dateRange,
             Pageable pageable
     );
 
-    Page<JobOffer> findByJobTitleContainingIgnoreCaseAndTaskAllowedLanguagesInIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(
+    Page<JobOffer> findByJobTitleContainingIgnoreCaseAndTaskAllowedLanguagesInIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskOpensAtBetween(
             String jobTitle,
             Set<String> languages,
-            Range<Integer> salaryRange ,
+            Range<Integer> salaryRange,
             Range<Integer> creditsRange,
+            Range<Date> dateRange,
             Pageable pageable
     );
 

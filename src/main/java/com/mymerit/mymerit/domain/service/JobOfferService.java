@@ -1,6 +1,5 @@
 package com.mymerit.mymerit.domain.service;
 
-import com.mymerit.mymerit.api.payload.request.SolutionRequest;
 import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
 import com.mymerit.mymerit.domain.entity.*;
@@ -9,9 +8,7 @@ import com.mymerit.mymerit.infrastructure.repository.SolutionRepository;
 import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import org.bson.types.ObjectId;
-import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.data.domain.*;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -70,7 +67,7 @@ public class JobOfferService {
                 jobOffer.getWorkLocations(),
                 jobOffer.getTechnologies(),
                 jobOffer.getCompany(),
-                jobOffer.getTask().getTaskStatus() == TaskStatus.OPEN ? jobOffer.getTask() : null,
+                jobOffer.getTask().getStatus() == TaskStatus.OPEN ? jobOffer.getTask() : null,
                 jobOffer.getSalary(),
                 jobOffer.getExperience(),
                 jobOffer.getMode(),
@@ -89,7 +86,8 @@ public class JobOfferService {
                 jobOffer.getTask().getOpensAt(),
                 jobOffer.getTask().getClosesAt(),
                 jobOffer.getCompany(),
-                jobOffer.getSalary()
+                jobOffer.getSalary(),
+                jobOffer.getTask().getStatus()
         );
     }
 
@@ -101,17 +99,22 @@ public class JobOfferService {
             Integer maxCredits,
             Integer minSalary,
             Integer maxSalary,
+            Date minOpensIn,
+            Date maxOpensIn,
             Sort sort
     ) {
+
         Range<Integer> salaryRange = Range.of(Range.Bound.inclusive(minSalary), Range.Bound.inclusive(maxSalary));
         Range<Integer> creditsRange = Range.of(Range.Bound.inclusive(minCredits), Range.Bound.inclusive(maxCredits));
-        PageRequest pageRequest = PageRequest.of(page, 4, sort);
+        Range<Date> dateRange = Range.of(Range.Bound.inclusive(minOpensIn), Range.Bound.inclusive(maxOpensIn));
+
+        PageRequest pageRequest = PageRequest.of(page, 3, sort);
 
         if (languages.isEmpty()) {
-            return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(q, salaryRange, creditsRange, pageRequest)
+            return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskOpensAtBetween(q, salaryRange, creditsRange, dateRange, pageRequest)
                     .map(this::createJobOfferListResponse);
         } else {
-            return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndTaskAllowedLanguagesInIgnoreCaseAndSalaryBetweenAndTaskRewardBetween(q, languages, salaryRange, creditsRange, pageRequest)
+            return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndTaskAllowedLanguagesInIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskOpensAtBetween(q, languages, salaryRange, creditsRange, dateRange, pageRequest)
                     .map(this::createJobOfferListResponse);
         }
     }

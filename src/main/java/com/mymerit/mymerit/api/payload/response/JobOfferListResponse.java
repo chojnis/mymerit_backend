@@ -1,6 +1,7 @@
 package com.mymerit.mymerit.api.payload.response;
 
 import com.mymerit.mymerit.domain.entity.Company;
+import com.mymerit.mymerit.domain.entity.TaskStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -42,5 +43,7 @@ public class JobOfferListResponse {
     @NotNull
     private Integer salary;
 
+    @NotNull
+    private TaskStatus status;
 
 }

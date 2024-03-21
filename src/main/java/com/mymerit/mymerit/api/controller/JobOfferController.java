@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Range;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,10 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 public class JobOfferController {
@@ -56,11 +54,13 @@ public class JobOfferController {
             @RequestParam(defaultValue = "40000") Integer maxSalary,
             @RequestParam(defaultValue = "0") Integer minCredits,
             @RequestParam(defaultValue = "10000") Integer maxCredits,
-            @SortDefault(sort = "taskOpensAt", direction = Sort.Direction.DESC) Sort sort
+            @RequestParam(defaultValue = "#{T(java.time.LocalDate).now().toString()}") @DateTimeFormat(pattern = "yyyy-MM-dd") Date minOpensIn,
+            @RequestParam(defaultValue = "#{T(java.time.LocalDate).now().plusYears(1).toString()}") @DateTimeFormat(pattern = "yyyy-MM-dd") Date maxOpensIn,
+            @SortDefault(sort = "taskOpensAt", direction = Sort.Direction.ASC) Sort sort
     ){
 
         Page<JobOfferListResponse> jobOffersPage = jobOfferService.getJobOffers(
-                q, languages, page, minCredits, maxCredits, minSalary, maxSalary, sort
+                q, languages, page, minCredits, maxCredits, minSalary, maxSalary, minOpensIn, maxOpensIn, sort
         );
 
         return ResponseEntity.ok(jobOffersPage);
