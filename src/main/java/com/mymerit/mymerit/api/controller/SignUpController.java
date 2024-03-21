@@ -3,11 +3,10 @@ package com.mymerit.mymerit.api.controller;
 import com.mymerit.mymerit.api.payload.request.EmailVerification;
 import com.mymerit.mymerit.api.payload.request.SignUpRequest;
 import com.mymerit.mymerit.api.payload.response.ApiResponse;
-import com.mymerit.mymerit.domain.entity.AuthenticationCode;
 import com.mymerit.mymerit.domain.entity.User;
 import com.mymerit.mymerit.domain.models.AuthProvider;
 import com.mymerit.mymerit.domain.models.Role;
-import com.mymerit.mymerit.domain.service.MailSenderService;
+import com.mymerit.mymerit.domain.service.VerificationCodeService;
 import com.mymerit.mymerit.infrastructure.repository.AuthenticationCodeRepository;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -18,22 +17,20 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
 public class SignUpController {
-    //Logger logger = LoggerFactory.getLogger(SignUpController.class);
     private final UserRepository userRepository;
     private final AuthenticationCodeRepository authenticationCodeRepository;
-    private final MailSenderService mailSenderService;
     private final PasswordEncoder passwordEncoder;
+    private final VerificationCodeService verificationCodeService;
 
-    public SignUpController(UserRepository userRepository, AuthenticationCodeRepository authenticationCodeRepository, PasswordEncoder passwordEncoder, MailSenderService mailSenderService) {
+    public SignUpController(UserRepository userRepository, AuthenticationCodeRepository authenticationCodeRepository, PasswordEncoder passwordEncoder, VerificationCodeService verificationCodeService) {
         this.userRepository = userRepository;
         this.authenticationCodeRepository = authenticationCodeRepository;
         this.passwordEncoder = passwordEncoder;
-        this.mailSenderService = mailSenderService;
+        this.verificationCodeService = verificationCodeService;
     }
 
     @PostMapping("/code")
@@ -45,56 +42,14 @@ public class SignUpController {
         }
 
         if (code != null) {
-            int codeInt = Integer.parseInt(code);
-
-            List<AuthenticationCode> codes = authenticationCodeRepository.findAllByEmail(emailVerification.getEmail());
-
-            if (codes.stream().noneMatch(c -> c.getCode() == codeInt)) {
-                return ResponseEntity
-                        .badRequest()
-                        .body(new ApiResponse(false, "The verification code is invalid"));
-            }
-
-            if (LocalDateTime.now().isAfter(authenticationCodeRepository.findByCode(codeInt).getExpiration())) {
-                return ResponseEntity
-                        .badRequest()
-                        .body(new ApiResponse(false, "Verification code expired"));
-            }
-
-            return ResponseEntity
-                    .ok()
-                    .body(new ApiResponse(true, "Verification successful"));
+            return verificationCodeService.processVerificationCode(code, emailVerification.getEmail());
         }
 
         if (authenticationCodeRepository.existsByEmail(emailVerification.getEmail())) {
-            List<AuthenticationCode> authenticationCodes = authenticationCodeRepository.findAllByEmail(emailVerification.getEmail());
-
-            for (AuthenticationCode authenticationCode : authenticationCodes) {
-                if (LocalDateTime.now().isBefore(authenticationCode.getExpiration())) {
-                    return ResponseEntity
-                            .ok()
-                            .body(new ApiResponse(true, "Verification code already sent"));
-                }
-            }
+            return verificationCodeService.checkIfCodeAlreadySent(emailVerification.getEmail());
         }
 
-        AuthenticationCode authenticationCode = new AuthenticationCode();
-
-        authenticationCode.setEmail(emailVerification.getEmail());
-
-        do {
-            authenticationCode.setCode(mailSenderService.generateVerificationCode());
-        } while (authenticationCodeRepository.existsByCode(authenticationCode.getCode()));
-
-        authenticationCode.setExpiration(LocalDateTime.now().plusMinutes(30));
-
-        authenticationCodeRepository.insert(authenticationCode);
-        //mailSenderService.sendEmail(emailVerification.getEmail());
-
-        return ResponseEntity
-                .ok()
-                //.body(new ApiResponse(true, "Verification code was successfully sent"))
-                .body(new ApiResponse(true, "Verification code created successfully"));
+        return verificationCodeService.generateAndSendVerificationCode(emailVerification.getEmail());
     }
 
     @PostMapping("/sign-up")
