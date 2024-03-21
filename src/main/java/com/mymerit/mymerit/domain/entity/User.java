@@ -1,5 +1,6 @@
 package com.mymerit.mymerit.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,6 +12,7 @@ public class User {
     private String id;
     private String username;
     private String email;
+    @JsonIgnore
     private String password;
     private String points;
     private String description;
