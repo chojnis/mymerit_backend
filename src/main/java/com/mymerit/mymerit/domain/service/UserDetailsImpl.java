@@ -1,6 +1,5 @@
 package com.mymerit.mymerit.domain.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mymerit.mymerit.domain.entity.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +19,6 @@ public class UserDetailsImpl implements UserDetails, OAuth2User {
     private String id;
     private String username;
     private String email;
-    @JsonIgnore
     private String password;
     private String role;
     private Collection<? extends GrantedAuthority> authorities;

@@ -1,7 +1,9 @@
 package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.domain.entity.User;
+import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import com.mymerit.mymerit.infrastructure.security.CurrentUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,13 @@ public class UserController {
 
     public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('USER')")
+    public User getCurrentUser(@CurrentUser UserDetailsImpl userDetailsImpl) {
+        return userRepository.findById(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " not found"));
     }
 
     @GetMapping("/users")
