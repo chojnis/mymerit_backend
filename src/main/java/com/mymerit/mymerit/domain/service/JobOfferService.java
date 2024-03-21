@@ -70,7 +70,7 @@ public class JobOfferService {
                 jobOffer.getWorkLocations(),
                 jobOffer.getTechnologies(),
                 jobOffer.getCompany(),
-                jobOffer.getTask().isOpen() ? jobOffer.getTask() : null,
+                jobOffer.getTask().getTaskStatus() == TaskStatus.OPEN ? jobOffer.getTask() : null,
                 jobOffer.getSalary(),
                 jobOffer.getExperience(),
                 jobOffer.getMode(),

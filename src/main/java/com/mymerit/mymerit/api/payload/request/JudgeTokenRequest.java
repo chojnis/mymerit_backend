@@ -12,7 +12,7 @@ public class JudgeTokenRequest {
 
     @NotBlank
     String fileContentBase64;
-    
+
     String commandLineArguments;
     Float cpuTimeLimit;
     Float memoryLimit;

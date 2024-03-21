@@ -50,12 +50,24 @@ public class Task {
         return solutions.size();
     }
 
-    public Boolean isOpen(){
-        var now = LocalDateTime.now();
-        return this.getClosesAt().isAfter(now) && this.getOpensAt().isBefore(now);
+
+    public TaskStatus getTaskStatus() {
+        LocalDateTime now = LocalDateTime.now();
+
+        if (this.getClosesAt().isBefore(now)) {
+            return TaskStatus.EXPIRED;
+        } else if (this.getOpensAt().isAfter(now)) {
+            return TaskStatus.NOT_YET_OPEN;
+        } else {
+            return TaskStatus.OPEN;
+        }
     }
 
+
+
     public void addSolution(Solution solution){
-        solutions.add(solution);
+        if(getTaskStatus() == TaskStatus.OPEN) {
+            solutions.add(solution);
+        }
     }
 }

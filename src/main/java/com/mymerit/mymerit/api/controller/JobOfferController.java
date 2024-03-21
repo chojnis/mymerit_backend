@@ -72,7 +72,7 @@ public class JobOfferController {
         return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId()))
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + jobOfferId));
-        //inne responsy gdy save i gdy update
+        //gdy updateujemy solution to usunac poprzednie pliki w bazie danych, lub jakos je zastapic
     }
 
 }
