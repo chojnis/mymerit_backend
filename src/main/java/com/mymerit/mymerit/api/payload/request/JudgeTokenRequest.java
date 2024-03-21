@@ -9,11 +9,11 @@ import lombok.Setter;
 public class JudgeTokenRequest {
     @NotBlank
     String fileName;
+
     @NotBlank
     String fileContentBase64;
-
+    
     String commandLineArguments;
-
     Float cpuTimeLimit;
     Float memoryLimit;
     String stdin;

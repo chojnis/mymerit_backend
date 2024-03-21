@@ -1,5 +1,7 @@
 package com.mymerit.mymerit.domain.service;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
 import com.mymerit.mymerit.api.payload.response.JudgeCompilationResponse;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenEntity;
@@ -21,37 +23,68 @@ public class JudgeService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        //  String requestBody = "{\n" +
-        //          "  \"additional_files\": \"" + judgeTokenRequest.getFileContentBase64() + "\",\n" +
-        //         "  \"language_id\": " + 89 + "\n" +
-       //         "  \"command_line_arguments\": + judgeTokenRequest.getCommandLineArguments() + "\n" +
-        //        "  \"cpu_time_limit\":  "
-//
-         //       "}";
-//
-        String requestBody = "{\n" +
-                "  \"additional_files\": \"" + judgeTokenRequest.getFileContentBase64() + "\",\n" +
-                "  \"language_id\": " + 89 + ",\n" +
-                "  \"command_line_arguments\": \"" + judgeTokenRequest.getCommandLineArguments() + "\",\n" +
-                "  \"memory_limit\": \"" + judgeTokenRequest.getMemoryLimit() + "\",\n" +
-                "  \"stdin\": \"" + judgeTokenRequest.getStdin() + "\",\n" +
-                "  \"cpu_time_limit\": " + judgeTokenRequest.getCpuTimeLimit() + "\n" +
-                "}";
+        String requestBody = toJsonString(judgeTokenRequest);
 
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
         ResponseEntity<JudgeTokenEntity> response = restTemplate.postForEntity(apiUrl, request, JudgeTokenEntity.class);
 
-        
-
         return response.getBody().getToken();
     }
-
 
     public JudgeCompilationResponse generateRequestResponse(String token){
         RestTemplate restTemplate = new RestTemplate();
         String apiUrl = "http://localhost:2358/submissions/"+token+"?base64_encoded=true";
         ResponseEntity<JudgeCompilationResponse> response = restTemplate.getForEntity(apiUrl, JudgeCompilationResponse.class);
         return response.getBody();
+    }
+
+    public String toJsonString(JudgeTokenRequest judgeTokenRequest) {
+        StringBuilder requestBodyBuilder = new StringBuilder("{\n");
+
+        if (judgeTokenRequest.getFileName() != null) {
+            requestBodyBuilder
+                    .append("  \"additional_files\": \"")
+                    .append(judgeTokenRequest.getFileContentBase64())
+                    .append("\",\n");
+        }
+        if (judgeTokenRequest.getFileName() != null) {
+            requestBodyBuilder
+                    .append("  \"language_id\": \"")
+                    .append(89)
+                    .append("\",\n");
+        }
+        if (judgeTokenRequest.getCommandLineArguments() != null) {
+            requestBodyBuilder
+                    .append("  \"command_line_arguments\": \"")
+                    .append(judgeTokenRequest.getCommandLineArguments())
+                    .append("\",\n");
+        }
+        if (judgeTokenRequest.getCpuTimeLimit() != null) {
+            requestBodyBuilder
+                    .append("  \"cpu_time_limit\": ")
+                    .append(judgeTokenRequest.getCpuTimeLimit())
+                    .append(",\n");
+        }
+        if (judgeTokenRequest.getMemoryLimit() != null) {
+            requestBodyBuilder
+                    .append("  \"memory_limit\": ")
+                    .append(judgeTokenRequest.getMemoryLimit())
+                    .append(",\n");
+        }
+        if (judgeTokenRequest.getStdin() != null) {
+            requestBodyBuilder
+                    .append("  \"stdin\": \"")
+                    .append(judgeTokenRequest.getStdin())
+                    .append("\",\n");
+        }
+
+        if (requestBodyBuilder.charAt(requestBodyBuilder.length() - 2) == ',') {
+            requestBodyBuilder.deleteCharAt(requestBodyBuilder.length() - 2);
+        }
+
+        requestBodyBuilder.append("}");
+
+        return requestBodyBuilder.toString();
     }
 }
 

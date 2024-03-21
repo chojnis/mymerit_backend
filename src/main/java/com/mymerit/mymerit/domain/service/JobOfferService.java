@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -116,32 +117,67 @@ public class JobOfferService {
     }
 
 
-    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId) throws IOException {
-        Optional<JobOffer> optionalJobOffer = jobOfferRepository.findById(jobOfferId);
+    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId){
+        JobOffer jobOffer = getJobOfferOrThrow(jobOfferId);
+        Task task = jobOffer.getTask();
 
-        if (optionalJobOffer.isPresent()) {
-            JobOffer jobOffer = optionalJobOffer.get();
-            Task task = jobOffer.getTask();
-
-            List<ObjectId> fileIDs = new ArrayList<>();
-            for (MultipartFile file : files) {
-                try {
-                    fileIDs.add(fileService.addFile(file));
-                } catch (IOException e) {
-                    throw new RuntimeException("Failed to add file for solution", e);
-                }
-            }
-
-            Solution solution = new Solution(task, userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found")), fileIDs);
-            solutionRepository.save(solution);
-            System.out.println(solution);
-            task.addSolution(solution);
-            taskRepository.save(task);
-            return jobOfferRepository.save(jobOffer);
+        if (userAlreadySubmittedSolution(task, userId)) {
+            updateExistingSolution(task, files, userId);
         } else {
-            throw new IllegalArgumentException("Job offer not found for id: " + jobOfferId);
+            createNewSolution(task, files, userId);
         }
+
+        return jobOfferRepository.save(jobOffer);
     }
+
+    private JobOffer getJobOfferOrThrow(String jobOfferId) {
+        return jobOfferRepository.findById(jobOfferId)
+                .orElseThrow(() -> new IllegalArgumentException("Job offer not found for id: " + jobOfferId));
+    }
+
+    private boolean userAlreadySubmittedSolution(Task task, String userId) {
+        return task.getSolutions().stream()
+                .anyMatch(solution -> solution.getUser().getId().equals(userId));
+    }
+
+    private void updateExistingSolution(Task task, List<MultipartFile> files, String userId){
+        Solution existingSolution = task.getSolutions().stream()
+                .filter(solution -> solution.getUser().getId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Solution not found for the user"));
+
+        List<ObjectId> fileIDs = addFiles(files);
+        existingSolution.setFiles(fileIDs);
+        solutionRepository.save(existingSolution);
+        System.out.println("Existing solution updated: " + existingSolution);
+    }
+
+    private void createNewSolution(Task task, List<MultipartFile> files, String userId){
+        List<ObjectId> fileIDs = addFiles(files);
+        Solution solution = new Solution(task, getUser(userId), fileIDs);
+        solutionRepository.save(solution);
+        System.out.println("New solution created: " + solution);
+        task.addSolution(solution);
+        taskRepository.save(task);
+    }
+
+    private List<ObjectId> addFiles(List<MultipartFile> files){
+        return files.stream()
+                .map(file -> {
+                    try {
+                        return fileService.addFile(file);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to add file for solution", e);
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    private User getUser(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
 
 
 
