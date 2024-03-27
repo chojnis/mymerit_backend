@@ -1,15 +1,15 @@
-version: "2"
+version: '2'
 
 x-logging:
   &default-logging
   logging:
     driver: json-file
     options:
-      max-size: 100M
+      max-size: 100m
 
 services:
   server:
-    image: judge0/judge0:latest
+    image: judge0/judge0:1.13.0
     volumes:
       - ./judge0.conf:/judge0.conf:ro
     ports:
@@ -18,8 +18,8 @@ services:
     <<: *default-logging
     restart: always
 
-  worker:
-    image: judge0/judge0:latest
+  workers:
+    image: judge0/judge0:1.13.0
     command: ["./scripts/workers"]
     volumes:
       - ./judge0.conf:/judge0.conf:ro
