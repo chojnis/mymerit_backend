@@ -1,16 +1,20 @@
 server:
   port:
     8080
+  tomcat:
+    max-swallow-size : 500MB
+
 
 spring:
   data:
     mongodb:
-      authentication-database: admin
-      username: root
-      password: password
+      # authentication-database: admin
+      # username: root
+      # password: password
+      uri : mongodb://root:password@localhost:27017/?authSource=admin&authMechanism=SCRAM-SHA-1
       database: mymerit
-      port: 27017
-      host: localhost
+      # port: 27017
+      # host: localhost
   security:
     oauth2:
       client:
@@ -40,6 +44,11 @@ spring:
           auth: true
           starttls:
             enable: true
+  servlet:
+    multipart:
+      enabled : true
+      max-file-size : 100MB
+      max-request-size : 105MB
 
 logging:
   level:
