@@ -1,6 +1,7 @@
 package com.mymerit.mymerit.domain.entity;
 
-import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mymerit.mymerit.domain.models.AuthProvider;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,12 +13,13 @@ import java.util.List;
 public class User {
     @Id
     private String id;
-    @NotBlank
     private String username;
-    @NotBlank
     private String email;
-    @NotBlank
+    @JsonIgnore
     private String password;
+    private String imageUrl;
+    private AuthProvider provider;
+    private String providerId;
     private String points;
     private String description;
     private String role;

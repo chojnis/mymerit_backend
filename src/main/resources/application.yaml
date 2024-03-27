@@ -21,10 +21,18 @@ spring:
         registration:
           github:
             client-id: a446935ece96249d5d22
-            client-secret: e1ab422c3a7faac427ace88c0f38ebb264b6e960
+            client-secret: d3e879cd7a0d6c81e6d94f7075edc49f0e08d964
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - user:email
+              - read:user
           google:
             client-id: 899578246174-akvbo1tf5lkhpdauisvbivc3unn5oljn.apps.googleusercontent.com
             client-secret: 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
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - profile
   mail:
     host: smtp.gmail.com
     port: 587
@@ -51,3 +59,8 @@ mymerit:
   app:
     jwtSecret: "tw1oqyxkbjg1bmgn5ociiasmdo41xg3qx5q88w19scmazo90nfjslmxdsmgkzy04i3aicwgbjtyesrftnby9wwj3ydey3g6zegh1cjk9wgov5rvwb7zafxgn74ooebz0"
     jwtExpirationMs: "900000"
+
+app:
+    oauth2:
+      authorizedRedirectUris:
+        - http://localhost:5173/oauth2/redirect
