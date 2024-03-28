@@ -1,12 +1,4 @@
-# MyMerit - Backend
-
-## Table of Contents
-
-- [Requirements](#requirements)
-- [Installation](#installation)
-  - [Database](#database)
-  - [Judge0](#judge0)
-- [Usage](#usage)
+# MyMerit - backend
 
 ## Requirements
 
@@ -16,19 +8,53 @@
 ## Installation
 
 ### Database
-1. ```cd database```
-2. ```docker-compose up -d```
+
+1. Go to the **database** directory
+```
+cd database
+```
+2. Create and start a container
+```
+docker-compose up -d
+```
 
 **Note:** The database is available at [http://localhost:8081](http://localhost:8081). You need to create a database named _**mymerit**_.
 
 ### Judge0
-1. ```cd judge0```
-2. ```docker-compose up -d```
+
+1. Go to the **judge0** directory
+```
+cd judge0
+```
+2. Create and start a container
+```
+docker-compose up -d
+```
 
 **Note:** The Judge0 API is available at [http://localhost:2358](http://localhost:2358).
 
-## Usage
-1. ```./gradlew clean build```
-2. ```./gradlew bootRun``` or ```java -jar build/libs/my-merit-0.0.1-SNAPSHOT.jar```
+## Run the application
+
+### Windows
+
+1. Assemble and test this project
+```
+.\gradlew.bat build
+```
+2. Run this project as a Spring Boot application
+```
+.\gradlew.bat bootRun
+```
+
+### Linux / macOS
+
+1. Assemble and test this project
+```
+./gradlew build
+```
+2. Run this project as a Spring Boot application
+```
+./gradlew bootRun
+```
 
 **Note:** The application is available at [http://localhost:8080](http://localhost:8080). For testing, I recommend [Postman](https://www.postman.com/).
