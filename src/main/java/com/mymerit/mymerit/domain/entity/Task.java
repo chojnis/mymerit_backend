@@ -53,7 +53,6 @@ public class Task {
         this.allowedLanguages = allowedLanguages;
     }
 
-
     public Integer getSolutionCount() {
         return solutions.size();
     }
@@ -75,5 +74,11 @@ public class Task {
         if(getStatus() == TaskStatus.OPEN) {
             solutions.add(solution);
         }
+    }
+
+    public Solution getSolutionForUser(User user){
+        return this.solutions.stream().filter(solution -> solution.getUser().equals(user))
+                .findFirst()
+                .orElse(null);
     }
 }

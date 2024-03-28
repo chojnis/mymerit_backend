@@ -11,6 +11,7 @@ import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -53,12 +54,19 @@ public class JobOfferService {
         return null;
     }
 
-    public Optional<JobOfferDetailsResponse> getJobOfferDetailsResponse(String id) {
-        return jobOfferRepository.findById(id)
-                .map(this::createJobOfferDetailsResponse);
+    public Optional<JobOfferDetailsResponse> getJobOfferDetailsResponse(String id, UserDetailsImpl userDetails) {
+        Optional<User> userOptional = userRepository.findById(userDetails.getId());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            return jobOfferRepository.findById(id)
+                    .map(jobOffer -> createJobOfferDetailsResponse(jobOffer, jobOffer.getTask().getSolutionForUser(user)));
+        } else {
+            throw new RuntimeException("User not found with id: " + userDetails.getId());
+        }
     }
 
-    private JobOfferDetailsResponse createJobOfferDetailsResponse(JobOffer jobOffer) {
+    private JobOfferDetailsResponse createJobOfferDetailsResponse(JobOffer jobOffer, Solution userSolution) {
         return new JobOfferDetailsResponse(
                 jobOffer.getId(),
                 jobOffer.getJobTitle(),
@@ -73,7 +81,8 @@ public class JobOfferService {
                 jobOffer.getExperience(),
                 jobOffer.getMode(),
                 jobOffer.getTask().getOpensAt(),
-                jobOffer.getTask().getClosesAt()
+                jobOffer.getTask().getClosesAt(),
+                userSolution
         );
     }
 

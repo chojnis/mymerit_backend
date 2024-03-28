@@ -1,6 +1,7 @@
 package com.mymerit.mymerit.api.payload.response;
 
 import com.mymerit.mymerit.domain.entity.Company;
+import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.models.EmploymentType;
 import com.mymerit.mymerit.domain.models.Experience1;
 import com.mymerit.mymerit.domain.entity.Task;
@@ -42,7 +43,8 @@ public class JobOfferDetailsResponse {
     @Valid
     private Company company;
 
-    private Task task; //w zaleznosci od isOpen : null lub Task
+    @NotNull
+    private Task task;
 
     @NotEmpty
     private Integer salary;
@@ -58,4 +60,6 @@ public class JobOfferDetailsResponse {
 
     @NotNull
     private LocalDateTime closesAt;
+
+    private Solution userSolution;
 }
