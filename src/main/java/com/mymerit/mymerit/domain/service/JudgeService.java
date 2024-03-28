@@ -33,7 +33,7 @@ public class JudgeService {
 
     public JudgeCompilationResponse generateRequestResponse(String token){
         RestTemplate restTemplate = new RestTemplate();
-        String apiUrl = "http://localhost:2358/submissions/"+token+"?base64_encoded=true";
+        String apiUrl = "http://localhost:2358/submissions/" + token + "?base64_encoded=true&fields=stdout,time,stderr,token,compile_output,message,status,exit_code";
         ResponseEntity<JudgeCompilationResponse> response = restTemplate.getForEntity(apiUrl, JudgeCompilationResponse.class);
         return response.getBody();
     }
@@ -59,10 +59,10 @@ public class JudgeService {
                     .append(judgeTokenRequest.getCommandLineArguments())
                     .append("\",\n");
         }
-        if (judgeTokenRequest.getCpuTimeLimit() != null) {
+        if (judgeTokenRequest.getTimeLimit() != null) {
             requestBodyBuilder
                     .append("  \"cpu_time_limit\": ")
-                    .append(judgeTokenRequest.getCpuTimeLimit())
+                    .append(judgeTokenRequest.getTimeLimit())
                     .append(",\n");
         }
         if (judgeTokenRequest.getMemoryLimit() != null) {

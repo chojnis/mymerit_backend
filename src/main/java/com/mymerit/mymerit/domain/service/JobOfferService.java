@@ -3,6 +3,7 @@ package com.mymerit.mymerit.domain.service;
 import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
 import com.mymerit.mymerit.domain.entity.*;
+import com.mymerit.mymerit.domain.models.TaskStatus;
 import com.mymerit.mymerit.infrastructure.repository.JobOfferRepository;
 import com.mymerit.mymerit.infrastructure.repository.SolutionRepository;
 import com.mymerit.mymerit.infrastructure.repository.TaskRepository;

@@ -1,8 +1,8 @@
 package com.mymerit.mymerit.api.payload.response;
 
 import com.mymerit.mymerit.domain.entity.Company;
-import com.mymerit.mymerit.domain.entity.EmploymentType;
-import com.mymerit.mymerit.domain.entity.Experience1;
+import com.mymerit.mymerit.domain.models.EmploymentType;
+import com.mymerit.mymerit.domain.models.Experience1;
 import com.mymerit.mymerit.domain.entity.Task;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

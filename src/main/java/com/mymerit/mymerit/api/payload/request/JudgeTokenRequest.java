@@ -14,7 +14,7 @@ public class JudgeTokenRequest {
     String fileContentBase64;
 
     String commandLineArguments;
-    Float cpuTimeLimit;
-    Float memoryLimit;
+    Float timeLimit;
+    Integer memoryLimit;
     String stdin;
 }

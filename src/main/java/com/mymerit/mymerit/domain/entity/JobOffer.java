@@ -1,11 +1,12 @@
 package com.mymerit.mymerit.domain.entity;
 
+import com.mymerit.mymerit.domain.models.EmploymentType;
+import com.mymerit.mymerit.domain.models.Experience1;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;

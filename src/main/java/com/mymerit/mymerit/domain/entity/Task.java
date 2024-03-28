@@ -1,8 +1,10 @@
 package com.mymerit.mymerit.domain.entity;
 
+import com.mymerit.mymerit.domain.models.TaskStatus;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.data.annotation.AccessType;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
@@ -10,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.springframework.data.annotation.AccessType.Type.PROPERTY;
-
 @Data
 @Document("tasks")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Task {
     @Id
     private String id;
@@ -36,6 +38,10 @@ public class Task {
     @NotEmpty(message = "Allowed languages are required")
     private Set<String> allowedLanguages;
 
+    private Integer memoryLimit;
+
+    private Float timeLimit;
+
     private List<Solution> solutions = new ArrayList<>();
 
     public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages) {
@@ -46,6 +52,7 @@ public class Task {
         this.reward = reward;
         this.allowedLanguages = allowedLanguages;
     }
+
 
     public Integer getSolutionCount() {
         return solutions.size();

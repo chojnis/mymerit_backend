@@ -1,14 +1,17 @@
 package com.mymerit.mymerit.api.payload.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 @Getter
 @Setter
+@AllArgsConstructor
 public class JudgeCompilationResponse implements Serializable {
     @Getter
     @Setter
+    @AllArgsConstructor
     static class Status{
         public Integer id;
         public String description;
@@ -18,12 +21,7 @@ public class JudgeCompilationResponse implements Serializable {
     private String stderr;
     private String compile_output;
     private Status status;
+    private Integer exit_code;
+    private Float time;
 
-    public JudgeCompilationResponse(String stdout, String status_id, int language_id, String stderr, String compile_output, Status status) {
-        this.stdout = stdout;
-        this.language_id = language_id;
-        this.stderr = stderr;
-        this.compile_output = compile_output;
-        this.status = status;
-    }
 }
