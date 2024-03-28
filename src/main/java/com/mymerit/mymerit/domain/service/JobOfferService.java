@@ -150,6 +150,14 @@ public class JobOfferService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Solution not found for the user"));
 
+        existingSolution.files.forEach((id) -> {
+            try {
+                fileService.DeleteFile(String.valueOf(id));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         List<ObjectId> fileIDs = addFiles(files);
         existingSolution.setFiles(fileIDs);
         solutionRepository.save(existingSolution);
