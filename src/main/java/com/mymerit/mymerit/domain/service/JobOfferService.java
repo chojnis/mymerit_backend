@@ -1,7 +1,9 @@
 package com.mymerit.mymerit.domain.service;
 
+import com.mymerit.mymerit.api.payload.response.DownloadFileResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
+import com.mymerit.mymerit.api.payload.response.UserTaskDetailsResponse;
 import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import com.mymerit.mymerit.infrastructure.repository.JobOfferRepository;
@@ -58,7 +60,7 @@ public class JobOfferService {
         Optional<User> userOptional = userRepository.findById(userDetails.getId());
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-
+            System.out.println(jobOfferRepository.findById(id).get().getTask().getSolutionForUser(user));
             return jobOfferRepository.findById(id)
                     .map(jobOffer -> createJobOfferDetailsResponse(jobOffer, jobOffer.getTask().getSolutionForUser(user)));
         } else {
@@ -76,13 +78,12 @@ public class JobOfferService {
                 jobOffer.getWorkLocations(),
                 jobOffer.getTechnologies(),
                 jobOffer.getCompany(),
-                jobOffer.getTask().getStatus() == TaskStatus.OPEN ? jobOffer.getTask() : null,
+                jobOffer.getTask().getStatus() == TaskStatus.OPEN ? createTaskResponse(jobOffer.getTask(), userSolution): null,
                 jobOffer.getSalary(),
                 jobOffer.getExperience(),
                 jobOffer.getMode(),
                 jobOffer.getTask().getOpensAt(),
-                jobOffer.getTask().getClosesAt(),
-                userSolution
+                jobOffer.getTask().getClosesAt()
         );
     }
 
@@ -98,6 +99,21 @@ public class JobOfferService {
                 jobOffer.getCompany(),
                 jobOffer.getSalary(),
                 jobOffer.getTask().getStatus()
+        );
+    }
+
+    private UserTaskDetailsResponse createTaskResponse(Task task, Solution userSolution){
+        return new UserTaskDetailsResponse(
+               task.getId(),
+                task.getTitle(),
+                task.getInstructions(),
+                task.getOpensAt(),
+                task.getClosesAt(),
+                task.getReward(),
+                task.getAllowedLanguages(),
+                task.getMemoryLimit(),
+                task.getTimeLimit(),
+                userSolution
         );
     }
 
@@ -143,6 +159,30 @@ public class JobOfferService {
         return jobOfferRepository.save(jobOffer);
     }
 
+    public List<DownloadFileResponse> downloadSolutionFilesForUser(String jobId, String userId) {
+        List<DownloadFileResponse> downloadedFiles = new ArrayList<>();
+        Optional<JobOffer> jobOfferOptional = jobOfferRepository.findById(jobId);
+        if (jobOfferOptional.isPresent()) {
+            JobOffer jobOffer = jobOfferOptional.get();
+            User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+            Solution solution = jobOffer.getTask().getSolutionForUser(user);
+            if (solution != null) {
+                for (String fileId : solution.getFiles()) {
+                    try {
+                        DownloadFile downloadFile = fileService.downloadFile(fileId);
+                        DownloadFileResponse downloadFileResponse = new DownloadFileResponse(downloadFile.getFilename(), downloadFile.getFileType(), downloadFile.getFile());
+                        downloadedFiles.add(downloadFileResponse);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return downloadedFiles;
+    }
+
+
+
     private JobOffer getJobOfferOrThrow(String jobOfferId) {
         return jobOfferRepository.findById(jobOfferId)
                 .orElseThrow(() -> new IllegalArgumentException("Job offer not found for id: " + jobOfferId));
@@ -168,13 +208,13 @@ public class JobOfferService {
         });
 
         List<ObjectId> fileIDs = addFiles(files);
-        existingSolution.setFiles(fileIDs);
+        existingSolution.setFiles(fileIDs.stream().map(ObjectId::toString).toList());
         solutionRepository.save(existingSolution);
         System.out.println("Existing solution updated: " + existingSolution);
     }
 
     private void createNewSolution(Task task, List<MultipartFile> files, String userId){
-        List<ObjectId> fileIDs = addFiles(files);
+        List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         Solution solution = new Solution(task, getUser(userId), fileIDs);
         solutionRepository.save(solution);
         System.out.println("New solution created: " + solution);

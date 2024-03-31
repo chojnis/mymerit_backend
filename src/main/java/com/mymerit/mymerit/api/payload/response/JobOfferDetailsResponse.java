@@ -44,7 +44,7 @@ public class JobOfferDetailsResponse {
     private Company company;
 
     @NotNull
-    private Task task;
+    private UserTaskDetailsResponse task;
 
     @NotEmpty
     private Integer salary;
@@ -61,5 +61,4 @@ public class JobOfferDetailsResponse {
     @NotNull
     private LocalDateTime closesAt;
 
-    private Solution userSolution;
 }

@@ -1,8 +1,10 @@
 package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.api.payload.request.SolutionRequest;
+import com.mymerit.mymerit.api.payload.response.DownloadFileResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
+import com.mymerit.mymerit.domain.entity.DownloadFile;
 import com.mymerit.mymerit.domain.entity.JobOffer;
 import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.service.JobOfferService;
@@ -75,5 +77,12 @@ public class JobOfferController {
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + jobOfferId));
     }
+
+    @GetMapping("/job/solutions/{jobOfferId}")
+    public ResponseEntity<List<DownloadFileResponse>> downloadSolutionFiles(@PathVariable String jobOfferId, @CurrentUser UserDetailsImpl userDetails) {
+        List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadSolutionFilesForUser(jobOfferId, userDetails.getId());
+        return ResponseEntity.ok(downloadedFiles);
+    }
+
 
 }

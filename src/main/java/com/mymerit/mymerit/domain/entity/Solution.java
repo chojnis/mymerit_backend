@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Data
@@ -25,9 +26,9 @@ public class Solution {
 
     public User user;
     
-    public List<ObjectId> files;
+    public List<String> files;
 
-    public Solution(Task taskId, User user, List<ObjectId> files) {
+    public Solution(Task taskId, User user, List<String> files) {
         this.taskId = taskId;
         this.user = user;
         this.files = files;
