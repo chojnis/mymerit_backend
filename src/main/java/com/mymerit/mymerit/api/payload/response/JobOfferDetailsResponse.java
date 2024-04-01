@@ -5,6 +5,7 @@ import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.models.EmploymentType;
 import com.mymerit.mymerit.domain.models.Experience1;
 import com.mymerit.mymerit.domain.entity.Task;
+import com.mymerit.mymerit.domain.models.TaskStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -60,5 +61,9 @@ public class JobOfferDetailsResponse {
 
     @NotNull
     private LocalDateTime closesAt;
+
+    @NotNull
+    private TaskStatus status;
+
 
 }

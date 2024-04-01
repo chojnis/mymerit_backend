@@ -78,12 +78,13 @@ public class JobOfferService {
                 jobOffer.getWorkLocations(),
                 jobOffer.getTechnologies(),
                 jobOffer.getCompany(),
-                jobOffer.getTask().getStatus() == TaskStatus.OPEN ? createTaskResponse(jobOffer.getTask(), userSolution): null,
+                jobOffer.getTask().getStatus() != TaskStatus.NOT_YET_OPEN ? createTaskResponse(jobOffer.getTask(), userSolution): null,
                 jobOffer.getSalary(),
                 jobOffer.getExperience(),
                 jobOffer.getMode(),
                 jobOffer.getTask().getOpensAt(),
-                jobOffer.getTask().getClosesAt()
+                jobOffer.getTask().getClosesAt(),
+                jobOffer.getTask().getStatus()
         );
     }
 
@@ -113,6 +114,7 @@ public class JobOfferService {
                 task.getAllowedLanguages(),
                 task.getMemoryLimit(),
                 task.getTimeLimit(),
+                task.getStatus(),
                 userSolution
         );
     }
@@ -180,8 +182,6 @@ public class JobOfferService {
         }
         return downloadedFiles;
     }
-
-
 
     private JobOffer getJobOfferOrThrow(String jobOfferId) {
         return jobOfferRepository.findById(jobOfferId)
