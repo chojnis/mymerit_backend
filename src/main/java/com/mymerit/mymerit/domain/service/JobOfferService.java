@@ -1,9 +1,6 @@
 package com.mymerit.mymerit.domain.service;
 
-import com.mymerit.mymerit.api.payload.response.DownloadFileResponse;
-import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
-import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
-import com.mymerit.mymerit.api.payload.response.UserTaskDetailsResponse;
+import com.mymerit.mymerit.api.payload.response.*;
 import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import com.mymerit.mymerit.infrastructure.repository.JobOfferRepository;
@@ -13,7 +10,6 @@ import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -41,16 +37,16 @@ public class JobOfferService {
         this.fileService = fileService;
         this.taskRepository = taskRepository;
         this.solutionRepository = solutionRepository;
-
-
     }
 
     public JobOffer addJobOffer(JobOffer jobOffer){
-        Integer companyCredits = jobOffer.getCompany().getCreditsAmount();
+        Integer companyCredits = jobOffer.getCompany().getCredits();
         taskRepository.save(jobOffer.getTask());
-        if(companyCredits > jobOffer.getTask().getReward()) {
-            jobOffer.getCompany().setCreditsAmount(companyCredits - jobOffer.getTask().getReward());
+        if(companyCredits >= jobOffer.getTask().getReward()) {
+            jobOffer.getCompany().setCredits(companyCredits - jobOffer.getTask().getReward());
             return jobOfferRepository.save(jobOffer);
+        }else{
+            System.out.println("Couldnt creeate job offer");
         }
 
         return null;
@@ -60,9 +56,17 @@ public class JobOfferService {
         Optional<User> userOptional = userRepository.findById(userDetails.getId());
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            System.out.println(jobOfferRepository.findById(id).get().getTask().getSolutionForUser(user));
-            return jobOfferRepository.findById(id)
-                    .map(jobOffer -> createJobOfferDetailsResponse(jobOffer, jobOffer.getTask().getSolutionForUser(user)));
+            Optional<JobOffer> jobOffer = jobOfferRepository.findById(id);
+            if(jobOffer.isPresent()){
+                if(jobOffer.get().getCompany().getId().equals(user.getId())){
+                    return jobOffer.map(this::createJobOfferDetailsSolutionsResponse);
+                }
+                return jobOffer
+                        .map(offer -> createJobOfferDetailsResponse(offer, offer.getTask().getSolutionForUser(user)));
+            }else{
+                throw new RuntimeException("No job offer with id: " + id);
+            }
+
         } else {
             throw new RuntimeException("User not found with id: " + userDetails.getId());
         }
@@ -81,10 +85,16 @@ public class JobOfferService {
                 jobOffer.getTask().getStatus() != TaskStatus.NOT_YET_OPEN ? createTaskResponse(jobOffer.getTask(), userSolution): null,
                 jobOffer.getSalary(),
                 jobOffer.getExperience(),
-                jobOffer.getMode(),
+                jobOffer.getEmploymentType(),
                 jobOffer.getTask().getOpensAt(),
                 jobOffer.getTask().getClosesAt(),
                 jobOffer.getTask().getStatus()
+        );
+    }
+
+    private JobOfferDetailsResponse createJobOfferDetailsSolutionsResponse(JobOffer jobOffer) {
+        return new JobOfferDetailsSolutionsResponse(
+                jobOffer
         );
     }
 
@@ -103,9 +113,9 @@ public class JobOfferService {
         );
     }
 
-    private UserTaskDetailsResponse createTaskResponse(Task task, Solution userSolution){
+    public  UserTaskDetailsResponse createTaskResponse(Task task, Solution userSolution) {
         return new UserTaskDetailsResponse(
-               task.getId(),
+                task.getId(),
                 task.getTitle(),
                 task.getInstructions(),
                 task.getOpensAt(),
@@ -222,7 +232,7 @@ public class JobOfferService {
         taskRepository.save(task);
     }
 
-    private List<ObjectId> addFiles(List<MultipartFile> files){
+    private List<ObjectId> addFiles(List<MultipartFile> files) {
         return files.stream()
                 .map(file -> {
                     try {
@@ -238,8 +248,4 @@ public class JobOfferService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
-
-
-
-
 }
