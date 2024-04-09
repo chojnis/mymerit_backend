@@ -3,10 +3,11 @@ package com.mymerit.mymerit.domain.entity;
 import com.mymerit.mymerit.domain.models.EmploymentType;
 import com.mymerit.mymerit.domain.models.Experience1;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
@@ -38,22 +39,21 @@ public class JobOffer {
     @NotNull(message = "Experience is required")
     private Experience1 experience;
 
-    @NotNull(message = "Company is required")
-    @Valid
-    private Company company;
-
     @NotNull(message = "Task is required")
 
     @Valid
     private Task task;
 
+    @Valid
+    private User company;
+
     @NotNull(message = "Salary is required")
     private Integer salary;
 
     @NotNull(message = "Employment Type is required")
-    private EmploymentType mode;
+    private EmploymentType employmentType;
 
-    public JobOffer(String jobTitle, String description, Set<String> requiredSkills, Set<String> preferredSkills, Set<String> workLocations, Set<String> technologies, Company company, Task task, Experience1 experience, EmploymentType mode, Integer salary) {
+    public JobOffer(String jobTitle, String description, Set<String> requiredSkills, Set<String> preferredSkills, Set<String> workLocations, Set<String> technologies,  User company,  Task task, Experience1 experience, EmploymentType employmentType, Integer salary) {
         this.jobTitle = jobTitle;
         this.description = description;
         this.requiredSkills = requiredSkills;
@@ -63,11 +63,9 @@ public class JobOffer {
         this.company = company;
         this.task = task;
         this.experience = experience;
-        this.mode = mode;
+        this.employmentType = employmentType;
         this.salary = salary;
-
     }
-
 }
 
 
