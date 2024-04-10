@@ -1,5 +1,6 @@
 package com.mymerit.mymerit.api.controller;
 
+import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
 import com.mymerit.mymerit.api.payload.response.DownloadFileResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
@@ -41,8 +42,8 @@ public class JobOfferController {
     }
 
     @PostMapping("/job")
-    ResponseEntity<JobOffer> addJobOffer(@RequestBody @Valid JobOffer jobOffer) {
-        return ResponseEntity.ok(jobOfferService.addJobOffer(jobOffer));
+    ResponseEntity<JobOffer> addJobOffer(@RequestBody @Valid JobOfferRequest jobOfferRequest, @CurrentUser UserDetailsImpl user) {
+        return ResponseEntity.ok(jobOfferService.addJobOffer(jobOfferRequest, user));
     }
 
     @GetMapping("/jobs")

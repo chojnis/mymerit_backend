@@ -1,5 +1,6 @@
 package com.mymerit.mymerit.domain.service;
 
+import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
 import com.mymerit.mymerit.api.payload.response.*;
 import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.TaskStatus;
@@ -39,17 +40,34 @@ public class JobOfferService {
         this.solutionRepository = solutionRepository;
     }
 
-    public JobOffer addJobOffer(JobOffer jobOffer){
-        Integer companyCredits = jobOffer.getCompany().getCredits();
-        taskRepository.save(jobOffer.getTask());
-        if(companyCredits >= jobOffer.getTask().getReward()) {
-            jobOffer.getCompany().setCredits(companyCredits - jobOffer.getTask().getReward());
-            return jobOfferRepository.save(jobOffer);
-        }else{
-            System.out.println("Couldnt creeate job offer");
+    public JobOffer addJobOffer(JobOfferRequest jobOfferRequest, UserDetailsImpl userDetails){
+        User user = getUser(userDetails.getId());
+
+        Integer userCredits = user.getCredits();
+        Integer taskReward = jobOfferRequest.getTask().getReward();
+
+        if (userCredits < taskReward) {
+            throw new RuntimeException("Not enough credits to create job offer");
         }
 
-        return null;
+        user.setCredits(userCredits - taskReward);
+        taskRepository.save(jobOfferRequest.getTask());
+
+        JobOffer jobOffer = new JobOffer(
+                jobOfferRequest.getJobTitle(),
+                jobOfferRequest.getDescription(),
+                jobOfferRequest.getRequiredSkills(),
+                jobOfferRequest.getPreferredSkills(),
+                jobOfferRequest.getWorkLocations(),
+                jobOfferRequest.getTechnologies(),
+                user,
+                jobOfferRequest.getTask(),
+                jobOfferRequest.getExperience(),
+                jobOfferRequest.getEmploymentType(),
+                jobOfferRequest.getSalary()
+        );
+
+        return jobOfferRepository.save(jobOffer);
     }
 
     public Optional<JobOfferDetailsResponse> getJobOfferDetailsResponse(String id, UserDetailsImpl userDetails) {
