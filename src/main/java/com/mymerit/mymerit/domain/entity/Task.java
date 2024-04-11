@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -42,15 +43,23 @@ public class Task {
 
     private Float timeLimit;
 
+    Map<String, String> testDataMap;
+
+    private SolutionFile testSolution;
+
     private List<Solution> solutions = new ArrayList<>();
 
-    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages) {
+    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages, SolutionFile testSolution,
+                Map<String,String> testDataMap) {
         this.title = title;
         this.instructions = instructions;
         this.opensAt = opensAt;
         this.closesAt = closesAt;
         this.reward = reward;
         this.allowedLanguages = allowedLanguages;
+        this.testSolution = testSolution;
+        this.testDataMap = testDataMap;
+
     }
 
     public Integer getSolutionCount() {

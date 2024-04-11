@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class TaskService {
     JobOfferRepository jobOfferRepository;
+    JudgeService judgeService;
 
-    TaskService(JobOfferRepository jobOfferRepository){
+    TaskService(JobOfferRepository jobOfferRepository,JudgeService judgeService){
         this.jobOfferRepository = jobOfferRepository;
+        this.judgeService = judgeService;
     }
 
     private Task getTaskById(String jobOfferId, String taskId) {
@@ -22,5 +24,6 @@ public class TaskService {
         }
         return null;
     }
+
 
 }

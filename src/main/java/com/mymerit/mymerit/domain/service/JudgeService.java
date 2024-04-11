@@ -77,6 +77,12 @@ public class JudgeService {
                     .append(judgeTokenRequest.getStdin())
                     .append("\",\n");
         }
+        if (judgeTokenRequest.getExpectedOutput() != null) {
+            requestBodyBuilder
+                    .append("  \"expected_output\": \"")
+                    .append(judgeTokenRequest.getExpectedOutput())
+                    .append("\",\n");
+        }
 
         if (requestBodyBuilder.charAt(requestBodyBuilder.length() - 2) == ',') {
             requestBodyBuilder.deleteCharAt(requestBodyBuilder.length() - 2);
