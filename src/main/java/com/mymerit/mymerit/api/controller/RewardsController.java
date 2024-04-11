@@ -1,17 +1,18 @@
 package com.mymerit.mymerit.api.controller;
 
-import com.mymerit.mymerit.domain.entity.User;
-import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import com.mymerit.mymerit.api.payload.response.ApiResponse;
 import com.mymerit.mymerit.domain.entity.Rewards;
-import com.mymerit.mymerit.infrastructure.repository.RewardsRepository;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import com.mymerit.mymerit.domain.entity.User;
 import com.mymerit.mymerit.domain.service.MailSenderService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
+import com.mymerit.mymerit.infrastructure.repository.RewardsRepository;
+import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import com.mymerit.mymerit.infrastructure.security.CurrentUser;
-import com.mymerit.mymerit.api.payload.response.ApiResponse;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
@@ -42,7 +43,7 @@ public class RewardsController {
                         .badRequest()
                         .body(new ApiResponse(false, "not enough points"));
         }
-        user.setPoints(  String.valueOf(user_points - reward_cost) );
+        user.setPoints(Integer.valueOf(String.valueOf(user_points - reward_cost)));
 
         mailService.sendReward(reward_name, user_mail);
         return ResponseEntity

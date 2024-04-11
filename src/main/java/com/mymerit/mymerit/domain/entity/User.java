@@ -20,18 +20,9 @@ public class User {
     private String imageUrl;
     private AuthProvider provider;
     private String providerId;
-    private String points;
+    private Integer points = 0;
     private String description;
     private String role;
     private Company company;
     private List<Solution> solutions;
-
-
-
-
-public boolean isWorkingInCompany(){
-    return company != null;
-
-}
-
 }
