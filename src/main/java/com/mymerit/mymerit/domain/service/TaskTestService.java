@@ -22,14 +22,10 @@ public class TaskTestService {
         this.taskRepository = taskRepository;
     }
 
-
-    public List<TaskTestResponse> testResults(JudgeTokenRequest judgeTokenRequest,String taskId){
-
+    public List<JudgeCompilationResponse.Status> testResults(JudgeTokenRequest judgeTokenRequest, String taskId){
         Map<String,String> test = taskRepository.findById(taskId).get().getTestDataMap();
-        List<TaskTestResponse> resultList = new ArrayList<>();
-
+        List<JudgeCompilationResponse.Status> resultList = new ArrayList<>();
         for (Map.Entry<String, String> entry : test.entrySet()) {
-
             String stdin = entry.getKey();
 
             String expectedOutput = entry.getValue();
@@ -43,12 +39,9 @@ public class TaskTestService {
 
             TaskTestResponse solutionResponse = new TaskTestResponse(judgeCompilationResponse.getStderr(), judgeCompilationResponse.getExit_code(), judgeCompilationResponse.getTime());
 
-            resultList.add(solutionResponse);
+            resultList.add(judgeCompilationResponse.getStatus());
         }
-            return resultList;
-
+        return resultList;
     }
-
-
 
 }

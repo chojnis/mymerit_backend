@@ -22,13 +22,11 @@ public class JudgeController {
     }
 
 
-    @GetMapping("/test")
-    private List<TaskTestResponse> tests(JudgeTokenRequest judgeTokenRequest){
-
-        return taskTestService.testResults(judgeTokenRequest);
+    @PostMapping("/test/task/{taskId}")
+    private List<JudgeCompilationResponse.Status> tests(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId){
+        return taskTestService.testResults(judgeTokenRequest, taskId);
 
     }
-
 
     @PostMapping("/token")
     private String getToken(@RequestBody JudgeTokenRequest fileRequest){

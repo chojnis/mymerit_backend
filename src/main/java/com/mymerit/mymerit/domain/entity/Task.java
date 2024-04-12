@@ -43,13 +43,13 @@ public class Task {
 
     private Float timeLimit;
 
-    Map<String, String> testDataMap;
+    private Map<String, String> testDataMap;
 
-    private SolutionFile testSolution;
+    private String testFileContentBase64;
 
     private List<Solution> solutions = new ArrayList<>();
 
-    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages, SolutionFile testSolution,
+    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages, String testSolution,
                 Map<String,String> testDataMap) {
         this.title = title;
         this.instructions = instructions;
@@ -57,7 +57,7 @@ public class Task {
         this.closesAt = closesAt;
         this.reward = reward;
         this.allowedLanguages = allowedLanguages;
-        this.testSolution = testSolution;
+        this.testFileContentBase64 = testSolution;
         this.testDataMap = testDataMap;
 
     }

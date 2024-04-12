@@ -10,6 +10,9 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
+
+import java.util.Map;
+
 import java.util.Set;
 
 @Data
@@ -42,5 +45,11 @@ public class UserTaskDetailsResponse {
     private TaskStatus status;
 
     private Solution userSolution;
-    // Feedback
+
+
+    private String testFileContentBase64;
+
+    private Map<String, String> testDataMap;
+
+
 }
