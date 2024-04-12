@@ -189,6 +189,18 @@ public class JobOfferService {
         return jobOfferRepository.save(jobOffer);
     }
 
+
+    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits) {
+        Solution solution = solutionRepository.findById(solutionId)
+                .orElseThrow(() -> new RuntimeException("Solution not found for id " + solutionId));
+        List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
+        Feedback feedback = new Feedback(solution, fileIDs, credits);
+        solution.setFeedback(feedback);
+        solutionRepository.save(solution);
+        //TODO feedback repsoitory i service ig, albo zostawicc tak juz idk, robione na szybko
+        return feedback;
+    };
+
     public List<DownloadFileResponse> downloadSolutionFilesForUser(String jobId, String userId) {
         List<DownloadFileResponse> downloadedFiles = new ArrayList<>();
         Optional<JobOffer> jobOfferOptional = jobOfferRepository.findById(jobId);
@@ -239,7 +251,7 @@ public class JobOfferService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Solution not found for the user"));
 
-        existingSolution.files.forEach((id) -> {
+        existingSolution.getFiles().forEach((id) -> {
             try {
                 fileService.DeleteFile(String.valueOf(id));
             } catch (IOException e) {
@@ -257,7 +269,6 @@ public class JobOfferService {
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         Solution solution = new Solution(task, getUser(userId), fileIDs);
         solutionRepository.save(solution);
-        System.out.println("New solution created: " + solution);
         task.addSolution(solution);
         taskRepository.save(task);
     }
@@ -278,4 +289,5 @@ public class JobOfferService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
+
 }

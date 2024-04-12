@@ -18,15 +18,17 @@ import java.util.List;
 @Document("solutions")
 public class Solution {
     @Id
-    public String id;
+    private String id;
 
     @DBRef
     @JsonIgnore
-    public Task taskId;
+    private Task taskId;
 
-    public User user;
-    
-    public List<String> files;
+    private User user;
+
+    private List<String> files;
+
+    private Feedback feedback;
 
     public Solution(Task taskId, User user, List<String> files) {
         this.taskId = taskId;

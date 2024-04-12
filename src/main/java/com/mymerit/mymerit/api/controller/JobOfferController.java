@@ -4,6 +4,7 @@ import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
 import com.mymerit.mymerit.api.payload.response.DownloadFileResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
+import com.mymerit.mymerit.domain.entity.Feedback;
 import com.mymerit.mymerit.domain.entity.JobOffer;
 import com.mymerit.mymerit.domain.service.JobOfferService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
@@ -71,6 +72,13 @@ public class JobOfferController {
         return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId()))
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + jobOfferId));
+    }
+
+    @PostMapping("/solution/{solutionId}")
+    ResponseEntity<Feedback> addFeedback(@PathVariable String solutionId, @RequestParam List<MultipartFile> files, @RequestParam Integer credits, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return Optional.ofNullable(jobOfferService.addFeedback(solutionId, files, credits))
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + solutionId));
     }
 
     @GetMapping("/job/solutions/{jobOfferId}")
