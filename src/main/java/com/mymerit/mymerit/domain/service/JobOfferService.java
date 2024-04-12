@@ -197,19 +197,31 @@ public class JobOfferService {
             User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
             Solution solution = jobOffer.getTask().getSolutionForUser(user);
             if (solution != null) {
-                for (String fileId : solution.getFiles()) {
-                    try {
-                        DownloadFile downloadFile = fileService.downloadFile(fileId);
-                        DownloadFileResponse downloadFileResponse = new DownloadFileResponse(downloadFile.getFilename(), downloadFile.getFileType(), downloadFile.getFile());
-                        downloadedFiles.add(downloadFileResponse);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+                downloadedFiles.addAll(downloadSolutionFiles(solution.getId()));
             }
         }
         return downloadedFiles;
     }
+
+    public List<DownloadFileResponse> downloadSolutionFiles(String solutionId) {
+        List<DownloadFileResponse> downloadedFiles = new ArrayList<>();
+        Solution solution = solutionRepository.findById(solutionId).
+                orElseThrow();
+
+        for (String fileId : solution.getFiles()) {
+            try {
+                DownloadFile downloadFile = fileService.downloadFile(fileId);
+                DownloadFileResponse downloadFileResponse = new DownloadFileResponse(downloadFile.getFilename(), downloadFile.getFileType(), downloadFile.getFile());
+                downloadedFiles.add(downloadFileResponse);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return downloadedFiles;
+    }
+
+
 
     private JobOffer getJobOfferOrThrow(String jobOfferId) {
         return jobOfferRepository.findById(jobOfferId)
