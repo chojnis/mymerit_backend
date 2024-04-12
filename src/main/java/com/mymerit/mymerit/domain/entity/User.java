@@ -6,8 +6,6 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-
 @Data
 @Document("users")
 public class User {
@@ -18,20 +16,13 @@ public class User {
     @JsonIgnore
     private String password;
     private String imageUrl;
+
     private AuthProvider provider;
+
     private String providerId;
-    private String points;
+
+    private Integer credits = 0;
+
     private String description;
     private String role;
-    private Company company;
-    private List<Solution> solutions;
-
-
-
-
-public boolean isWorkingInCompany(){
-    return company != null;
-
-}
-
 }

@@ -17,7 +17,6 @@ public class TaskService {
 
     private Task getTaskById(String jobOfferId, String taskId) {
 
-
         if (jobOfferRepository.findById(jobOfferId).isPresent()) {
             JobOffer jobOffer = jobOfferRepository.findById(jobOfferId).get();
 

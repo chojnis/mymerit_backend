@@ -14,7 +14,6 @@ public class SolutionFile {
     Boolean isMain;
 
     public SolutionFile( String name, String content, Boolean isMain) {
-
         this.name = name;
         this.content = content;
         this.isMain = isMain;
