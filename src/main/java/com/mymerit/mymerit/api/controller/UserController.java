@@ -4,6 +4,7 @@ import com.mymerit.mymerit.api.payload.response.RewardHistoryResponse;
 import com.mymerit.mymerit.domain.entity.Reward;
 import com.mymerit.mymerit.domain.entity.RewardHistory;
 import com.mymerit.mymerit.domain.entity.User;
+import com.mymerit.mymerit.domain.service.MailSenderService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.RewardHistoryRepository;
 import com.mymerit.mymerit.infrastructure.repository.RewardRepository;
@@ -26,11 +27,13 @@ public class UserController {
     private final UserRepository userRepository;
     private final RewardHistoryRepository rewardHistoryRepository;
     private final RewardRepository rewardRepository;
+    private final MailSenderService mailSenderService;
 
-    public UserController(UserRepository userRepository, RewardHistoryRepository rewardHistoryRepository, RewardRepository rewardRepository) {
+    public UserController(UserRepository userRepository, RewardHistoryRepository rewardHistoryRepository, RewardRepository rewardRepository, MailSenderService mailSenderService) {
         this.userRepository = userRepository;
         this.rewardHistoryRepository = rewardHistoryRepository;
         this.rewardRepository = rewardRepository;
+        this.mailSenderService = mailSenderService;
     }
 
     @GetMapping("/me")
@@ -64,6 +67,8 @@ public class UserController {
         rewardHistory.setReward(reward.get());
         rewardHistory.setDatePurchase(LocalDateTime.now());
         rewardHistoryRepository.insert(rewardHistory);
+
+        mailSenderService.sendReward(reward.get().getName(), user.getEmail());
 
         return ResponseEntity.ok(reward.get());
     }
