@@ -1,8 +1,10 @@
 package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.domain.entity.User;
+import com.mymerit.mymerit.domain.entity.Socials;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import com.mymerit.mymerit.infrastructure.repository.SocialRepository;
 import com.mymerit.mymerit.infrastructure.security.CurrentUser;
 import com.mymerit.mymerit.api.payload.response.ApiResponse;
 import com.mymerit.mymerit.api.payload.request.UpdateUserRequest;
@@ -20,10 +22,12 @@ import java.util.Optional;
 public class UserController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SocialRepository socialRepository;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialRepository socialRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.socialRepository = socialRepository;
     }
 
     @GetMapping("/me")
@@ -74,6 +78,14 @@ public class UserController {
                 return ResponseEntity.ok( ).body(new ApiResponse(true, "account data updated"));
         }
         return ResponseEntity.badRequest().body(new ApiResponse(false, "failed to update account data"));
+    }
+
+    @GetMapping("/me/socials")
+    @PreAuthorize("hasRole('USER')")
+    public Socials getUserSocials(@CurrentUser UserDetailsImpl userDetailsImpl){
+        return socialRepository.findByUserId(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " social media not found"));
+
     }
 
     
