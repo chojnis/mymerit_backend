@@ -33,6 +33,8 @@ public class TaskTestService {
 
         CodeTest test = tests.stream().filter(l->l.getLanguage() == language).findFirst().orElseThrow(()->new RuntimeException("error"));
 
+        userRequest.setFileContentBase64(test.getTestFile());
+
         for (TestCase testCase : test.getTestList()) {
 
             String input = testCase.getInput();
@@ -60,6 +62,44 @@ public class TaskTestService {
         }
 
         return result;
+    }
+
+    public TestResponse singleTest(JudgeTokenRequest judgeTokenRequest, String taskId, String language,Integer index){
+
+        Task task = taskRepository.findById(taskId).get();
+
+        List<TestResponse> result = new ArrayList<>();
+
+        TestResponse testResult = new TestResponse();
+
+        List<CodeTest> tests = taskRepository.findById(taskId).get().getTests();
+
+        CodeTest test = tests.stream().filter(l->l.getLanguage() == language).findFirst().orElseThrow(()->new RuntimeException("error"));
+
+        judgeTokenRequest.setFileContentBase64(test.getTestFile());
+
+        TestCase testCase = test.getTestList().get(index);
+
+        JudgeCompilationResponse response = judgeService.generateRequestResponse(judgeService.generateTokenRequest(judgeTokenRequest));
+
+        String input = testCase.getInput();
+        String output = testCase.getExpectedOutput();
+
+        judgeTokenRequest.setStdin(input);
+        judgeTokenRequest.setExpectedOutput(output);
+
+        if(response.getStatus().getId() == 2){
+            testResult.setEvaluation(true);
+            testResult.setName(testCase.getName());
+        }
+
+        else{
+            testResult.setEvaluation(false);
+            testResult.setName(testCase.getName());
+        }
+
+            return testResult;
+
     }
 
 

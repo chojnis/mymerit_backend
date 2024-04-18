@@ -28,6 +28,12 @@ public class JudgeController {
 
     }
 
+    @PostMapping("/test/task/{taskId}")
+    private TestResponse tests(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @RequestBody String language, @RequestBody Integer index){
+        return taskTestService.singleTest(judgeTokenRequest, taskId,language,index);
+
+    }
+
     @PostMapping("/token")
     private String getToken(@RequestBody JudgeTokenRequest fileRequest){
         return judgeService.generateTokenRequest(fileRequest);
