@@ -2,7 +2,7 @@ package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
 import com.mymerit.mymerit.api.payload.response.JudgeCompilationResponse;
-import com.mymerit.mymerit.api.payload.response.TaskTestResponse;
+import com.mymerit.mymerit.api.payload.response.TestResponse;
 import com.mymerit.mymerit.domain.service.JudgeService;
 import com.mymerit.mymerit.domain.service.TaskTestService;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +23,8 @@ public class JudgeController {
 
 
     @PostMapping("/test/task/{taskId}")
-    private List<JudgeCompilationResponse.Status> tests(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId){
-        return taskTestService.testResults(judgeTokenRequest, taskId);
+    private List<TestResponse> tests(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @RequestBody String language){
+        return taskTestService.testResults(judgeTokenRequest, taskId,language);
 
     }
 

@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Document("tasks")
@@ -43,22 +40,19 @@ public class Task {
 
     private Float timeLimit;
 
-    private Map<String, String> testDataMap;
-
-    private String testFileContentBase64;
+    public List<CodeTest> tests;
 
     private List<Solution> solutions = new ArrayList<>();
 
     public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages, String testSolution,
-                Map<String,String> testDataMap) {
+                String input, String output) {
         this.title = title;
         this.instructions = instructions;
         this.opensAt = opensAt;
         this.closesAt = closesAt;
         this.reward = reward;
         this.allowedLanguages = allowedLanguages;
-        this.testFileContentBase64 = testSolution;
-        this.testDataMap = testDataMap;
+
 
     }
 
@@ -89,5 +83,15 @@ public class Task {
         return this.solutions.stream().filter(solution -> solution.getUser().equals(user))
                 .findFirst()
                 .orElse(null);
+    }
+
+    Map<String,String> encodeData(String input, String output){
+
+        String encodedInput = Base64.getEncoder().encodeToString(input.getBytes());
+        String encodedOutput = Base64.getEncoder().encodeToString(output.getBytes());
+
+        Map<String, String> result = new HashMap<>();
+        result.put(encodedInput, encodedOutput);
+        return result;
     }
 }
