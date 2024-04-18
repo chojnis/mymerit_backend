@@ -1,5 +1,6 @@
 package com.mymerit.mymerit.api.payload.response;
 
+import com.mymerit.mymerit.domain.entity.Feedback;
 import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import jakarta.validation.constraints.NotBlank;
@@ -41,15 +42,11 @@ public class UserTaskDetailsResponse {
 
     private Integer memoryLimit;
     private Float timeLimit;
+
     @NotNull
     private TaskStatus status;
-
     private Solution userSolution;
 
-
-    private String testFileContentBase64;
-
-    private Map<String, String> testDataMap;
-
+    private Feedback companyFeedback;
 
 }

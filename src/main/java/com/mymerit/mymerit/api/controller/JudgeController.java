@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 public class JudgeController {
-
     JudgeService judgeService;
     TaskTestService taskTestService;
 

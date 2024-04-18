@@ -37,9 +37,8 @@ public class JobOfferController {
 
     @GetMapping("/job/{id}")
     ResponseEntity<JobOfferDetailsResponse> getJobOfferById(@PathVariable String id, @CurrentUser UserDetailsImpl user) {
-        return jobOfferService.getJobOfferDetailsResponse(id, user)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(jobOfferService.getJobOfferDetailsResponse(id, user));
+
     }
 
     @PostMapping("/job")
@@ -67,7 +66,7 @@ public class JobOfferController {
         return ResponseEntity.ok(jobOffersPage);
     }
 
-    @PostMapping("/job/solution/{jobOfferId}")
+    @PostMapping("/job/{jobOfferId}/solution")
     ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam List<MultipartFile> files, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId()))
                 .map(ResponseEntity::ok)
@@ -81,9 +80,15 @@ public class JobOfferController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + solutionId));
     }
 
-    @GetMapping("/job/solutions/{jobOfferId}")
+    @GetMapping("/job/{jobOfferId}/solution")
     public ResponseEntity<List<DownloadFileResponse>> downloadSolutionFilesForUserAndJobOffer(@PathVariable String jobOfferId, @CurrentUser UserDetailsImpl userDetails) {
         List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadSolutionFilesForUser(jobOfferId, userDetails.getId());
+        return ResponseEntity.ok(downloadedFiles);
+    }
+
+    @GetMapping("/job/{jobOfferId}/feedback")
+    public ResponseEntity<List<DownloadFileResponse>> downloadFeedbackFilesForUserAndJobOffer(@PathVariable String jobOfferId, @CurrentUser UserDetailsImpl userDetails) {
+        List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadFeedbackFilesForUser(jobOfferId, userDetails.getId());
         return ResponseEntity.ok(downloadedFiles);
     }
 

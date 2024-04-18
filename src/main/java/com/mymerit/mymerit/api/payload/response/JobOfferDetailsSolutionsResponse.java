@@ -1,6 +1,7 @@
 package com.mymerit.mymerit.api.payload.response;
 
 
+import com.mymerit.mymerit.domain.entity.Feedback;
 import com.mymerit.mymerit.domain.entity.JobOffer;
 import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.entity.Task;
@@ -35,7 +36,7 @@ public class JobOfferDetailsSolutionsResponse extends JobOfferDetailsResponse{
         this.solutions = jobOffer.getTask().getSolutions().stream().map(Solution::getId).collect(Collectors.toList());
     }
 
-    public  UserTaskDetailsResponse createTaskResponse(Task task ){
+    public  UserTaskDetailsResponse createTaskResponse(Task task){
         return new UserTaskDetailsResponse(
                 task.getId(),
                 task.getTitle(),
@@ -48,8 +49,8 @@ public class JobOfferDetailsSolutionsResponse extends JobOfferDetailsResponse{
                 task.getTimeLimit(),
                 task.getStatus(),
                 null,
-                task.getTestFileContentBase64(),
-                task.getTestDataMap()
+                null
+
         );
     }
 }

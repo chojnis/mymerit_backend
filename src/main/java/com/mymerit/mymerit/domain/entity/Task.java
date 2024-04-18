@@ -79,10 +79,10 @@ public class Task {
         }
     }
 
-    public Solution getSolutionForUser(User user){
+    public Optional<Solution> getSolutionForUser(User user){
         return this.solutions.stream().filter(solution -> solution.getUser().equals(user))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
+
     }
 
     Map<String,String> encodeData(String input, String output){
