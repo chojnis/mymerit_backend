@@ -21,13 +21,13 @@ public class JudgeController {
     }
 
 
-    @PostMapping("/test/task/{taskId}")
-    private List<TestResponse> tests(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @RequestBody String language){
+    @PostMapping("/test/task/{taskId}/language/{language}")
+    private List<TestResponse> tests(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @PathVariable String language){
         return taskTestService.testResults(judgeTokenRequest, taskId,language);
 
     }
 
-    @PostMapping("/test/task/{taskId}")
+    @PostMapping("/single-test/task/{taskId}")
     private TestResponse tests(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @RequestBody String language, @RequestBody Integer index){
         return taskTestService.singleTest(judgeTokenRequest, taskId,language,index);
 

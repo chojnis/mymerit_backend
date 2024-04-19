@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -41,7 +42,7 @@ public class Task {
     private Float timeLimit;
 
     public List<CodeTest> tests;
-
+    @DBRef
     private List<Solution> solutions = new ArrayList<>();
 
     public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages, String testSolution,

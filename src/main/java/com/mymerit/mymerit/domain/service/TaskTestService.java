@@ -8,7 +8,9 @@ import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TaskTestService {
@@ -21,39 +23,37 @@ public class TaskTestService {
     }
 
     public List<TestResponse> testResults(JudgeTokenRequest userRequest, String taskId,String language){
-
-
-        Task task = taskRepository.findById(taskId).get();
-
-
-
         List<TestResponse> result = new ArrayList<>();
-
         List<CodeTest> tests = taskRepository.findById(taskId).get().getTests();
 
-        CodeTest test = tests.stream().filter(l->l.getLanguage() == language).findFirst().orElseThrow(()->new RuntimeException("error"));
+        CodeTest test = tests.stream()
+                .filter(l-> Objects.equals(l.getLanguage(), language))
+                .findFirst()
+                .orElseThrow(()->new RuntimeException("error"));
 
-        userRequest.setFileContentBase64(test.getTestFile());
+        //userRequest.setFileContentBase64(test.getTestFileBase64());
 
-        for (TestCase testCase : test.getTestList()) {
+        for (TestCase testCase : test.getTestCases()) {
 
-            String input = testCase.getInput();
-            String output = testCase.getExpectedOutput();
+            String input = Base64.getEncoder().encodeToString(testCase.getInput().getBytes());
+
+            String output = Base64.getEncoder().encodeToString(testCase.getExpectedOutput().getBytes());
 
             userRequest.setStdin(input);
             userRequest.setExpectedOutput(output);
 
             JudgeCompilationResponse response = judgeService.generateRequestResponse(judgeService.generateTokenRequest(userRequest));
-
-             TestResponse testResponse = new TestResponse();
-
-            if(response.getStatus().getId() == 2){
-                testResponse.setEvaluation(true);
+            System.out.println(response);
+            TestResponse testResponse = new TestResponse();
+            System.out.println("\n\n\n");
+            System.out.println(response.getStatus().getId());
+            if(response.getStatus().getId() == 3){
+                testResponse.setPassed(true);
                 testResponse.setName(testCase.getName());
             }
 
             else{
-                testResponse.setEvaluation(false);
+                testResponse.setPassed(false);
                 testResponse.setName(testCase.getName());
             }
 
@@ -76,11 +76,10 @@ public class TaskTestService {
 
         CodeTest test = tests.stream().filter(l->l.getLanguage() == language).findFirst().orElseThrow(()->new RuntimeException("error"));
 
-        judgeTokenRequest.setFileContentBase64(test.getTestFile());
+        judgeTokenRequest.setFileContentBase64(test.getTestFileBase64());
 
-        TestCase testCase = test.getTestList().get(index);
+        TestCase testCase = test.getTestCases().get(index);
 
-        JudgeCompilationResponse response = judgeService.generateRequestResponse(judgeService.generateTokenRequest(judgeTokenRequest));
 
         String input = testCase.getInput();
         String output = testCase.getExpectedOutput();
@@ -88,13 +87,18 @@ public class TaskTestService {
         judgeTokenRequest.setStdin(input);
         judgeTokenRequest.setExpectedOutput(output);
 
-        if(response.getStatus().getId() == 2){
-            testResult.setEvaluation(true);
+        JudgeCompilationResponse response = judgeService.generateRequestResponse(judgeService.generateTokenRequest(judgeTokenRequest));
+
+
+        if(response.getStatus().getId() == 3){
+            testResult.setPassed(true);
             testResult.setName(testCase.getName());
         }
 
+
+
         else{
-            testResult.setEvaluation(false);
+            testResult.setPassed(false);
             testResult.setName(testCase.getName());
         }
 

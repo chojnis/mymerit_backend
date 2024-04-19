@@ -49,7 +49,8 @@ public class JobOfferDetailsSolutionsResponse extends JobOfferDetailsResponse{
                 task.getTimeLimit(),
                 task.getStatus(),
                 null,
-                null
+                null,
+                task.getTests()
 
         );
     }

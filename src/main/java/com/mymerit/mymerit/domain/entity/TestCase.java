@@ -10,10 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TestCase {
-
-
-
-
     private String name;
 
     private String input;

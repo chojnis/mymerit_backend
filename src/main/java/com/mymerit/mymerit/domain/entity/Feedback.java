@@ -20,7 +20,7 @@ public class Feedback {
 
     @DBRef
     @JsonIgnore
-    private Solution solutionId;
+    private Solution solution;
 
     @NotBlank
     private List<String> files;
@@ -30,8 +30,8 @@ public class Feedback {
     @Max(9999)
     private Integer credits;
 
-    public Feedback(Solution solutionId, List<String> files, Integer credits) {
-        this.solutionId = solutionId;
+    public Feedback(Solution solution, List<String> files, Integer credits) {
+        this.solution = solution;
         this.files = files;
         this.credits = credits;
     }

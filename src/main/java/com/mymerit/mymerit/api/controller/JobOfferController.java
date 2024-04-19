@@ -86,15 +86,16 @@ public class JobOfferController {
         return ResponseEntity.ok(downloadedFiles);
     }
 
-    @GetMapping("/job/{jobOfferId}/feedback")
-    public ResponseEntity<List<DownloadFileResponse>> downloadFeedbackFilesForUserAndJobOffer(@PathVariable String jobOfferId, @CurrentUser UserDetailsImpl userDetails) {
-        List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadFeedbackFilesForUser(jobOfferId, userDetails.getId());
-        return ResponseEntity.ok(downloadedFiles);
-    }
 
     @GetMapping("/solution/{solutionId}")
     public ResponseEntity<List<DownloadFileResponse>> downloadSolution(@PathVariable String solutionId) {
         List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadSolutionFiles(solutionId);
+        return ResponseEntity.ok(downloadedFiles);
+    }
+
+    @GetMapping("/solution/{solutionId}/feedback")
+    public ResponseEntity<List<DownloadFileResponse>> downloadFeedback(@PathVariable String solutionId, @CurrentUser UserDetailsImpl userDetails) {
+        List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadFeedbackForSolution(solutionId, userDetails.getId());
         return ResponseEntity.ok(downloadedFiles);
     }
 

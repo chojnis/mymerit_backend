@@ -4,10 +4,7 @@ import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
 import com.mymerit.mymerit.api.payload.response.*;
 import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.TaskStatus;
-import com.mymerit.mymerit.infrastructure.repository.JobOfferRepository;
-import com.mymerit.mymerit.infrastructure.repository.SolutionRepository;
-import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
-import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import com.mymerit.mymerit.infrastructure.repository.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -24,20 +21,23 @@ public class JobOfferService {
     UserRepository userRepository;
     DownloadFileService fileService;
     TaskRepository taskRepository;
-    SolutionRepository solutionRepository;
+    SolutionRepository solutionRepository; //nah co tu sie dzieje xd troche duzo tego
+    FeedbackRepository feedbackRepository;
 
     JobOfferService(
             JobOfferRepository jobOfferRepository,
             UserRepository userRepository,
             DownloadFileService fileService,
             TaskRepository taskRepository,
-            SolutionRepository solutionRepository
+            SolutionRepository solutionRepository,
+            FeedbackRepository feedbackRepository
     ) {
         this.jobOfferRepository = jobOfferRepository;
         this.userRepository = userRepository;
         this.fileService = fileService;
         this.taskRepository = taskRepository;
         this.solutionRepository = solutionRepository;
+        this.feedbackRepository = feedbackRepository;
     }
 
     public JobOffer addJobOffer(JobOfferRequest jobOfferRequest, UserDetailsImpl userDetails){
@@ -142,7 +142,8 @@ public class JobOfferService {
                 task.getTimeLimit(),
                 task.getStatus(),
                 userSolution,
-                companyFeedback
+                companyFeedback,
+                task.getTests()
         );
     }
 
@@ -194,9 +195,9 @@ public class JobOfferService {
                 .orElseThrow(() -> new RuntimeException("Solution not found for id " + solutionId));
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         Feedback feedback = new Feedback(solution, fileIDs, credits);
+        feedbackRepository.save(feedback);
         solution.setFeedback(feedback);
         solutionRepository.save(solution);
-        //TODO feedback repsoitory i service ig, albo zostawicc tak juz idk, robione na szybko
         return feedback;
     };
 
@@ -218,6 +219,19 @@ public class JobOfferService {
         Optional<Feedback> feedback = jobOffer.getTask().getSolutionForUser(user).map(Solution::getFeedback);
         if(feedback.isPresent()){
             return downloadFiles(feedback.get().getFiles());
+        }else{
+            return Collections.emptyList();
+        }
+    }
+
+    public List<DownloadFileResponse> downloadFeedbackForSolution(String solutionId, String userId){
+        Solution solution = solutionRepository.findById(solutionId).orElseThrow();
+        /*if(!userId.equals(solution.getUser().getId())){
+            throw new RuntimeException("Unauthorized");
+        }*/
+        Feedback feedback = solution.getFeedback();
+        if(feedback != null){
+            return downloadFiles(feedback.getFiles());
         }else{
             return Collections.emptyList();
         }
@@ -245,9 +259,6 @@ public class JobOfferService {
 
         return downloadedFiles;
     }
-
-
-
 
 
     private JobOffer getJobOfferOrThrow(String jobOfferId) {
