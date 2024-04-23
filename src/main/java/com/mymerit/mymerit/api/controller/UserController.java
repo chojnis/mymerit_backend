@@ -2,6 +2,7 @@ package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.domain.entity.User;
 import com.mymerit.mymerit.domain.entity.Socials;
+import com.mymerit.mymerit.domain.entity.Task;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import com.mymerit.mymerit.infrastructure.repository.SocialRepository;
@@ -43,9 +44,9 @@ public class UserController {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
-    @PostMapping("/me/update/")
+    @PostMapping("/me/update")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity updateUserProfileInfo(@CurrentUser UserDetailsImpl userDetailsImpl, @Valid @RequestBody UpdateUserRequest updateUserRequest){
+    public ResponseEntity<?> updateUserProfileInfo(@CurrentUser UserDetailsImpl userDetailsImpl, @Valid @RequestBody UpdateUserRequest updateUserRequest){
         Optional<User> user_check = userRepository.findById(userDetailsImpl.getId());
         User user;
         if( user_check != null){
@@ -88,7 +89,56 @@ public class UserController {
 
     }
 
-    
+    @GetMapping("/company")
+    @PreAuthorize("hasRole('COMPANY')")
+    public User getCurrentCompanyUser(@CurrentUser UserDetailsImpl userDetailsImpl) {
+        return userRepository.findById(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("Company user " + userDetailsImpl.getId() + " not found"));
+    }
 
+    @PostMapping("/company/update")
+    @PreAuthorize("hasRole('COMPANY')")
+    public ResponseEntity<?> updateCompanyUserProfileInfo(@CurrentUser UserDetailsImpl userDetailsImpl, @Valid @RequestBody UpdateUserRequest updateUserRequest){
+        Optional<User> user_check = userRepository.findById(userDetailsImpl.getId());
+        User user;
+        if( user_check != null){
+            user = user_check.get();
+        }
+        else{
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "company user doesnt exist"));
+        }
+        Boolean changed = false;
+        
+        if( updateUserRequest.getImageUrl() != null ){
+                user.setImageUrl(updateUserRequest.getImageUrl());
+                changed = true;
+        }
+        if( updateUserRequest.getDescription() != null ){
+                user.setDescription(updateUserRequest.getDescription());
+                changed = true;
+        }
+        if( updateUserRequest.getPassword() != null ){
+                user.setPassword(updateUserRequest.getPassword());
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                changed = true;
+        }
+        if( updateUserRequest.getUsername() != null ){
+                user.setUsername(updateUserRequest.getUsername());
+                changed = true;
+        }
+        if( changed == true ){
+                userRepository.save(user);
+                return ResponseEntity.ok( ).body(new ApiResponse(true, "account data updated"));
+        }
+        return ResponseEntity.badRequest().body(new ApiResponse(false, "failed to update account data"));
+    }
+
+    @GetMapping("/company/socials")
+    @PreAuthorize("hasRole('COMPANY')")
+    public Socials getCompanyUserSocials(@CurrentUser UserDetailsImpl userDetailsImpl){
+        return socialRepository.findByUserId(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("Company user " + userDetailsImpl.getId() + " social media not found"));
+
+    }
 
 }
