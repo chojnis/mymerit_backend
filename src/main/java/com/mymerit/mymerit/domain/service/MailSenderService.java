@@ -51,4 +51,13 @@ public class MailSenderService {
 
         return (int)Math.floor(Math.random() * (max - min + 1) + min);
     }
+
+    public void sendReward(String reward_name, String user_mail){
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user_mail);
+        mailMessage.setText("Granted Reward: " + reward_name + "\nRedeem code is: "  + generateVerificationCode());
+        mailMessage.setSubject("MyMerit Reward");
+
+        javaMailSender.send(mailMessage);
+    }
 }

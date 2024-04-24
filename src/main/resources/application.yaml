@@ -4,17 +4,15 @@ server:
   tomcat:
     max-swallow-size : 500MB
 
-
 spring:
   data:
     mongodb:
-      # authentication-database: admin
-      # username: root
-      # password: password
-      uri : mongodb://root:password@localhost:27017/?authSource=admin&authMechanism=SCRAM-SHA-1
+      authentication-database: admin
+      username: root
+      password: password
       database: mymerit
-      # port: 27017
-      # host: localhost
+      port: 27017
+      host: localhost
   security:
     oauth2:
       client:
@@ -57,8 +55,8 @@ logging:
 
 mymerit:
   app:
-    jwtSecret: "tw1oqyxkbjg1bmgn5ociiasmdo41xg3qx5q88w19scmazo90nfjslmxdsmgkzy04i3aicwgbjtyesrftnby9wwj3ydey3g6zegh1cjk9wgov5rvwb7zafxgn74ooebz0"
-    jwtExpirationMs: "90000000"
+    jwtSecret: tw1oqyxkbjg1bmgn5ociiasmdo41xg3qx5q88w19scmazo90nfjslmxdsmgkzy04i3aicwgbjtyesrftnby9wwj3ydey3g6zegh1cjk9wgov5rvwb7zafxgn74ooebz0
+    jwtExpirationMs: 86400000 # 24 hours
 
 app:
     oauth2:
