@@ -3,6 +3,7 @@ package com.mymerit.mymerit.infrastructure.oauth2;
 import com.mymerit.mymerit.domain.entity.User;
 import com.mymerit.mymerit.domain.models.AuthProvider;
 import com.mymerit.mymerit.domain.models.Role;
+import com.mymerit.mymerit.domain.service.ImageService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import com.mymerit.mymerit.domain.models.OAuth2UserInfo;
@@ -20,9 +21,11 @@ import java.util.Optional;
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
+    private final ImageService imageService;
 
-    public CustomOAuth2UserService(UserRepository userRepository) {
+    public CustomOAuth2UserService(UserRepository userRepository, ImageService imageService) {
         this.userRepository = userRepository;
+        this.imageService = imageService;
     }
 
     @Override
@@ -74,7 +77,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.setUsername(oAuth2UserInfo.getName());
 
         user.setEmail(oAuth2UserInfo.getEmail());
-        user.setImageUrl(oAuth2UserInfo.getImageUrl());
+        user.setImageBase64(imageService.getBase64ImageURL(oAuth2UserInfo.getImageUrl()));
         user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
         user.setProviderId(oAuth2UserInfo.getId());
         user.setRole(Role.user.name());
@@ -84,7 +87,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
         existingUser.setUsername(oAuth2UserInfo.getName());
-        existingUser.setImageUrl(oAuth2UserInfo.getImageUrl());
+        existingUser.setImageBase64(imageService.getBase64ImageURL(oAuth2UserInfo.getImageUrl()));
 
         return userRepository.save(existingUser);
     }
