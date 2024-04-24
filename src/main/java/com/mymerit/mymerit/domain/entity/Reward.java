@@ -11,6 +11,6 @@ public class Reward {
     private String id;
     private String name;
     private String description;
-    private String imageUrl;
+    private String imageBase64;
     private Integer cost;
 }
