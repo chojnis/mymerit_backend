@@ -3,11 +3,14 @@ package com.mymerit.mymerit.api.controller;
 import com.mymerit.mymerit.domain.entity.User;
 import com.mymerit.mymerit.domain.entity.Socials;
 import com.mymerit.mymerit.domain.entity.Task;
+import com.mymerit.mymerit.domain.entity.TaskHistory;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import com.mymerit.mymerit.infrastructure.repository.SocialRepository;
+import com.mymerit.mymerit.infrastructure.repository.TaskHistoryRepository;
 import com.mymerit.mymerit.infrastructure.security.CurrentUser;
 import com.mymerit.mymerit.api.payload.response.ApiResponse;
+import com.mymerit.mymerit.api.payload.response.TaskHistoryResponse;
 import com.mymerit.mymerit.api.payload.request.UpdateUserRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.validation.Valid;
 
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,11 +27,13 @@ public class UserController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SocialRepository socialRepository;
+    private final TaskHistoryRepository taskHistoryRepository;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialRepository socialRepository) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialRepository socialRepository, TaskHistoryRepository taskHistoryRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.socialRepository = socialRepository;
+        this.taskHistoryRepository = taskHistoryRepository;
     }
 
     @GetMapping("/me")
@@ -139,6 +144,28 @@ public class UserController {
         return socialRepository.findByUserId(userDetailsImpl.getId())
                 .orElseThrow(() -> new RuntimeException("Company user " + userDetailsImpl.getId() + " social media not found"));
 
+    }
+
+    @GetMapping("/me/mytasks")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<TaskHistoryResponse>> getCurrentUserTaskHistory(@CurrentUser UserDetailsImpl userDetailsImpl) {
+        User user = userRepository.findById(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " not found"));
+
+        List<TaskHistory> userTasks = taskHistoryRepository.findByUser(user)
+                .orElse(new ArrayList<>());
+
+        if (userTasks.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<TaskHistoryResponse> taskHistoryResponse = new ArrayList<>();
+
+        for (TaskHistory taskHistory : userTasks) {
+            taskHistoryResponse.add(new TaskHistoryResponse(taskHistory.getTask(), taskHistory.getDateLastModified()));
+        }
+
+        return ResponseEntity.ok(taskHistoryResponse);
     }
 
 }
