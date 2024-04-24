@@ -34,76 +34,45 @@ public class TaskTestService {
         //userRequest.setFileContentBase64(test.getTestFileBase64());
 
         for (TestCase testCase : test.getTestCases()) {
-
             String input = Base64.getEncoder().encodeToString(testCase.getInput().getBytes());
-
             String output = Base64.getEncoder().encodeToString(testCase.getExpectedOutput().getBytes());
 
             userRequest.setStdin(input);
             userRequest.setExpectedOutput(output);
 
             JudgeCompilationResponse response = judgeService.generateRequestResponse(judgeService.generateTokenRequest(userRequest));
-            System.out.println(response);
             TestResponse testResponse = new TestResponse();
-            System.out.println("\n\n\n");
-            System.out.println(response.getStatus().getId());
-            if(response.getStatus().getId() == 3){
-                testResponse.setPassed(true);
-                testResponse.setName(testCase.getName());
-            }
 
-            else{
-                testResponse.setPassed(false);
-                testResponse.setName(testCase.getName());
-            }
+            testResponse.setName(testCase.getName());
+            testResponse.setPassed(response.getStatus().getId() == 3);
 
             result.add(testResponse);
-
         }
-
         return result;
     }
 
-    public TestResponse singleTest(JudgeTokenRequest judgeTokenRequest, String taskId, String language,Integer index){
-
-        Task task = taskRepository.findById(taskId).get();
-
-        List<TestResponse> result = new ArrayList<>();
-
+    public TestResponse singleTest(JudgeTokenRequest judgeTokenRequest, String taskId, String language,Integer index){//we zrob jakos podfunkcje bo duzo sie powtarza
         TestResponse testResult = new TestResponse();
 
         List<CodeTest> tests = taskRepository.findById(taskId).get().getTests();
 
-        CodeTest test = tests.stream().filter(l->l.getLanguage() == language).findFirst().orElseThrow(()->new RuntimeException("error"));
-
-        judgeTokenRequest.setFileContentBase64(test.getTestFileBase64());
-
+        CodeTest test = tests.stream()
+                .filter(l-> Objects.equals(l.getLanguage(), language))
+                .findFirst()
+                .orElseThrow(()->new RuntimeException("error"));//komentarz
         TestCase testCase = test.getTestCases().get(index);
-
-
-        String input = testCase.getInput();
-        String output = testCase.getExpectedOutput();
+        String input = Base64.getEncoder().encodeToString(testCase.getInput().getBytes());
+        String output = Base64.getEncoder().encodeToString(testCase.getExpectedOutput().getBytes());
 
         judgeTokenRequest.setStdin(input);
         judgeTokenRequest.setExpectedOutput(output);
 
         JudgeCompilationResponse response = judgeService.generateRequestResponse(judgeService.generateTokenRequest(judgeTokenRequest));
 
+        testResult.setName(testCase.getName());
+        testResult.setPassed(response.getStatus().getId() == 3);
 
-        if(response.getStatus().getId() == 3){
-            testResult.setPassed(true);
-            testResult.setName(testCase.getName());
-        }
-
-
-
-        else{
-            testResult.setPassed(false);
-            testResult.setName(testCase.getName());
-        }
-
-            return testResult;
-
+        return testResult;
     }
 
 

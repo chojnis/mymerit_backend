@@ -7,6 +7,8 @@ import com.mymerit.mymerit.domain.service.JudgeService;
 import com.mymerit.mymerit.domain.service.TaskTestService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -22,15 +24,14 @@ public class JudgeController {
 
 
     @PostMapping("/test/task/{taskId}/language/{language}")
-    private List<TestResponse> tests(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @PathVariable String language){
+    private List<TestResponse> testAllCases(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @PathVariable String language){
         return taskTestService.testResults(judgeTokenRequest, taskId,language);
 
     }
 
-    @PostMapping("/single-test/task/{taskId}")
-    private TestResponse tests(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @RequestBody String language, @RequestBody Integer index){
-        return taskTestService.singleTest(judgeTokenRequest, taskId,language,index);
-
+    @PostMapping("/test/task/{taskId}/language/{language}/{testIndex}")
+    private List<TestResponse> testSingleCase(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @PathVariable String language, @PathVariable Integer testIndex){
+        return Collections.singletonList(taskTestService.singleTest(judgeTokenRequest, taskId, language, testIndex));
     }
 
     @PostMapping("/token")
