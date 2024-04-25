@@ -6,11 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Document("tasks")
@@ -42,15 +41,20 @@ public class Task {
 
     private Float timeLimit;
 
+    public List<CodeTest> tests;
+    @DBRef
     private List<Solution> solutions = new ArrayList<>();
 
-    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages) {
+    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages, String testSolution,
+                String input, String output) {
         this.title = title;
         this.instructions = instructions;
         this.opensAt = opensAt;
         this.closesAt = closesAt;
         this.reward = reward;
         this.allowedLanguages = allowedLanguages;
+
+
     }
 
     public Integer getSolutionCount() {
@@ -76,9 +80,19 @@ public class Task {
         }
     }
 
-    public Solution getSolutionForUser(User user){
+    public Optional<Solution> getSolutionForUser(User user){
         return this.solutions.stream().filter(solution -> solution.getUser().equals(user))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
+
+    }
+
+    Map<String,String> encodeData(String input, String output){
+
+        String encodedInput = Base64.getEncoder().encodeToString(input.getBytes());
+        String encodedOutput = Base64.getEncoder().encodeToString(output.getBytes());
+
+        Map<String, String> result = new HashMap<>();
+        result.put(encodedInput, encodedOutput);
+        return result;
     }
 }
