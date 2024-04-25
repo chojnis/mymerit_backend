@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Data
@@ -38,6 +39,11 @@ public class Solution {
         this.user = user;
         this.files = files;
         this.submitDate = LocalDateTime.now();
+    }
+
+    public Integer getSolvingTime() {
+        long minutes = ChronoUnit.MINUTES.between(task.getOpensAt(), submitDate);
+        return (int) minutes;
     }
 
     @Override

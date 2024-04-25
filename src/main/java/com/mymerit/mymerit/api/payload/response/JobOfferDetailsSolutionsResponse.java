@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class JobOfferDetailsSolutionsResponse extends JobOfferDetailsResponse{
-    private List<String> solutions; // id
+    private List<Solution> solutions; // id
 
     public JobOfferDetailsSolutionsResponse(JobOffer jobOffer) {
         super.setId(jobOffer.getId());
@@ -33,7 +33,7 @@ public class JobOfferDetailsSolutionsResponse extends JobOfferDetailsResponse{
         super.setClosesAt(jobOffer.getTask().getClosesAt());
         super.setStatus(jobOffer.getTask().getStatus());
 
-        this.solutions = jobOffer.getTask().getSolutions().stream().map(Solution::getId).collect(Collectors.toList());
+        this.solutions = jobOffer.getTask().getSolutions();
     }
 
     public  UserTaskDetailsResponse createTaskResponse(Task task){
