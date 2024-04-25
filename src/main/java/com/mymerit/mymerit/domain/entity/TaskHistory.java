@@ -12,9 +12,14 @@ import java.time.LocalDateTime;
 public class TaskHistory {
     @Id
     private String id;
+    private String userId;
     @DBRef
     private Task task;
-    @DBRef
-    private User user;
     private LocalDateTime dateLastModified;
+
+    public TaskHistory(Task task, String userId, LocalDateTime dateLastModified){
+        this.task = task;
+        this.userId = userId;
+        this.dateLastModified = dateLastModified;
+    }
 }

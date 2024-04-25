@@ -94,6 +94,28 @@ public class UserController {
 
     }
 
+    @GetMapping("/me/mytasks")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<TaskHistoryResponse>> getCurrentUserTaskHistory(@CurrentUser UserDetailsImpl userDetailsImpl) {
+        User user = userRepository.findById(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " not found"));
+
+        List<TaskHistory> userTasks = taskHistoryRepository.findByUserId(user.getId())
+                .orElse(new ArrayList<>());
+
+        if (userTasks.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<TaskHistoryResponse> taskHistoryResponse = new ArrayList<>();
+
+        for (TaskHistory taskHistory : userTasks) {
+            taskHistoryResponse.add(new TaskHistoryResponse(taskHistory.getTask(), taskHistory.getDateLastModified()));
+        }
+
+        return ResponseEntity.ok(taskHistoryResponse);
+    }
+
     @GetMapping("/company")
     @PreAuthorize("hasRole('COMPANY')")
     public User getCurrentCompanyUser(@CurrentUser UserDetailsImpl userDetailsImpl) {
@@ -144,28 +166,6 @@ public class UserController {
         return socialRepository.findByUserId(userDetailsImpl.getId())
                 .orElseThrow(() -> new RuntimeException("Company user " + userDetailsImpl.getId() + " social media not found"));
 
-    }
-
-    @GetMapping("/me/mytasks")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<TaskHistoryResponse>> getCurrentUserTaskHistory(@CurrentUser UserDetailsImpl userDetailsImpl) {
-        User user = userRepository.findById(userDetailsImpl.getId())
-                .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " not found"));
-
-        List<TaskHistory> userTasks = taskHistoryRepository.findByUser(user)
-                .orElse(new ArrayList<>());
-
-        if (userTasks.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        List<TaskHistoryResponse> taskHistoryResponse = new ArrayList<>();
-
-        for (TaskHistory taskHistory : userTasks) {
-            taskHistoryResponse.add(new TaskHistoryResponse(taskHistory.getTask(), taskHistory.getDateLastModified()));
-        }
-
-        return ResponseEntity.ok(taskHistoryResponse);
     }
 
 }

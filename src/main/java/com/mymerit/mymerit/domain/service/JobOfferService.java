@@ -8,6 +8,7 @@ import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import com.mymerit.mymerit.infrastructure.repository.JobOfferRepository;
 import com.mymerit.mymerit.infrastructure.repository.SolutionRepository;
+import com.mymerit.mymerit.infrastructure.repository.TaskHistoryRepository;
 import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import org.bson.types.ObjectId;
@@ -17,6 +18,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,19 +30,22 @@ public class JobOfferService {
     DownloadFileService fileService;
     TaskRepository taskRepository;
     SolutionRepository solutionRepository;
+    TaskHistoryRepository taskHistoryRepository;
 
     JobOfferService(
             JobOfferRepository jobOfferRepository,
             UserRepository userRepository,
             DownloadFileService fileService,
             TaskRepository taskRepository,
-            SolutionRepository solutionRepository
+            SolutionRepository solutionRepository,
+            TaskHistoryRepository taskHistoryRepository
     ) {
         this.jobOfferRepository = jobOfferRepository;
         this.userRepository = userRepository;
         this.fileService = fileService;
         this.taskRepository = taskRepository;
         this.solutionRepository = solutionRepository;
+        this.taskHistoryRepository = taskHistoryRepository;
 
 
     }
@@ -211,6 +216,17 @@ public class JobOfferService {
         existingSolution.setFiles(fileIDs.stream().map(ObjectId::toString).toList());
         solutionRepository.save(existingSolution);
         System.out.println("Existing solution updated: " + existingSolution);
+
+        Optional<List<TaskHistory>> taskHistoryList = taskHistoryRepository.findByUserId(userId);
+        if( !taskHistoryList.isPresent()){
+            throw new IllegalStateException("Task history record not found for the user");
+        }
+        TaskHistory taskHistory = taskHistoryList.get().stream(). 
+        filter(taskhist -> taskhist.getTask().getId().equals(task.getId()))
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("Solution not found for the user"));
+        taskHistory.setDateLastModified(LocalDateTime.now());
+        taskHistoryRepository.save(taskHistory);
     }
 
     private void createNewSolution(Task task, List<MultipartFile> files, String userId){
@@ -220,6 +236,8 @@ public class JobOfferService {
         System.out.println("New solution created: " + solution);
         task.addSolution(solution);
         taskRepository.save(task);
+        TaskHistory taskHistory = new TaskHistory(task, userId, LocalDateTime.now());
+        taskHistoryRepository.save(taskHistory);
     }
 
     private List<ObjectId> addFiles(List<MultipartFile> files){
