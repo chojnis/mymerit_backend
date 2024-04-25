@@ -55,11 +55,11 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
-        if (user.getPoints() < reward.get().getCost()) {
+        if (user.getCredits() < reward.get().getCost()) {
             return ResponseEntity.badRequest().build();
         }
 
-        user.setPoints(user.getPoints() - reward.get().getCost());
+        user.setCredits(user.getCredits() - reward.get().getCost());
         userRepository.save(user);
 
         RewardHistory rewardHistory = new RewardHistory();
