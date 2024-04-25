@@ -95,4 +95,32 @@ public class SignUpController {
                 .created(location)
                 .body(new ApiResponse(true, "User registered successfully"));
     }
+
+    @PostMapping("/sign-up-company")
+    public ResponseEntity<?> registerCompany(@Valid @RequestBody SignUpRequest signUpRequest) {
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "Email address already in use"));
+        }
+
+        User user = new User();
+
+        user.setUsername(signUpRequest.getUsername());
+        user.setEmail(signUpRequest.getEmail());
+        user.setPassword(signUpRequest.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setProvider(AuthProvider.local);
+        user.setRole(Role.company.name());
+
+        User result = userRepository.insert(user);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/user")
+                .buildAndExpand(result.getId()).toUri();
+
+        return ResponseEntity
+                .created(location)
+                .body(new ApiResponse(true, "User (company) registered successfully"));
+    }
 }

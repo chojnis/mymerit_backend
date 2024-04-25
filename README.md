@@ -9,24 +9,25 @@
 
 ### Database
 
-1. Go to the **database** directory
+Go to the `database` directory
 ```
 cd database
 ```
-2. Create and start a container
+Create and start a container
 ```
 docker-compose up -d
 ```
 
-**Note:** The database is available at [http://localhost:8081](http://localhost:8081). You need to create a database named _**mymerit**_.
+**Note:** The database is available at [http://localhost:8081](http://localhost:8081).
+To populate the database with data, run the `restore` script depending on the platform.
 
 ### Judge0
 
-1. Go to the **judge0** directory
+Go to the `judge0` directory
 ```
 cd judge0
 ```
-2. Create and start a container
+Create and start a container
 ```
 docker-compose up -d
 ```
@@ -37,22 +38,22 @@ docker-compose up -d
 
 ### Windows
 
-1. Assemble and test this project
+Assemble and test this project
 ```
 .\gradlew.bat build
 ```
-2. Run this project as a Spring Boot application
+Run this project as a Spring Boot application
 ```
 .\gradlew.bat bootRun
 ```
 
 ### Linux / macOS
 
-1. Assemble and test this project
+Assemble and test this project
 ```
 ./gradlew build
 ```
-2. Run this project as a Spring Boot application
+Run this project as a Spring Boot application
 ```
 ./gradlew bootRun
 ```
