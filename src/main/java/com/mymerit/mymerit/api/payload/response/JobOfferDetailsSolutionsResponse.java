@@ -47,9 +47,8 @@ public class JobOfferDetailsSolutionsResponse extends JobOfferDetailsResponse{
                 task.getMemoryLimit(),
                 task.getTimeLimit(),
                 task.getStatus(),
-                null,
-                task.getTestFileContentBase64(),
-                task.getTestDataMap()
+                null
+
         );
     }
 }

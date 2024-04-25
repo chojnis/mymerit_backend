@@ -10,4 +10,9 @@ import java.util.List;
 @Getter
 public class SolutionRequest {
      private List<SolutionFile> files;
+     private String mainName;
+
+
+
+
 }

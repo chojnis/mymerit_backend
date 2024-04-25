@@ -143,9 +143,9 @@ public class JobOfferService {
                 task.getMemoryLimit(),
                 task.getTimeLimit(),
                 task.getStatus(),
-                userSolution,
-                task.getTestFileContentBase64(),
-                task.getTestDataMap()
+                userSolution
+
+
         );
     }
 

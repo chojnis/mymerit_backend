@@ -47,9 +47,5 @@ public class UserTaskDetailsResponse {
     private Solution userSolution;
 
 
-    private String testFileContentBase64;
-
-    private Map<String, String> testDataMap;
-
 
 }
