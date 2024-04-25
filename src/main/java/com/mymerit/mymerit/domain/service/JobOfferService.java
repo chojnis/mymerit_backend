@@ -185,19 +185,25 @@ public class JobOfferService {
         } else {
             createNewSolution(task, files, userId);
         }
-
         return jobOfferRepository.save(jobOffer);
     }
 
-
-    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment) {
+    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment, String userId) {
         Solution solution = solutionRepository.findById(solutionId)
                 .orElseThrow(() -> new RuntimeException("Solution not found for id " + solutionId));
+        User company = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found for id " + solutionId));
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
+        if(company.getCredits() < credits){
+            throw new RuntimeException("Not enought credits");
+        }
         Feedback feedback = new Feedback(solution, fileIDs, credits, comment);
+        User user = solution.getUser();
+        user.setCredits(user.getCredits() + credits);
         feedbackRepository.save(feedback);
         solution.setFeedback(feedback);
         solutionRepository.save(solution);
+        userRepository.save(user);
         return feedback;
     };
 

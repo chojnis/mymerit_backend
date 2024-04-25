@@ -74,8 +74,8 @@ public class JobOfferController {
     }
 
     @PostMapping("/solution/{solutionId}")
-    ResponseEntity<Feedback> addFeedback(@PathVariable String solutionId, @RequestParam List<MultipartFile> files, @RequestParam Integer reward, @RequestParam String comment) {
-        return Optional.ofNullable(jobOfferService.addFeedback(solutionId, files, reward, comment))
+    ResponseEntity<Feedback> addFeedback(@PathVariable String solutionId, @RequestParam List<MultipartFile> files, @RequestParam Integer reward, @RequestParam String comment, @CurrentUser UserDetailsImpl userDetails) {
+        return Optional.ofNullable(jobOfferService.addFeedback(solutionId, files, reward, comment, userDetails.getId()))
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + solutionId));
     }
