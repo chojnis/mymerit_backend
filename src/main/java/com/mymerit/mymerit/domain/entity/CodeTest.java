@@ -17,9 +17,9 @@ public class CodeTest {
     @JsonIgnore
     private Task taskId;
 
-    private String testFile;
+    private String testFileBase64;
 
 
-    private List<TestCase> testList;
+    private List<TestCase> testCases;
 
 }

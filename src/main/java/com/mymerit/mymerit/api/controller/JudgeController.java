@@ -10,12 +10,12 @@ import com.mymerit.mymerit.infrastructure.utils.ZipUtility;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
 public class JudgeController {
-
     JudgeService judgeService;
     TaskTestService taskTestService;
 
@@ -27,16 +27,15 @@ public class JudgeController {
     }
 
 
-    @PostMapping("/test/task/{taskId}")
-    private List<TestResponse> tests(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @RequestBody String language){
+    @PostMapping("/test/task/{taskId}/language/{language}")
+    private List<TestResponse> testAllCases(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @PathVariable String language){
         return taskTestService.testResults(judgeTokenRequest, taskId,language);
 
     }
 
-    @PostMapping("/test/task/{taskId}/singleTest")
-    private TestResponse tests(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @RequestBody String language, @RequestBody Integer index){
-        return taskTestService.singleTest(judgeTokenRequest, taskId,language,index);
-
+    @PostMapping("/test/task/{taskId}/language/{language}/{testIndex}")
+    private List<TestResponse> testSingleCase(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @PathVariable String language, @PathVariable Integer testIndex){
+        return Collections.singletonList(taskTestService.singleTest(judgeTokenRequest, taskId, language, testIndex));
     }
 
     @PostMapping("/token")

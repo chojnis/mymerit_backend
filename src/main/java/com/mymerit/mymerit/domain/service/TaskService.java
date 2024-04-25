@@ -7,22 +7,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TaskService {
-    JobOfferRepository jobOfferRepository;
-    JudgeService judgeService;
+    private final JobOfferRepository jobOfferRepository;
 
-    TaskService(JobOfferRepository jobOfferRepository,JudgeService judgeService){
+    TaskService(JobOfferRepository jobOfferRepository){
         this.jobOfferRepository = jobOfferRepository;
-        this.judgeService = judgeService;
     }
-
-    private Task getTaskById(String jobOfferId, String taskId) {
-
-        if (jobOfferRepository.findById(jobOfferId).isPresent()) {
-            JobOffer jobOffer = jobOfferRepository.findById(jobOfferId).get();
-
-        }
-        return null;
-    }
-
 
 }

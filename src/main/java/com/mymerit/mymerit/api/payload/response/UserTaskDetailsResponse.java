@@ -1,5 +1,7 @@
 package com.mymerit.mymerit.api.payload.response;
 
+import com.mymerit.mymerit.domain.entity.CodeTest;
+import com.mymerit.mymerit.domain.entity.Feedback;
 import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import jakarta.validation.constraints.NotBlank;
@@ -11,6 +13,7 @@ import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 
+import java.util.List;
 import java.util.Map;
 
 import java.util.Set;
@@ -41,11 +44,13 @@ public class UserTaskDetailsResponse {
 
     private Integer memoryLimit;
     private Float timeLimit;
+
     @NotNull
     private TaskStatus status;
-
     private Solution userSolution;
 
+    private Feedback companyFeedback;
 
+    private List<CodeTest> tests;
 
 }

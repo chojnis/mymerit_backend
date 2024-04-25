@@ -4,10 +4,7 @@ import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
 import com.mymerit.mymerit.api.payload.response.*;
 import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.TaskStatus;
-import com.mymerit.mymerit.infrastructure.repository.JobOfferRepository;
-import com.mymerit.mymerit.infrastructure.repository.SolutionRepository;
-import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
-import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import com.mymerit.mymerit.infrastructure.repository.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -24,20 +21,23 @@ public class JobOfferService {
     UserRepository userRepository;
     DownloadFileService fileService;
     TaskRepository taskRepository;
-    SolutionRepository solutionRepository;
+    SolutionRepository solutionRepository; //nah co tu sie dzieje xd troche duzo tego
+    FeedbackRepository feedbackRepository;
 
     JobOfferService(
             JobOfferRepository jobOfferRepository,
             UserRepository userRepository,
             DownloadFileService fileService,
             TaskRepository taskRepository,
-            SolutionRepository solutionRepository
+            SolutionRepository solutionRepository,
+            FeedbackRepository feedbackRepository
     ) {
         this.jobOfferRepository = jobOfferRepository;
         this.userRepository = userRepository;
         this.fileService = fileService;
         this.taskRepository = taskRepository;
         this.solutionRepository = solutionRepository;
+        this.feedbackRepository = feedbackRepository;
     }
 
     public JobOffer addJobOffer(JobOfferRequest jobOfferRequest, UserDetailsImpl userDetails){
@@ -70,27 +70,25 @@ public class JobOfferService {
         return jobOfferRepository.save(jobOffer);
     }
 
-    public Optional<JobOfferDetailsResponse> getJobOfferDetailsResponse(String id, UserDetailsImpl userDetails) {
-        Optional<User> userOptional = userRepository.findById(userDetails.getId());
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            Optional<JobOffer> jobOffer = jobOfferRepository.findById(id);
-            if(jobOffer.isPresent()){
-                if(jobOffer.get().getCompany().getId().equals(user.getId())){
-                    return jobOffer.map(this::createJobOfferDetailsSolutionsResponse);
-                }
-                return jobOffer
-                        .map(offer -> createJobOfferDetailsResponse(offer, offer.getTask().getSolutionForUser(user)));
-            }else{
-                throw new RuntimeException("No job offer with id: " + id);
-            }
+    public JobOfferDetailsResponse getJobOfferDetailsResponse(String id, UserDetailsImpl userDetails) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userDetails.getId()));
 
-        } else {
-            throw new RuntimeException("User not found with id: " + userDetails.getId());
+        JobOffer jobOffer = jobOfferRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("JobOffer not found with id: " + id));
+
+        if(jobOffer.getCompany().getId().equals(user.getId())){
+            return createJobOfferDetailsSolutionsResponse(jobOffer);
         }
+
+        Optional<Solution> userSolution = jobOffer.getTask().getSolutionForUser(user);
+
+        return createJobOfferDetailsResponse(jobOffer, userSolution.orElse(null), userSolution.map(Solution::getFeedback).orElse(null));
+
     }
 
-    private JobOfferDetailsResponse createJobOfferDetailsResponse(JobOffer jobOffer, Solution userSolution) {
+
+    private JobOfferDetailsResponse createJobOfferDetailsResponse(JobOffer jobOffer, Solution userSolution, Feedback companyFeedback) {
         return new JobOfferDetailsResponse(
                 jobOffer.getId(),
                 jobOffer.getJobTitle(),
@@ -100,7 +98,7 @@ public class JobOfferService {
                 jobOffer.getWorkLocations(),
                 jobOffer.getTechnologies(),
                 jobOffer.getCompany(),
-                jobOffer.getTask().getStatus() != TaskStatus.NOT_YET_OPEN ? createTaskResponse(jobOffer.getTask(), userSolution): null,
+                jobOffer.getTask().getStatus() != TaskStatus.NOT_YET_OPEN ? createTaskResponse(jobOffer.getTask(), userSolution, companyFeedback): null,
                 jobOffer.getSalary(),
                 jobOffer.getExperience(),
                 jobOffer.getEmploymentType(),
@@ -131,7 +129,7 @@ public class JobOfferService {
         );
     }
 
-    public  UserTaskDetailsResponse createTaskResponse(Task task, Solution userSolution) {
+    public  UserTaskDetailsResponse createTaskResponse(Task task, Solution userSolution, Feedback companyFeedback) {
         return new UserTaskDetailsResponse(
                 task.getId(),
                 task.getTitle(),
@@ -143,9 +141,9 @@ public class JobOfferService {
                 task.getMemoryLimit(),
                 task.getTimeLimit(),
                 task.getStatus(),
-                userSolution
-
-
+                userSolution,
+                companyFeedback,
+                task.getTests()
         );
     }
 
@@ -192,14 +190,14 @@ public class JobOfferService {
     }
 
 
-    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits) {
+    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment) {
         Solution solution = solutionRepository.findById(solutionId)
                 .orElseThrow(() -> new RuntimeException("Solution not found for id " + solutionId));
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
-        Feedback feedback = new Feedback(solution, fileIDs, credits);
+        Feedback feedback = new Feedback(solution, fileIDs, credits, comment);
+        feedbackRepository.save(feedback);
         solution.setFeedback(feedback);
         solutionRepository.save(solution);
-        //TODO feedback repsoitory i service ig, albo zostawicc tak juz idk, robione na szybko
         return feedback;
     };
 
@@ -209,20 +207,47 @@ public class JobOfferService {
         if (jobOfferOptional.isPresent()) {
             JobOffer jobOffer = jobOfferOptional.get();
             User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-            Solution solution = jobOffer.getTask().getSolutionForUser(user);
-            if (solution != null) {
-                downloadedFiles.addAll(downloadSolutionFiles(solution.getId()));
-            }
+            Optional<Solution> solution = jobOffer.getTask().getSolutionForUser(user);
+            solution.ifPresent(value -> downloadedFiles.addAll(downloadSolutionFiles(value.getId())));
         }
         return downloadedFiles;
     }
 
+    public List<DownloadFileResponse> downloadFeedbackFilesForUser(String jobId, String userId){
+        JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        Optional<Feedback> feedback = jobOffer.getTask().getSolutionForUser(user).map(Solution::getFeedback);
+        if(feedback.isPresent()){
+            return downloadFiles(feedback.get().getFiles());
+        }else{
+            return Collections.emptyList();
+        }
+    }
+
+    public List<DownloadFileResponse> downloadFeedbackForSolution(String solutionId, String userId){
+        Solution solution = solutionRepository.findById(solutionId).orElseThrow();
+        /*if(!userId.equals(solution.getUser().getId())){
+            throw new RuntimeException("Unauthorized");
+        }*/
+        Feedback feedback = solution.getFeedback();
+        if(feedback != null){
+            return downloadFiles(feedback.getFiles());
+        }else{
+            return Collections.emptyList();
+        }
+    }
+
+
     public List<DownloadFileResponse> downloadSolutionFiles(String solutionId) {
-        List<DownloadFileResponse> downloadedFiles = new ArrayList<>();
         Solution solution = solutionRepository.findById(solutionId).
                 orElseThrow();
 
-        for (String fileId : solution.getFiles()) {
+        return downloadFiles(solution.getFiles());
+    }
+
+    public List<DownloadFileResponse> downloadFiles(List<String> fileIDS) {
+        List<DownloadFileResponse> downloadedFiles = new ArrayList<>();
+        for (String fileId : fileIDS) {
             try {
                 DownloadFile downloadFile = fileService.downloadFile(fileId);
                 DownloadFileResponse downloadFileResponse = new DownloadFileResponse(downloadFile.getFilename(), downloadFile.getFileType(), downloadFile.getFile());
@@ -234,7 +259,6 @@ public class JobOfferService {
 
         return downloadedFiles;
     }
-
 
 
     private JobOffer getJobOfferOrThrow(String jobOfferId) {

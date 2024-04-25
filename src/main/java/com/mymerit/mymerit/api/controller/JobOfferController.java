@@ -37,9 +37,8 @@ public class JobOfferController {
 
     @GetMapping("/job/{id}")
     ResponseEntity<JobOfferDetailsResponse> getJobOfferById(@PathVariable String id, @CurrentUser UserDetailsImpl user) {
-        return jobOfferService.getJobOfferDetailsResponse(id, user)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(jobOfferService.getJobOfferDetailsResponse(id, user));
+
     }
 
     @PostMapping("/job")
@@ -67,7 +66,7 @@ public class JobOfferController {
         return ResponseEntity.ok(jobOffersPage);
     }
 
-    @PostMapping("/job/solution/{jobOfferId}")
+    @PostMapping("/job/{jobOfferId}/solution")
     ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam List<MultipartFile> files, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId()))
                 .map(ResponseEntity::ok)
@@ -75,21 +74,28 @@ public class JobOfferController {
     }
 
     @PostMapping("/solution/{solutionId}")
-    ResponseEntity<Feedback> addFeedback(@PathVariable String solutionId, @RequestParam List<MultipartFile> files, @RequestParam Integer credits, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return Optional.ofNullable(jobOfferService.addFeedback(solutionId, files, credits))
+    ResponseEntity<Feedback> addFeedback(@PathVariable String solutionId, @RequestParam List<MultipartFile> files, @RequestParam Integer reward, @RequestParam String comment) {
+        return Optional.ofNullable(jobOfferService.addFeedback(solutionId, files, reward, comment))
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + solutionId));
     }
 
-    @GetMapping("/job/solutions/{jobOfferId}")
+    @GetMapping("/job/{jobOfferId}/solution")
     public ResponseEntity<List<DownloadFileResponse>> downloadSolutionFilesForUserAndJobOffer(@PathVariable String jobOfferId, @CurrentUser UserDetailsImpl userDetails) {
         List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadSolutionFilesForUser(jobOfferId, userDetails.getId());
         return ResponseEntity.ok(downloadedFiles);
     }
 
+
     @GetMapping("/solution/{solutionId}")
     public ResponseEntity<List<DownloadFileResponse>> downloadSolution(@PathVariable String solutionId) {
         List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadSolutionFiles(solutionId);
+        return ResponseEntity.ok(downloadedFiles);
+    }
+
+    @GetMapping("/solution/{solutionId}/feedback")
+    public ResponseEntity<List<DownloadFileResponse>> downloadFeedback(@PathVariable String solutionId, @CurrentUser UserDetailsImpl userDetails) {
+        List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadFeedbackForSolution(solutionId, userDetails.getId());
         return ResponseEntity.ok(downloadedFiles);
     }
 

@@ -7,5 +7,5 @@ public class TestResponse {
 
 
    public String name;
-   public Boolean evaluation;
+   public Boolean passed;
 }
