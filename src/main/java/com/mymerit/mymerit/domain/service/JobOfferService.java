@@ -190,11 +190,11 @@ public class JobOfferService {
     }
 
 
-    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits) {
+    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment) {
         Solution solution = solutionRepository.findById(solutionId)
                 .orElseThrow(() -> new RuntimeException("Solution not found for id " + solutionId));
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
-        Feedback feedback = new Feedback(solution, fileIDs, credits);
+        Feedback feedback = new Feedback(solution, fileIDs, credits, comment);
         feedbackRepository.save(feedback);
         solution.setFeedback(feedback);
         solutionRepository.save(solution);
