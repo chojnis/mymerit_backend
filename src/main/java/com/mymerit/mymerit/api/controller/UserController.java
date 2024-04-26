@@ -1,15 +1,19 @@
 package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.domain.entity.User;
+import com.mymerit.mymerit.domain.entity.JobOffer;
+import com.mymerit.mymerit.domain.entity.JobOfferHistory;
 import com.mymerit.mymerit.domain.entity.Socials;
 import com.mymerit.mymerit.domain.entity.Task;
 import com.mymerit.mymerit.domain.entity.TaskHistory;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import com.mymerit.mymerit.infrastructure.repository.JobOfferHistoryRepository;
 import com.mymerit.mymerit.infrastructure.repository.SocialRepository;
 import com.mymerit.mymerit.infrastructure.repository.TaskHistoryRepository;
 import com.mymerit.mymerit.infrastructure.security.CurrentUser;
 import com.mymerit.mymerit.api.payload.response.ApiResponse;
+import com.mymerit.mymerit.api.payload.response.JobOfferHistoryResponse;
 import com.mymerit.mymerit.api.payload.response.TaskHistoryResponse;
 import com.mymerit.mymerit.api.payload.request.UpdateUserRequest;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +32,15 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final SocialRepository socialRepository;
     private final TaskHistoryRepository taskHistoryRepository;
+    private final JobOfferHistoryRepository jobOfferHistoryRepository;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialRepository socialRepository, TaskHistoryRepository taskHistoryRepository) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialRepository socialRepository, 
+    TaskHistoryRepository taskHistoryRepository, JobOfferHistoryRepository jobOfferHistoryRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.socialRepository = socialRepository;
         this.taskHistoryRepository = taskHistoryRepository;
+        this.jobOfferHistoryRepository = jobOfferHistoryRepository;
     }
 
     @GetMapping("/me")
@@ -166,6 +173,28 @@ public class UserController {
         return socialRepository.findByUserId(userDetailsImpl.getId())
                 .orElseThrow(() -> new RuntimeException("Company user " + userDetailsImpl.getId() + " social media not found"));
 
+    }
+
+    @GetMapping("/company/myjoboffers")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<JobOfferHistoryResponse>> getCurrentCompanyUserJobOfferHistory(@CurrentUser UserDetailsImpl userDetailsImpl) {
+        User user = userRepository.findById(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " not found"));
+
+        List<JobOfferHistory> userJobOffers = jobOfferHistoryRepository.findByUserId(user.getId())
+                .orElse(new ArrayList<>());
+
+        if (userJobOffers.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<JobOfferHistoryResponse> jobOfferHistoryResponse = new ArrayList<>();
+
+        for (JobOfferHistory jobOfferHistory : userJobOffers) {
+            jobOfferHistoryResponse.add(new JobOfferHistoryResponse(jobOfferHistory.getJobOffer(), jobOfferHistory.getDateLastModified()));
+        }
+
+        return ResponseEntity.ok(jobOfferHistoryResponse);
     }
 
 }

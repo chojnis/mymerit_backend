@@ -6,6 +6,7 @@ import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
 import com.mymerit.mymerit.api.payload.response.UserTaskDetailsResponse;
 import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.TaskStatus;
+import com.mymerit.mymerit.infrastructure.repository.JobOfferHistoryRepository;
 import com.mymerit.mymerit.infrastructure.repository.JobOfferRepository;
 import com.mymerit.mymerit.infrastructure.repository.SolutionRepository;
 import com.mymerit.mymerit.infrastructure.repository.TaskHistoryRepository;
@@ -31,6 +32,7 @@ public class JobOfferService {
     TaskRepository taskRepository;
     SolutionRepository solutionRepository;
     TaskHistoryRepository taskHistoryRepository;
+    JobOfferHistoryRepository jobOfferHistoryRepository;
 
     JobOfferService(
             JobOfferRepository jobOfferRepository,
@@ -38,7 +40,8 @@ public class JobOfferService {
             DownloadFileService fileService,
             TaskRepository taskRepository,
             SolutionRepository solutionRepository,
-            TaskHistoryRepository taskHistoryRepository
+            TaskHistoryRepository taskHistoryRepository,
+            JobOfferHistoryRepository jobOfferHistoryRepository
     ) {
         this.jobOfferRepository = jobOfferRepository;
         this.userRepository = userRepository;
@@ -46,6 +49,7 @@ public class JobOfferService {
         this.taskRepository = taskRepository;
         this.solutionRepository = solutionRepository;
         this.taskHistoryRepository = taskHistoryRepository;
+        this.jobOfferHistoryRepository = jobOfferHistoryRepository;
 
 
     }
@@ -55,6 +59,8 @@ public class JobOfferService {
         taskRepository.save(jobOffer.getTask());
         if(companyCredits > jobOffer.getTask().getReward()) {
             jobOffer.getCompany().setCreditsAmount(companyCredits - jobOffer.getTask().getReward());
+            JobOfferHistory jobOfferHistory = new JobOfferHistory(jobOffer, jobOffer.getCompany().getId(), LocalDateTime.now());
+            jobOfferHistoryRepository.save(jobOfferHistory);
             return jobOfferRepository.save(jobOffer);
         }
 
