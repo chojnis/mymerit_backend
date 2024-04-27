@@ -27,7 +27,7 @@ public class DownloadFileController {
     private DownloadFileService fileService;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> upload(@RequestParam("file")MultipartFile file) throws IOException {
+    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) throws IOException {
         return new ResponseEntity<>(fileService.addFile(file), HttpStatus.OK);
     }
 

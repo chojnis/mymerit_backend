@@ -1,21 +1,13 @@
 package com.mymerit.mymerit.domain.service;
 
-import com.mymerit.mymerit.api.payload.response.DownloadFileResponse;
-import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
-import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
-import com.mymerit.mymerit.api.payload.response.UserTaskDetailsResponse;
+import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
+import com.mymerit.mymerit.api.payload.response.*;
 import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.TaskStatus;
-import com.mymerit.mymerit.infrastructure.repository.JobOfferHistoryRepository;
-import com.mymerit.mymerit.infrastructure.repository.JobOfferRepository;
-import com.mymerit.mymerit.infrastructure.repository.SolutionRepository;
-import com.mymerit.mymerit.infrastructure.repository.TaskHistoryRepository;
-import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
-import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import com.mymerit.mymerit.infrastructure.repository.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -30,9 +22,10 @@ public class JobOfferService {
     UserRepository userRepository;
     DownloadFileService fileService;
     TaskRepository taskRepository;
-    SolutionRepository solutionRepository;
     TaskHistoryRepository taskHistoryRepository;
     JobOfferHistoryRepository jobOfferHistoryRepository;
+    SolutionRepository solutionRepository; //nah co tu sie dzieje xd troche duzo tego
+    FeedbackRepository feedbackRepository;
 
     JobOfferService(
             JobOfferRepository jobOfferRepository,
@@ -42,6 +35,7 @@ public class JobOfferService {
             SolutionRepository solutionRepository,
             TaskHistoryRepository taskHistoryRepository,
             JobOfferHistoryRepository jobOfferHistoryRepository
+            FeedbackRepository feedbackRepository
     ) {
         this.jobOfferRepository = jobOfferRepository;
         this.userRepository = userRepository;
@@ -50,9 +44,14 @@ public class JobOfferService {
         this.solutionRepository = solutionRepository;
         this.taskHistoryRepository = taskHistoryRepository;
         this.jobOfferHistoryRepository = jobOfferHistoryRepository;
-
-
+        this.feedbackRepository = feedbackRepository;
     }
+
+    public JobOffer addJobOffer(JobOfferRequest jobOfferRequest, UserDetailsImpl userDetails){
+        User user = getUser(userDetails.getId());
+
+        Integer userCredits = user.getCredits();
+        Integer taskReward = jobOfferRequest.getTask().getReward();
 
     public JobOffer addJobOffer(JobOffer jobOffer){
         Integer companyCredits = jobOffer.getCompany().getCreditsAmount();
@@ -62,24 +61,49 @@ public class JobOfferService {
             JobOfferHistory jobOfferHistory = new JobOfferHistory(jobOffer, jobOffer.getCompany().getId(), LocalDateTime.now());
             jobOfferHistoryRepository.save(jobOfferHistory);
             return jobOfferRepository.save(jobOffer);
+        if (userCredits < taskReward) {
+            throw new RuntimeException("Not enough credits to create job offer");
         }
 
-        return null;
+        user.setCredits(userCredits - taskReward);
+        taskRepository.save(jobOfferRequest.getTask());
+
+        JobOffer jobOffer = new JobOffer(
+                jobOfferRequest.getJobTitle(),
+                jobOfferRequest.getDescription(),
+                jobOfferRequest.getRequiredSkills(),
+                jobOfferRequest.getPreferredSkills(),
+                jobOfferRequest.getWorkLocations(),
+                jobOfferRequest.getTechnologies(),
+                user,
+                jobOfferRequest.getTask(),
+                jobOfferRequest.getExperience(),
+                jobOfferRequest.getEmploymentType(),
+                jobOfferRequest.getSalary()
+        );
+
+        return jobOfferRepository.save(jobOffer);
     }
 
-    public Optional<JobOfferDetailsResponse> getJobOfferDetailsResponse(String id, UserDetailsImpl userDetails) {
-        Optional<User> userOptional = userRepository.findById(userDetails.getId());
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            System.out.println(jobOfferRepository.findById(id).get().getTask().getSolutionForUser(user));
-            return jobOfferRepository.findById(id)
-                    .map(jobOffer -> createJobOfferDetailsResponse(jobOffer, jobOffer.getTask().getSolutionForUser(user)));
-        } else {
-            throw new RuntimeException("User not found with id: " + userDetails.getId());
+    public JobOfferDetailsResponse getJobOfferDetailsResponse(String id, UserDetailsImpl userDetails) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userDetails.getId()));
+
+        JobOffer jobOffer = jobOfferRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("JobOffer not found with id: " + id));
+
+        if(jobOffer.getCompany().getId().equals(user.getId())){
+            return createJobOfferDetailsSolutionsResponse(jobOffer);
         }
+
+        Optional<Solution> userSolution = jobOffer.getTask().getSolutionForUser(user);
+
+        return createJobOfferDetailsResponse(jobOffer, userSolution.orElse(null), userSolution.map(Solution::getFeedback).orElse(null));
+
     }
 
-    private JobOfferDetailsResponse createJobOfferDetailsResponse(JobOffer jobOffer, Solution userSolution) {
+
+    private JobOfferDetailsResponse createJobOfferDetailsResponse(JobOffer jobOffer, Solution userSolution, Feedback companyFeedback) {
         return new JobOfferDetailsResponse(
                 jobOffer.getId(),
                 jobOffer.getJobTitle(),
@@ -89,13 +113,19 @@ public class JobOfferService {
                 jobOffer.getWorkLocations(),
                 jobOffer.getTechnologies(),
                 jobOffer.getCompany(),
-                jobOffer.getTask().getStatus() != TaskStatus.NOT_YET_OPEN ? createTaskResponse(jobOffer.getTask(), userSolution): null,
+                jobOffer.getTask().getStatus() != TaskStatus.NOT_YET_OPEN ? createTaskResponse(jobOffer.getTask(), userSolution, companyFeedback): null,
                 jobOffer.getSalary(),
                 jobOffer.getExperience(),
-                jobOffer.getMode(),
+                jobOffer.getEmploymentType(),
                 jobOffer.getTask().getOpensAt(),
                 jobOffer.getTask().getClosesAt(),
                 jobOffer.getTask().getStatus()
+        );
+    }
+
+    private JobOfferDetailsResponse createJobOfferDetailsSolutionsResponse(JobOffer jobOffer) {
+        return new JobOfferDetailsSolutionsResponse(
+                jobOffer
         );
     }
 
@@ -114,9 +144,9 @@ public class JobOfferService {
         );
     }
 
-    private UserTaskDetailsResponse createTaskResponse(Task task, Solution userSolution){
+    public  UserTaskDetailsResponse createTaskResponse(Task task, Solution userSolution, Feedback companyFeedback) {
         return new UserTaskDetailsResponse(
-               task.getId(),
+                task.getId(),
                 task.getTitle(),
                 task.getInstructions(),
                 task.getOpensAt(),
@@ -126,7 +156,9 @@ public class JobOfferService {
                 task.getMemoryLimit(),
                 task.getTimeLimit(),
                 task.getStatus(),
-                userSolution
+                userSolution,
+                companyFeedback,
+                task.getTests()
         );
     }
 
@@ -168,9 +200,27 @@ public class JobOfferService {
         } else {
             createNewSolution(task, files, userId);
         }
-
         return jobOfferRepository.save(jobOffer);
     }
+
+    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment, String userId) {
+        Solution solution = solutionRepository.findById(solutionId)
+                .orElseThrow(() -> new RuntimeException("Solution not found for id " + solutionId));
+        User company = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found for id " + solutionId));
+        List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
+        if(company.getCredits() < credits){
+            throw new RuntimeException("Not enought credits");
+        }
+        Feedback feedback = new Feedback(solution, fileIDs, credits, comment);
+        User user = solution.getUser();
+        user.setCredits(user.getCredits() + credits);
+        feedbackRepository.save(feedback);
+        solution.setFeedback(feedback);
+        solutionRepository.save(solution);
+        userRepository.save(user);
+        return feedback;
+    };
 
     public List<DownloadFileResponse> downloadSolutionFilesForUser(String jobId, String userId) {
         List<DownloadFileResponse> downloadedFiles = new ArrayList<>();
@@ -178,21 +228,59 @@ public class JobOfferService {
         if (jobOfferOptional.isPresent()) {
             JobOffer jobOffer = jobOfferOptional.get();
             User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-            Solution solution = jobOffer.getTask().getSolutionForUser(user);
-            if (solution != null) {
-                for (String fileId : solution.getFiles()) {
-                    try {
-                        DownloadFile downloadFile = fileService.downloadFile(fileId);
-                        DownloadFileResponse downloadFileResponse = new DownloadFileResponse(downloadFile.getFilename(), downloadFile.getFileType(), downloadFile.getFile());
-                        downloadedFiles.add(downloadFileResponse);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+            Optional<Solution> solution = jobOffer.getTask().getSolutionForUser(user);
+            solution.ifPresent(value -> downloadedFiles.addAll(downloadSolutionFiles(value.getId())));
         }
         return downloadedFiles;
     }
+
+    public List<DownloadFileResponse> downloadFeedbackFilesForUser(String jobId, String userId){
+        JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        Optional<Feedback> feedback = jobOffer.getTask().getSolutionForUser(user).map(Solution::getFeedback);
+        if(feedback.isPresent()){
+            return downloadFiles(feedback.get().getFiles());
+        }else{
+            return Collections.emptyList();
+        }
+    }
+
+    public List<DownloadFileResponse> downloadFeedbackForSolution(String solutionId, String userId){
+        Solution solution = solutionRepository.findById(solutionId).orElseThrow();
+        /*if(!userId.equals(solution.getUser().getId())){
+            throw new RuntimeException("Unauthorized");
+        }*/
+        Feedback feedback = solution.getFeedback();
+        if(feedback != null){
+            return downloadFiles(feedback.getFiles());
+        }else{
+            return Collections.emptyList();
+        }
+    }
+
+
+    public List<DownloadFileResponse> downloadSolutionFiles(String solutionId) {
+        Solution solution = solutionRepository.findById(solutionId).
+                orElseThrow();
+
+        return downloadFiles(solution.getFiles());
+    }
+
+    public List<DownloadFileResponse> downloadFiles(List<String> fileIDS) {
+        List<DownloadFileResponse> downloadedFiles = new ArrayList<>();
+        for (String fileId : fileIDS) {
+            try {
+                DownloadFile downloadFile = fileService.downloadFile(fileId);
+                DownloadFileResponse downloadFileResponse = new DownloadFileResponse(downloadFile.getFilename(), downloadFile.getFileType(), downloadFile.getFile());
+                downloadedFiles.add(downloadFileResponse);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return downloadedFiles;
+    }
+
 
     private JobOffer getJobOfferOrThrow(String jobOfferId) {
         return jobOfferRepository.findById(jobOfferId)
@@ -210,7 +298,7 @@ public class JobOfferService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Solution not found for the user"));
 
-        existingSolution.files.forEach((id) -> {
+        existingSolution.getFiles().forEach((id) -> {
             try {
                 fileService.DeleteFile(String.valueOf(id));
             } catch (IOException e) {
@@ -239,14 +327,13 @@ public class JobOfferService {
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         Solution solution = new Solution(task, getUser(userId), fileIDs);
         solutionRepository.save(solution);
-        System.out.println("New solution created: " + solution);
         task.addSolution(solution);
         taskRepository.save(task);
         TaskHistory taskHistory = new TaskHistory(task, userId, LocalDateTime.now());
         taskHistoryRepository.save(taskHistory);
     }
 
-    private List<ObjectId> addFiles(List<MultipartFile> files){
+    private List<ObjectId> addFiles(List<MultipartFile> files) {
         return files.stream()
                 .map(file -> {
                     try {
@@ -262,8 +349,5 @@ public class JobOfferService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
-
-
-
 
 }

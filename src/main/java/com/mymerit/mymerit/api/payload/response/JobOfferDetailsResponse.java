@@ -1,10 +1,8 @@
 package com.mymerit.mymerit.api.payload.response;
 
-import com.mymerit.mymerit.domain.entity.Company;
-import com.mymerit.mymerit.domain.entity.Solution;
+import com.mymerit.mymerit.domain.entity.User;
 import com.mymerit.mymerit.domain.models.EmploymentType;
 import com.mymerit.mymerit.domain.models.Experience1;
-import com.mymerit.mymerit.domain.entity.Task;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -12,12 +10,17 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class JobOfferDetailsResponse {
     @NotNull
     private String id;
@@ -42,7 +45,7 @@ public class JobOfferDetailsResponse {
 
     @NotNull
     @Valid
-    private Company company;
+    private User company;
 
     @NotNull
     private UserTaskDetailsResponse task;
@@ -64,6 +67,4 @@ public class JobOfferDetailsResponse {
 
     @NotNull
     private TaskStatus status;
-
-
 }
