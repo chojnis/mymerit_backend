@@ -67,7 +67,7 @@ public class UserController {
         else{
             return ResponseEntity.badRequest().body(new ApiResponse(false, "user doesnt exist"));
         }
-        Boolean changed = false;
+        boolean changed = false;
         
         if( updateUserRequest.getImageUrl() != null ){
                 user.setImageUrl(updateUserRequest.getImageUrl());
@@ -135,13 +135,13 @@ public class UserController {
     public ResponseEntity<?> updateCompanyUserProfileInfo(@CurrentUser UserDetailsImpl userDetailsImpl, @Valid @RequestBody UpdateUserRequest updateUserRequest){
         Optional<User> user_check = userRepository.findById(userDetailsImpl.getId());
         User user;
-        if( user_check != null){
+        if( !user_check.isPresent()){
             user = user_check.get();
         }
         else{
             return ResponseEntity.badRequest().body(new ApiResponse(false, "company user doesnt exist"));
         }
-        Boolean changed = false;
+        boolean changed = false;
         
         if( updateUserRequest.getImageUrl() != null ){
                 user.setImageUrl(updateUserRequest.getImageUrl());
@@ -176,7 +176,7 @@ public class UserController {
     }
 
     @GetMapping("/company/myjoboffers")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<List<JobOfferHistoryResponse>> getCurrentCompanyUserJobOfferHistory(@CurrentUser UserDetailsImpl userDetailsImpl) {
         User user = userRepository.findById(userDetailsImpl.getId())
                 .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " not found"));
@@ -184,7 +184,7 @@ public class UserController {
         List<JobOfferHistory> userJobOffers = jobOfferHistoryRepository.findByUserId(user.getId())
                 .orElse(new ArrayList<>());
 
-        if (userJobOffers.isEmpty()) {
+        if (userJobOffers.isEmpty() ) {
             return ResponseEntity.notFound().build();
         }
 
