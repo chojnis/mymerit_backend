@@ -103,10 +103,6 @@ public class UserController {
         List<RewardHistory> userRewards = rewardHistoryRepository.findByUser(user)
                 .orElse(new ArrayList<>());
 
-        if (userRewards.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
         List<RewardHistoryResponse> rewardHistoryResponse = new ArrayList<>();
 
         for (RewardHistory rewardHistory : userRewards) {
