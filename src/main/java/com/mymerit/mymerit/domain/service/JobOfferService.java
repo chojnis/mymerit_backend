@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class JobOfferService {
     JobOfferRepository jobOfferRepository;
     UserRepository userRepository;
-    DownloadFileService fileService;
+    GridFileService fileService;
     TaskRepository taskRepository;
     TaskHistoryRepository taskHistoryRepository;
     JobOfferHistoryRepository jobOfferHistoryRepository;
@@ -30,7 +30,7 @@ public class JobOfferService {
     JobOfferService(
             JobOfferRepository jobOfferRepository,
             UserRepository userRepository,
-            DownloadFileService fileService,
+            GridFileService fileService,
             TaskRepository taskRepository,
             SolutionRepository solutionRepository,
             TaskHistoryRepository taskHistoryRepository,
@@ -218,8 +218,8 @@ public class JobOfferService {
         return feedback;
     };
 
-    public List<DownloadFileResponse> downloadSolutionFilesForUser(String jobId, String userId) {
-        List<DownloadFileResponse> downloadedFiles = new ArrayList<>();
+    public List<GridFileResponse> downloadSolutionFilesForUser(String jobId, String userId) {
+        List<GridFileResponse> downloadedFiles = new ArrayList<>();
         Optional<JobOffer> jobOfferOptional = jobOfferRepository.findById(jobId);
         if (jobOfferOptional.isPresent()) {
             JobOffer jobOffer = jobOfferOptional.get();
@@ -230,7 +230,7 @@ public class JobOfferService {
         return downloadedFiles;
     }
 
-    public List<DownloadFileResponse> downloadFeedbackFilesForUser(String jobId, String userId){
+    public List<GridFileResponse> downloadFeedbackFilesForUser(String jobId, String userId){
         JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow();
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         Optional<Feedback> feedback = jobOffer.getTask().getSolutionForUser(user).map(Solution::getFeedback);
@@ -241,7 +241,7 @@ public class JobOfferService {
         }
     }
 
-    public List<DownloadFileResponse> downloadFeedbackForSolution(String solutionId, String userId){
+    public List<GridFileResponse> downloadFeedbackForSolution(String solutionId, String userId){
         Solution solution = solutionRepository.findById(solutionId).orElseThrow();
         /*if(!userId.equals(solution.getUser().getId())){
             throw new RuntimeException("Unauthorized");
@@ -255,19 +255,19 @@ public class JobOfferService {
     }
 
 
-    public List<DownloadFileResponse> downloadSolutionFiles(String solutionId) {
+    public List<GridFileResponse> downloadSolutionFiles(String solutionId) {
         Solution solution = solutionRepository.findById(solutionId).
                 orElseThrow();
 
         return downloadFiles(solution.getFiles());
     }
 
-    public List<DownloadFileResponse> downloadFiles(List<String> fileIDS) {
-        List<DownloadFileResponse> downloadedFiles = new ArrayList<>();
+    public List<GridFileResponse> downloadFiles(List<String> fileIDS) {
+        List<GridFileResponse> downloadedFiles = new ArrayList<>();
         for (String fileId : fileIDS) {
             try {
-                DownloadFile downloadFile = fileService.downloadFile(fileId);
-                DownloadFileResponse downloadFileResponse = new DownloadFileResponse(downloadFile.getFilename(), downloadFile.getFileType(), downloadFile.getFile());
+                GridFile downloadFile = fileService.gridFile(fileId);
+                GridFileResponse downloadFileResponse = new GridFileResponse(downloadFile.getFilename(), downloadFile.getFileType(), downloadFile.getFile());
                 downloadedFiles.add(downloadFileResponse);
             } catch (IOException e) {
                 e.printStackTrace();

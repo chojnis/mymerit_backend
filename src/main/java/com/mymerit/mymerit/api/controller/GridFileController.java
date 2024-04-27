@@ -1,9 +1,9 @@
 package com.mymerit.mymerit.api.controller;
 
-import com.mymerit.mymerit.api.payload.response.DownloadFileResponse;
-import com.mymerit.mymerit.domain.entity.DownloadFile;
+import com.mymerit.mymerit.api.payload.response.GridFileResponse;
+import com.mymerit.mymerit.domain.entity.GridFile;
 import com.mymerit.mymerit.domain.entity.Solution;
-import com.mymerit.mymerit.domain.service.DownloadFileService;
+import com.mymerit.mymerit.domain.service.GridFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -21,10 +21,10 @@ import java.util.List;
 
 @RestController 
 @RequestMapping("file/")
-public class DownloadFileController {
+public class GridFileController {
 
     @Autowired
-    private DownloadFileService fileService;
+    private GridFileService fileService;
 
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) throws IOException {
@@ -32,10 +32,10 @@ public class DownloadFileController {
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<DownloadFileResponse> download(@PathVariable String id) throws IOException {
-        DownloadFile loadFile = fileService.downloadFile(id);
+    public ResponseEntity<GridFileResponse> download(@PathVariable String id) throws IOException {
+        GridFile loadFile = fileService.gridFile(id);
 
-        DownloadFileResponse response = new DownloadFileResponse(loadFile.getFilename(), loadFile.getFileType(), loadFile.getFile());
+        GridFileResponse response = new GridFileResponse(loadFile.getFilename(), loadFile.getFileType(), loadFile.getFile());
         System.out.println(response);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + response.getName() + "\"")

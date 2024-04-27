@@ -11,12 +11,12 @@ import java.util.Base64;
 @Data
 @AllArgsConstructor
 @ToString
-public class DownloadFileResponse {
+public class GridFileResponse {
     private String name;
     private String type;
     private String contentBase64;
 
-    public DownloadFileResponse(String filename, String fileType, byte[] fileContent) {
+    public GridFileResponse(String filename, String fileType, byte[] fileContent) {
         this.name = filename;
         this.type = fileType;
         this.contentBase64 = Base64.getEncoder().encodeToString(fileContent);

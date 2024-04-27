@@ -1,6 +1,6 @@
 package com.mymerit.mymerit.domain.service;
 
-import com.mymerit.mymerit.domain.entity.DownloadFile;
+import com.mymerit.mymerit.domain.entity.GridFile;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class DownloadFileService {
+public class GridFileService {
 
     @Autowired
     private GridFsTemplate template;
@@ -44,19 +44,19 @@ public class DownloadFileService {
         return template.store(upload.getInputStream(), upload.getOriginalFilename(), upload.getContentType(), metadata);
     }
 
-    public DownloadFile downloadFile(String id) throws IOException {
+    public GridFile gridFile(String id) throws IOException {
         GridFSFile gridFSFile = template.findOne(new Query(Criteria.where("_id").is(id)));
 
-        DownloadFile downloadFile = new DownloadFile();
+        GridFile gridFile = new GridFile();
 
         if (gridFSFile != null && gridFSFile.getMetadata() != null) {
-            downloadFile.setFilename(gridFSFile.getFilename());
-            downloadFile.setFileType(gridFSFile.getMetadata().get("_contentType").toString());
-            downloadFile.setFileSize(gridFSFile.getMetadata().get("fileSize").toString());
-            downloadFile.setFile(IOUtils.toByteArray(operations.getResource(gridFSFile).getInputStream()));
+            gridFile.setFilename(gridFSFile.getFilename());
+            gridFile.setFileType(gridFSFile.getMetadata().get("_contentType").toString());
+            gridFile.setFileSize(gridFSFile.getMetadata().get("fileSize").toString());
+            gridFile.setFile(IOUtils.toByteArray(operations.getResource(gridFSFile).getInputStream()));
         }
 
-        return downloadFile;
+        return gridFile;
     }
 
     public void DeleteFile(String id) throws IOException {

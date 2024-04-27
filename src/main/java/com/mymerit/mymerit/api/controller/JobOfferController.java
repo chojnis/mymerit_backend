@@ -1,7 +1,7 @@
 package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
-import com.mymerit.mymerit.api.payload.response.DownloadFileResponse;
+import com.mymerit.mymerit.api.payload.response.GridFileResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
 import com.mymerit.mymerit.domain.entity.Feedback;
@@ -81,21 +81,21 @@ public class JobOfferController {
     }
 
     @GetMapping("/job/{jobOfferId}/solution")
-    public ResponseEntity<List<DownloadFileResponse>> downloadSolutionFilesForUserAndJobOffer(@PathVariable String jobOfferId, @CurrentUser UserDetailsImpl userDetails) {
-        List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadSolutionFilesForUser(jobOfferId, userDetails.getId());
+    public ResponseEntity<List<GridFileResponse>> downloadSolutionFilesForUserAndJobOffer(@PathVariable String jobOfferId, @CurrentUser UserDetailsImpl userDetails) {
+        List<GridFileResponse> downloadedFiles = jobOfferService.downloadSolutionFilesForUser(jobOfferId, userDetails.getId());
         return ResponseEntity.ok(downloadedFiles);
     }
 
 
     @GetMapping("/solution/{solutionId}")
-    public ResponseEntity<List<DownloadFileResponse>> downloadSolution(@PathVariable String solutionId) {
-        List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadSolutionFiles(solutionId);
+    public ResponseEntity<List<GridFileResponse>> downloadSolution(@PathVariable String solutionId) {
+        List<GridFileResponse> downloadedFiles = jobOfferService.downloadSolutionFiles(solutionId);
         return ResponseEntity.ok(downloadedFiles);
     }
 
     @GetMapping("/solution/{solutionId}/feedback")
-    public ResponseEntity<List<DownloadFileResponse>> downloadFeedback(@PathVariable String solutionId, @CurrentUser UserDetailsImpl userDetails) {
-        List<DownloadFileResponse> downloadedFiles = jobOfferService.downloadFeedbackForSolution(solutionId, userDetails.getId());
+    public ResponseEntity<List<GridFileResponse>> downloadFeedback(@PathVariable String solutionId, @CurrentUser UserDetailsImpl userDetails) {
+        List<GridFileResponse> downloadedFiles = jobOfferService.downloadFeedbackForSolution(solutionId, userDetails.getId());
         return ResponseEntity.ok(downloadedFiles);
     }
 
