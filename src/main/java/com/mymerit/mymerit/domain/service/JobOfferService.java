@@ -34,7 +34,7 @@ public class JobOfferService {
             TaskRepository taskRepository,
             SolutionRepository solutionRepository,
             TaskHistoryRepository taskHistoryRepository,
-            JobOfferHistoryRepository jobOfferHistoryRepository
+            JobOfferHistoryRepository jobOfferHistoryRepository,
             FeedbackRepository feedbackRepository
     ) {
         this.jobOfferRepository = jobOfferRepository;
@@ -52,15 +52,8 @@ public class JobOfferService {
 
         Integer userCredits = user.getCredits();
         Integer taskReward = jobOfferRequest.getTask().getReward();
+        taskRepository.save(jobOfferRequest.getTask());
 
-    public JobOffer addJobOffer(JobOffer jobOffer){
-        Integer companyCredits = jobOffer.getCompany().getCreditsAmount();
-        taskRepository.save(jobOffer.getTask());
-        if(companyCredits > jobOffer.getTask().getReward()) {
-            jobOffer.getCompany().setCreditsAmount(companyCredits - jobOffer.getTask().getReward());
-            JobOfferHistory jobOfferHistory = new JobOfferHistory(jobOffer, jobOffer.getCompany().getId(), LocalDateTime.now());
-            jobOfferHistoryRepository.save(jobOfferHistory);
-            return jobOfferRepository.save(jobOffer);
         if (userCredits < taskReward) {
             throw new RuntimeException("Not enough credits to create job offer");
         }
@@ -81,6 +74,9 @@ public class JobOfferService {
                 jobOfferRequest.getEmploymentType(),
                 jobOfferRequest.getSalary()
         );
+
+        JobOfferHistory jobOfferHistory = new JobOfferHistory(jobOffer, jobOffer.getCompany().getId(), LocalDateTime.now());
+        jobOfferHistoryRepository.save(jobOfferHistory);
 
         return jobOfferRepository.save(jobOffer);
     }

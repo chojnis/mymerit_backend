@@ -28,11 +28,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.validation.Valid;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -140,8 +135,8 @@ public class UserController {
         }
         boolean changed = false;
         
-        if( updateUserRequest.getImageUrl() != null ){
-                user.setImageUrl(updateUserRequest.getImageUrl());
+        if( updateUserRequest.getImageBase64() != null ){
+                user.setImageBase64(updateUserRequest.getImageBase64());
                 changed = true;
         }
         if( updateUserRequest.getDescription() != null ){
@@ -214,8 +209,8 @@ public class UserController {
         }
         boolean changed = false;
         
-        if( updateUserRequest.getImageUrl() != null ){
-                user.setImageUrl(updateUserRequest.getImageUrl());
+        if( updateUserRequest.getImageBase64() != null ){
+                user.setImageBase64(updateUserRequest.getImageBase64());
                 changed = true;
         }
         if( updateUserRequest.getDescription() != null ){
