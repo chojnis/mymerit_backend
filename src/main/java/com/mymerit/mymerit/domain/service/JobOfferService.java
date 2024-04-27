@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,8 @@ public class JobOfferService {
     UserRepository userRepository;
     DownloadFileService fileService;
     TaskRepository taskRepository;
+    TaskHistoryRepository taskHistoryRepository;
+    JobOfferHistoryRepository jobOfferHistoryRepository;
     SolutionRepository solutionRepository; //nah co tu sie dzieje xd troche duzo tego
     FeedbackRepository feedbackRepository;
 
@@ -30,6 +33,8 @@ public class JobOfferService {
             DownloadFileService fileService,
             TaskRepository taskRepository,
             SolutionRepository solutionRepository,
+            TaskHistoryRepository taskHistoryRepository,
+            JobOfferHistoryRepository jobOfferHistoryRepository
             FeedbackRepository feedbackRepository
     ) {
         this.jobOfferRepository = jobOfferRepository;
@@ -37,6 +42,8 @@ public class JobOfferService {
         this.fileService = fileService;
         this.taskRepository = taskRepository;
         this.solutionRepository = solutionRepository;
+        this.taskHistoryRepository = taskHistoryRepository;
+        this.jobOfferHistoryRepository = jobOfferHistoryRepository;
         this.feedbackRepository = feedbackRepository;
     }
 
@@ -46,6 +53,14 @@ public class JobOfferService {
         Integer userCredits = user.getCredits();
         Integer taskReward = jobOfferRequest.getTask().getReward();
 
+    public JobOffer addJobOffer(JobOffer jobOffer){
+        Integer companyCredits = jobOffer.getCompany().getCreditsAmount();
+        taskRepository.save(jobOffer.getTask());
+        if(companyCredits > jobOffer.getTask().getReward()) {
+            jobOffer.getCompany().setCreditsAmount(companyCredits - jobOffer.getTask().getReward());
+            JobOfferHistory jobOfferHistory = new JobOfferHistory(jobOffer, jobOffer.getCompany().getId(), LocalDateTime.now());
+            jobOfferHistoryRepository.save(jobOfferHistory);
+            return jobOfferRepository.save(jobOffer);
         if (userCredits < taskReward) {
             throw new RuntimeException("Not enough credits to create job offer");
         }
@@ -295,6 +310,17 @@ public class JobOfferService {
         existingSolution.setFiles(fileIDs.stream().map(ObjectId::toString).toList());
         solutionRepository.save(existingSolution);
         System.out.println("Existing solution updated: " + existingSolution);
+
+        Optional<List<TaskHistory>> taskHistoryList = taskHistoryRepository.findByUserId(userId);
+        if( !taskHistoryList.isPresent()){
+            throw new IllegalStateException("Task history record not found for the user");
+        }
+        TaskHistory taskHistory = taskHistoryList.get().stream(). 
+        filter(taskhist -> taskhist.getTask().getId().equals(task.getId()))
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException("Solution not found for the user"));
+        taskHistory.setDateLastModified(LocalDateTime.now());
+        taskHistoryRepository.save(taskHistory);
     }
 
     private void createNewSolution(Task task, List<MultipartFile> files, String userId){
@@ -303,6 +329,8 @@ public class JobOfferService {
         solutionRepository.save(solution);
         task.addSolution(solution);
         taskRepository.save(task);
+        TaskHistory taskHistory = new TaskHistory(task, userId, LocalDateTime.now());
+        taskHistoryRepository.save(taskHistory);
     }
 
     private List<ObjectId> addFiles(List<MultipartFile> files) {

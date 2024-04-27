@@ -4,14 +4,30 @@ import com.mymerit.mymerit.api.payload.response.RewardHistoryResponse;
 import com.mymerit.mymerit.domain.entity.Reward;
 import com.mymerit.mymerit.domain.entity.RewardHistory;
 import com.mymerit.mymerit.domain.entity.User;
+import com.mymerit.mymerit.domain.entity.JobOffer;
+import com.mymerit.mymerit.domain.entity.JobOfferHistory;
+import com.mymerit.mymerit.domain.entity.Socials;
+import com.mymerit.mymerit.domain.entity.Task;
+import com.mymerit.mymerit.domain.entity.TaskHistory;
 import com.mymerit.mymerit.domain.service.MailSenderService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.RewardHistoryRepository;
 import com.mymerit.mymerit.infrastructure.repository.RewardRepository;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import com.mymerit.mymerit.infrastructure.repository.JobOfferHistoryRepository;
+import com.mymerit.mymerit.infrastructure.repository.SocialRepository;
+import com.mymerit.mymerit.infrastructure.repository.TaskHistoryRepository;
 import com.mymerit.mymerit.infrastructure.security.CurrentUser;
+import com.mymerit.mymerit.api.payload.response.ApiResponse;
+import com.mymerit.mymerit.api.payload.response.JobOfferHistoryResponse;
+import com.mymerit.mymerit.api.payload.response.TaskHistoryResponse;
+import com.mymerit.mymerit.api.payload.request.UpdateUserRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,12 +41,22 @@ import java.util.Optional;
 @RestController
 public class UserController {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final SocialRepository socialRepository;
+    private final TaskHistoryRepository taskHistoryRepository;
+    private final JobOfferHistoryRepository jobOfferHistoryRepository;
     private final RewardHistoryRepository rewardHistoryRepository;
     private final RewardRepository rewardRepository;
     private final MailSenderService mailSenderService;
 
-    public UserController(UserRepository userRepository, RewardHistoryRepository rewardHistoryRepository, RewardRepository rewardRepository, MailSenderService mailSenderService) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialRepository socialRepository, 
+    TaskHistoryRepository taskHistoryRepository, JobOfferHistoryRepository jobOfferHistoryRepository,
+    RewardHistoryRepository rewardHistoryRepository, RewardRepository rewardRepository, MailSenderService mailSenderService) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.socialRepository = socialRepository;
+        this.taskHistoryRepository = taskHistoryRepository;
+        this.jobOfferHistoryRepository = jobOfferHistoryRepository;
         this.rewardHistoryRepository = rewardHistoryRepository;
         this.rewardRepository = rewardRepository;
         this.mailSenderService = mailSenderService;
@@ -100,4 +126,146 @@ public class UserController {
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userRepository.findAll());
     }
+
+    @PostMapping("/me/update")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> updateUserProfileInfo(@CurrentUser UserDetailsImpl userDetailsImpl, @Valid @RequestBody UpdateUserRequest updateUserRequest){
+        Optional<User> user_check = userRepository.findById(userDetailsImpl.getId());
+        User user;
+        if( user_check != null){
+            user = user_check.get();
+        }
+        else{
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "user doesnt exist"));
+        }
+        boolean changed = false;
+        
+        if( updateUserRequest.getImageUrl() != null ){
+                user.setImageUrl(updateUserRequest.getImageUrl());
+                changed = true;
+        }
+        if( updateUserRequest.getDescription() != null ){
+                user.setDescription(updateUserRequest.getDescription());
+                changed = true;
+        }
+        if( updateUserRequest.getPassword() != null ){
+                user.setPassword(updateUserRequest.getPassword());
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                changed = true;
+        }
+        if( updateUserRequest.getUsername() != null ){
+                user.setUsername(updateUserRequest.getUsername());
+                changed = true;
+        }
+        if( changed == true ){
+                userRepository.save(user);
+                return ResponseEntity.ok( ).body(new ApiResponse(true, "account data updated"));
+        }
+        return ResponseEntity.badRequest().body(new ApiResponse(false, "failed to update account data"));
+    }
+
+    @GetMapping("/me/socials")
+    @PreAuthorize("hasRole('USER')")
+    public Socials getUserSocials(@CurrentUser UserDetailsImpl userDetailsImpl){
+        return socialRepository.findByUserId(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " social media not found"));
+
+    }
+
+    @GetMapping("/me/mytasks")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<TaskHistoryResponse>> getCurrentUserTaskHistory(@CurrentUser UserDetailsImpl userDetailsImpl) {
+        User user = userRepository.findById(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " not found"));
+
+        List<TaskHistory> userTasks = taskHistoryRepository.findByUserId(user.getId())
+                .orElse(new ArrayList<>());
+
+        if (userTasks.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<TaskHistoryResponse> taskHistoryResponse = new ArrayList<>();
+
+        for (TaskHistory taskHistory : userTasks) {
+            taskHistoryResponse.add(new TaskHistoryResponse(taskHistory.getTask(), taskHistory.getDateLastModified()));
+        }
+
+        return ResponseEntity.ok(taskHistoryResponse);
+    }
+
+    @GetMapping("/company")
+    @PreAuthorize("hasRole('COMPANY')")
+    public User getCurrentCompanyUser(@CurrentUser UserDetailsImpl userDetailsImpl) {
+        return userRepository.findById(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("Company user " + userDetailsImpl.getId() + " not found"));
+    }
+
+    @PostMapping("/company/update")
+    @PreAuthorize("hasRole('COMPANY')")
+    public ResponseEntity<?> updateCompanyUserProfileInfo(@CurrentUser UserDetailsImpl userDetailsImpl, @Valid @RequestBody UpdateUserRequest updateUserRequest){
+        Optional<User> user_check = userRepository.findById(userDetailsImpl.getId());
+        User user;
+        if( !user_check.isPresent()){
+            user = user_check.get();
+        }
+        else{
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "company user doesnt exist"));
+        }
+        boolean changed = false;
+        
+        if( updateUserRequest.getImageUrl() != null ){
+                user.setImageUrl(updateUserRequest.getImageUrl());
+                changed = true;
+        }
+        if( updateUserRequest.getDescription() != null ){
+                user.setDescription(updateUserRequest.getDescription());
+                changed = true;
+        }
+        if( updateUserRequest.getPassword() != null ){
+                user.setPassword(updateUserRequest.getPassword());
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                changed = true;
+        }
+        if( updateUserRequest.getUsername() != null ){
+                user.setUsername(updateUserRequest.getUsername());
+                changed = true;
+        }
+        if( changed == true ){
+                userRepository.save(user);
+                return ResponseEntity.ok( ).body(new ApiResponse(true, "account data updated"));
+        }
+        return ResponseEntity.badRequest().body(new ApiResponse(false, "failed to update account data"));
+    }
+
+    @GetMapping("/company/socials")
+    @PreAuthorize("hasRole('COMPANY')")
+    public Socials getCompanyUserSocials(@CurrentUser UserDetailsImpl userDetailsImpl){
+        return socialRepository.findByUserId(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("Company user " + userDetailsImpl.getId() + " social media not found"));
+
+    }
+
+    @GetMapping("/company/myjoboffers")
+    @PreAuthorize("hasRole('COMPANY')")
+    public ResponseEntity<List<JobOfferHistoryResponse>> getCurrentCompanyUserJobOfferHistory(@CurrentUser UserDetailsImpl userDetailsImpl) {
+        User user = userRepository.findById(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " not found"));
+
+        List<JobOfferHistory> userJobOffers = jobOfferHistoryRepository.findByUserId(user.getId())
+                .orElse(new ArrayList<>());
+
+        if (userJobOffers.isEmpty() ) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<JobOfferHistoryResponse> jobOfferHistoryResponse = new ArrayList<>();
+
+        for (JobOfferHistory jobOfferHistory : userJobOffers) {
+            jobOfferHistoryResponse.add(new JobOfferHistoryResponse(jobOfferHistory.getJobOffer(), jobOfferHistory.getDateLastModified()));
+        }
+
+        return ResponseEntity.ok(jobOfferHistoryResponse);
+    }
+
 }
