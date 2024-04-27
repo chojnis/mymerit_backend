@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 
 @Service
 public class ImageService {
@@ -25,7 +26,11 @@ public class ImageService {
 
             byte[] bytes = IOUtils.toByteArray(inputStream);
 
-            imageBase64 = Base64.encodeBase64String(bytes);
+            URLConnection urlConnection = url.openConnection();
+
+            String mimeType = urlConnection.getContentType();
+
+            imageBase64 = "data:" + mimeType + ";base64," + Base64.encodeBase64String(bytes);
         }
         catch (IOException e) {
             logger.error("Error while converting imageURL to base64", e);
@@ -40,7 +45,9 @@ public class ImageService {
         try {
             byte[] bytes = file.getBytes();
 
-            imageBase64 = Base64.encodeBase64String(bytes);
+            String mimeType = file.getContentType();
+
+            imageBase64 = "data:" + mimeType + ";base64," + Base64.encodeBase64String(bytes);
         }
         catch (IOException e) {
             logger.error("Error while converting image to base64", e);
