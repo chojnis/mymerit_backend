@@ -172,10 +172,6 @@ public class UserController {
         List<TaskHistory> userTasks = taskHistoryRepository.findByUserId(user.getId())
                 .orElse(new ArrayList<>());
 
-        if (userTasks.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
         List<TaskHistoryResponse> taskHistoryResponse = new ArrayList<>();
 
         for (TaskHistory taskHistory : userTasks) {
