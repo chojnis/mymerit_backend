@@ -72,11 +72,11 @@ public class JobOfferController {
     }
 
     @PostMapping("/job/{jobOfferId}/solution")
-    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam List<MultipartFile> files, @AuthenticationPrincipal UserDetailsImpl userDetails,@RequestParam String language) throws IOException {
+    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam List<MultipartFile> files, @AuthenticationPrincipal UserDetailsImpl userDetails,@RequestParam String language,String mainFileName) throws IOException {
 
 
 
-        return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId(),language))
+        return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId(),language, mainFileName))
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + jobOfferId));
     }

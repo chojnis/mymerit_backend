@@ -23,24 +23,27 @@ public class ZipUtility {
 
 
     public static String zipSolutionFilesAsBase64(SolutionRequest solutionRequest, String language) throws IOException {
+        if (solutionRequest == null || solutionRequest.getFiles() == null || solutionRequest.getFiles().isEmpty()) {
+            throw new IllegalArgumentException("Solution request is null or empty.");
+        }
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {
             List<SolutionFile> files = solutionRequest.getFiles();
             for (SolutionFile file : files) {
-
                 addToZip(zos, file.getContent().getBytes(), file.getName());
             }
 
-
+            System.out.println(solutionRequest.getMainName());
             ConfigFile configFile = getSourceFileForLanguage(language, solutionRequest.getMainName());
             if (configFile != null) {
-
                 addToZip(zos, configFile.getCompile().getBytes(), "compile");
                 addToZip(zos, configFile.getRun().getBytes(), "run");
             }
         }
         return Base64.getEncoder().encodeToString(baos.toByteArray());
     }
+
 
     public static String getFileExtension(String fileName) {
         String[] parts = fileName.split("\\.");
@@ -54,7 +57,7 @@ public class ZipUtility {
 
 
 
-    public static ConfigFile getSourceFileForLanguage(String language, String mainFileName) {
+    public static ConfigFile getSourceFileForLanguage(String language, String mainFileName) {// porownac mianfile z mutlipart main i indeks wziac i guess 
         JSONParser jsonParser = new JSONParser();
 
         try (FileReader reader = new FileReader("src/main/resources/extension-scripts-map.json")) {

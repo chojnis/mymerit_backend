@@ -186,14 +186,15 @@ public class JobOfferService {
     }
 
 
-    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId,String language) throws IOException {
+    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId,String language,String mainFileName) throws IOException {
         JobOffer jobOffer = getJobOfferOrThrow(jobOfferId);
         Task task = jobOffer.getTask();
 
+
         if (userAlreadySubmittedSolution(task, userId)) {
-            updateExistingSolution(task, files, userId);
+            updateExistingSolution(task, files, userId,mainFileName);
         } else {
-            createNewSolution(task, files, userId);
+            createNewSolution(task, files, userId,mainFileName);
         }
 
         executeTests(userId,task,language,files);
@@ -305,7 +306,7 @@ public class JobOfferService {
                 .anyMatch(solution -> solution.getUser().getId().equals(userId));
     }
 
-    private void updateExistingSolution(Task task, List<MultipartFile> files, String userId){
+    private void updateExistingSolution(Task task, List<MultipartFile> files, String userId,String mainFileId){
         Solution existingSolution = task.getSolutions().stream()
                 .filter(solution -> solution.getUser().getId().equals(userId))
                 .findFirst()
@@ -321,13 +322,15 @@ public class JobOfferService {
 
         List<ObjectId> fileIDs = addFiles(files);
         existingSolution.setFiles(fileIDs.stream().map(ObjectId::toString).toList());
+        existingSolution.setMainFileId(mainFileId);
         solutionRepository.save(existingSolution);
         System.out.println("Existing solution updated: " + existingSolution);
     }
 
-    private void createNewSolution(Task task, List<MultipartFile> files, String userId){
+    private void createNewSolution(Task task, List<MultipartFile> files, String userId,String mainFileName){
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         Solution solution = new Solution(task, getUser(userId), fileIDs);
+        solution.setMainFileId(mainFileName);
         solutionRepository.save(solution);
         task.addSolution(solution);
         taskRepository.save(task);
