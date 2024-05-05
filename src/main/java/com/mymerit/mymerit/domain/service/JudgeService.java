@@ -29,11 +29,11 @@ import static com.mymerit.mymerit.infrastructure.utils.ZipUtility.zipSolutionFil
 public class JudgeService {
 
     DownloadFileService downloadFileService;
-    TaskTestService taskTestService;
+ 
 
-    JudgeService(DownloadFileService downloadFileService,TaskTestService taskTestService){
+    JudgeService(DownloadFileService downloadFileService){
         this.downloadFileService = downloadFileService;
-        this.taskTestService = taskTestService;
+
     }
 
     public String generateTokenRequest(JudgeTokenRequest judgeTokenRequest) {
