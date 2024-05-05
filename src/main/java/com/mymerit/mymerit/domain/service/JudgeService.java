@@ -29,7 +29,7 @@ import static com.mymerit.mymerit.infrastructure.utils.ZipUtility.zipSolutionFil
 public class JudgeService {
 
     DownloadFileService downloadFileService;
- 
+
 
     JudgeService(DownloadFileService downloadFileService){
         this.downloadFileService = downloadFileService;

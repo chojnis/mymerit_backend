@@ -205,20 +205,22 @@ public class JobOfferService {
 
        Solution solution =  task.findSolutionByUserId(userId);
 
+
+
        String mainFileName = downloadFileService.downloadFile(solution.getMainFileId()).getFilename();
        String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
 
        JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles,language);
 
-      //JudgeCompilationResponse judgeCompilationResponse = judgeService.generateRequestResponse(judgeService.generateTokenRequest(judgeTokenRequest));
-
-        List<TestResponse> testResponse = taskTestService.testResults(judgeTokenRequest,task.getId(),language);
+       List<TestResponse> testResponse = taskTestService.testResults(judgeTokenRequest,task.getId(),language);
 
         for(TestResponse x : testResponse){
 
             solution.addTestResponse(x);
 
         }
+
+        solutionRepository.save(solution);
 
     }
 
