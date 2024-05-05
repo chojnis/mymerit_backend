@@ -57,6 +57,15 @@ public class Task {
 
     }
 
+    public Solution findSolutionByUserId(String userId){
+        for(Solution solution : solutions) {
+            if (solution.getUser().getId().equals(userId)) {
+                return solution;
+            }
+        }
+        return null;
+    }
+
     public Integer getSolutionCount() {
         return solutions.size();
     }

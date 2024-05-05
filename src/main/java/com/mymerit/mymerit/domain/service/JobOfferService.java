@@ -1,6 +1,7 @@
 package com.mymerit.mymerit.domain.service;
 
 import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
+import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
 import com.mymerit.mymerit.api.payload.response.*;
 import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.TaskStatus;
@@ -18,13 +19,19 @@ import java.util.stream.Collectors;
 @Service
 public class JobOfferService {
     JobOfferRepository jobOfferRepository;
+    JudgeService judgeService;
+    TaskTestService taskTestService;
     UserRepository userRepository;
     DownloadFileService fileService;
     TaskRepository taskRepository;
     SolutionRepository solutionRepository; //nah co tu sie dzieje xd troche duzo tego
     FeedbackRepository feedbackRepository;
+    DownloadFileService downloadFileService;
 
     JobOfferService(
+            DownloadFileService downloadFileService,
+            JudgeService judgeService,
+            TaskTestService taskTestService,
             JobOfferRepository jobOfferRepository,
             UserRepository userRepository,
             DownloadFileService fileService,
@@ -32,6 +39,9 @@ public class JobOfferService {
             SolutionRepository solutionRepository,
             FeedbackRepository feedbackRepository
     ) {
+        this.taskTestService = taskTestService;
+        this.downloadFileService = downloadFileService;
+        this.judgeService = judgeService;
         this.jobOfferRepository = jobOfferRepository;
         this.userRepository = userRepository;
         this.fileService = fileService;
@@ -176,7 +186,7 @@ public class JobOfferService {
     }
 
 
-    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId){
+    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId,String language) throws IOException {
         JobOffer jobOffer = getJobOfferOrThrow(jobOfferId);
         Task task = jobOffer.getTask();
 
@@ -186,9 +196,31 @@ public class JobOfferService {
             createNewSolution(task, files, userId);
         }
 
+        executeTests(userId,task,language,files);
+
         return jobOfferRepository.save(jobOffer);
     }
 
+    public void executeTests(String userId,Task task,String language, List<MultipartFile> files) throws IOException {
+
+       Solution solution =  task.findSolutionByUserId(userId);
+
+       String mainFileName = downloadFileService.downloadFile(solution.getMainFileId()).getFilename();
+       String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
+
+       JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles,language);
+
+      //JudgeCompilationResponse judgeCompilationResponse = judgeService.generateRequestResponse(judgeService.generateTokenRequest(judgeTokenRequest));
+
+        List<TestResponse> testResponse = taskTestService.testResults(judgeTokenRequest,task.getId(),language);
+
+        for(TestResponse x : testResponse){
+
+            solution.addTestResponse(x);
+
+        }
+
+    }
 
     public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment) {
         Solution solution = solutionRepository.findById(solutionId)

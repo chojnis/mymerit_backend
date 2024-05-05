@@ -1,15 +1,19 @@
 package com.mymerit.mymerit.api.controller;
 
+import com.mymerit.mymerit.api.payload.request.JudgeParams;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
 import com.mymerit.mymerit.api.payload.request.SolutionRequest;
 import com.mymerit.mymerit.api.payload.response.JudgeCompilationResponse;
 import com.mymerit.mymerit.api.payload.response.TestResponse;
 import com.mymerit.mymerit.domain.service.JudgeService;
 import com.mymerit.mymerit.domain.service.TaskTestService;
+import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.utils.ZipUtility;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,8 +42,9 @@ public class JudgeController {
         return Collections.singletonList(taskTestService.singleTest(judgeTokenRequest, taskId, language, testIndex));
     }
 
-    @PostMapping("/token")
-    private String getToken(@RequestBody JudgeTokenRequest fileRequest){
+    @PostMapping("/token/{jobOfferId}")
+    private String getToken(@RequestBody JudgeTokenRequest fileRequest, UserDetailsImpl userDetails){
+
         return judgeService.generateTokenRequest(fileRequest);
     }
 
@@ -49,10 +54,15 @@ public class JudgeController {
     }
 
     @PostMapping("/generateZipBaseEncode/{language}")
-    private ResponseEntity<?> generateEncoded(@RequestBody SolutionRequest solutionRequest, @PathVariable String language) throws IOException {
+    private ResponseEntity<?> generateEncoded(@RequestBody SolutionRequest solutionRequest, @PathVariable String language) throws IOException, IOException {
 
         return ResponseEntity.ok(ZipUtility.zipSolutionFilesAsBase64(solutionRequest,language));
     }
 
+    @GetMapping("/xdxd")
+        private ResponseEntity<?> gxed(@RequestParam String language, @RequestParam String mainName, @RequestBody List<MultipartFile>files,
+                                       @RequestBody JudgeParams judgeParams) throws IOException {
 
+        return ResponseEntity.ok(judgeService.getResponseFromMultipartFiles(files,mainName,judgeParams,language));
+    }
 }

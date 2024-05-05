@@ -12,10 +12,9 @@ import java.util.Map;
 public class JudgeTokenRequest {
     @NotBlank
     String fileName;
-
     @NotBlank
     String fileContentBase64;
-
+    String language;
     String commandLineArguments;
     Float timeLimit;
     Integer memoryLimit;
@@ -25,5 +24,21 @@ public class JudgeTokenRequest {
     public JudgeTokenRequest(String fileContentBase64, String stdin) {
         this.fileContentBase64 = fileContentBase64;
         this.stdin = stdin;
+    }
+
+    public JudgeTokenRequest(String fileName, String fileContentBase64, String commandLineArguments, Float timeLimit, Integer memoryLimit, String stdin, String expectedOutput) {
+        this.fileName = fileName;
+        this.fileContentBase64 = fileContentBase64;
+        this.commandLineArguments = commandLineArguments;
+        this.timeLimit = timeLimit;
+        this.memoryLimit = memoryLimit;
+        this.stdin = stdin;
+        this.expectedOutput = expectedOutput;
+    }
+
+    public JudgeTokenRequest(String fileName, String fileContentBase64, String language) {
+        this.fileName = fileName;
+        this.fileContentBase64 = fileContentBase64;
+        this.language = language;
     }
 }
