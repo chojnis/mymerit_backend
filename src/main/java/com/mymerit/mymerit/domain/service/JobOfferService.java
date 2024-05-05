@@ -52,7 +52,6 @@ public class JobOfferService {
 
         Integer userCredits = user.getCredits();
         Integer taskReward = jobOfferRequest.getTask().getReward();
-        taskRepository.save(jobOfferRequest.getTask());
 
         if (userCredits < taskReward) {
             throw new RuntimeException("Not enough credits to create job offer");
@@ -74,11 +73,11 @@ public class JobOfferService {
                 jobOfferRequest.getEmploymentType(),
                 jobOfferRequest.getSalary()
         );
-
-        JobOfferHistory jobOfferHistory = new JobOfferHistory(jobOffer, jobOffer.getCompany().getId(), LocalDateTime.now());
+        JobOffer createdJobOffer = jobOfferRepository.save(jobOffer);
+        JobOfferHistory jobOfferHistory = new JobOfferHistory(createdJobOffer, jobOffer.getCompany().getId(), LocalDateTime.now());
         jobOfferHistoryRepository.save(jobOfferHistory);
 
-        return jobOfferRepository.save(jobOffer);
+        return createdJobOffer;
     }
 
     public JobOfferDetailsResponse getJobOfferDetailsResponse(String id, UserDetailsImpl userDetails) {
@@ -199,10 +198,10 @@ public class JobOfferService {
         return jobOfferRepository.save(jobOffer);
     }
 
-    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment, String userId) {
+    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment, String companyId) {
         Solution solution = solutionRepository.findById(solutionId)
                 .orElseThrow(() -> new RuntimeException("Solution not found for id " + solutionId));
-        User company = userRepository.findById(userId)
+        User company = userRepository.findById(companyId)
                 .orElseThrow(() -> new RuntimeException("User not found for id " + solutionId));
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         if(company.getCredits() < credits){
