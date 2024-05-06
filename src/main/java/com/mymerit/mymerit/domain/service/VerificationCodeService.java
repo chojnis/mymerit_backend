@@ -20,7 +20,14 @@ public class VerificationCodeService {
     }
 
     public ResponseEntity<?> processVerificationCode(String code, String email) {
-        int codeInt = Integer.parseInt(code);
+        int codeInt;
+        try{
+            codeInt = Integer.parseInt(code);
+        } catch(Exception exception){
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "The verification code is invalid"));
+        }
 
         List<AuthenticationCode> codes = authenticationCodeRepository.findAllByEmail(email);
 

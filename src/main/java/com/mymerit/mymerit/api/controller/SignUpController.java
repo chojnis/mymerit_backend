@@ -10,6 +10,7 @@ import com.mymerit.mymerit.domain.service.VerificationCodeService;
 import com.mymerit.mymerit.infrastructure.repository.AuthenticationCodeRepository;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -60,7 +61,14 @@ public class SignUpController {
                     .body(new ApiResponse(false, "Email address already in use"));
         }
 
-        int codeInt = Integer.parseInt(signUpRequest.getCode());
+        int codeInt;
+        try{
+            codeInt = Integer.parseInt(signUpRequest.getCode());
+        } catch(Exception exception){
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "The verification code is invalid"));
+        }
 
         if (!authenticationCodeRepository.existsByCode(codeInt)) {
             return ResponseEntity
