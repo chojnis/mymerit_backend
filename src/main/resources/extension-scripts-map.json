@@ -1,0 +1,192 @@
+{
+    "asm": {
+        "compile": "/usr/local/nasm-2.14.02/bin/nasmld -f elf64 %s main.asm",
+        "run": "./a.out",
+        "source_file": "main.asm"
+    },
+    "sh": {
+        "compile": null,
+        "run": "/usr/local/bash-5.0/bin/bash script.sh",
+        "source_file": "script.sh"
+    },
+    "bas": {
+        "compile": "/usr/local/fbc-1.07.1/bin/fbc %s main.bas",
+        "run": "./main",
+        "source_file": "main.bas"
+    },
+    "c": {
+        "compile": "/usr/local/gcc-9.2.0/bin/gcc %s main.c",
+        "run": "./a.out",
+        "source_file": "main.c"
+    },
+    "cpp": {
+        "compile": "/usr/local/gcc-9.2.0/bin/g++ %s main.cpp",
+        "run": "LD_LIBRARY_PATH=/usr/local/gcc-9.2.0/lib64 ./a.out",
+        "source_file": "main.cpp"
+    },
+    "clj": {
+        "compile": null,
+        "run": "/usr/local/bin/java -jar /usr/local/clojure-1.10.1/clojure.jar main.clj",
+        "source_file": "main.clj"
+    },
+    "cs": {
+        "compile": "/usr/local/mono-6.6.0.161/bin/mcs %s Main.cs",
+        "run": "/usr/local/mono-6.6.0.161/bin/mono Main.exe",
+        "source_file": "Main.cs"
+    },
+    "cob": {
+        "compile": "/usr/local/gnucobol-2.2/bin/cobc -free -x %s main.cob",
+        "run": "LD_LIBRARY_PATH=/usr/local/gnucobol-2.2/lib ./main",
+        "source_file": "main.cob"
+    },
+    "lisp": {
+        "compile": null,
+        "run": "SBCL_HOME=/usr/local/sbcl-2.0.0/lib/sbcl /usr/local/sbcl-2.0.0/bin/sbcl --script script.lisp",
+        "source_file": "script.lisp"
+    },
+    "d": {
+        "compile": "/usr/local/d-2.089.1/linux/bin64/dmd %s main.d",
+        "run": "./main",
+        "source_file": "main.d"
+    },
+    "exs": {
+        "compile": null,
+        "run": "/usr/local/elixir-1.9.4/bin/elixir script.exs",
+        "source_file": "script.exs"
+    },
+    "erl": {
+        "compile": null,
+        "run": "/bin/sed -i '1s/^/\\n/' main.erl && /usr/local/erlang-22.2/bin/escript main.erl",
+        "source_file": "main.erl"
+    },
+    "out": {
+        "compile": null,
+        "run": "/bin/chmod +x a.out && ./a.out",
+        "source_file": "a.out"
+    },
+    "fsx": {
+        "compile": null,
+        "run": "mkdir -p ~/.dotnet && touch ~/.dotnet/3.1.202.dotnetFirstUseSentinel && /usr/local/dotnet-sdk/dotnet fsi script.fsx",
+        "source_file": "script.fsx"
+    },
+    "f90": {
+        "compile": "/usr/local/gcc-9.2.0/bin/gfortran %s main.f90",
+        "run": "LD_LIBRARY_PATH=/usr/local/gcc-9.2.0/lib64 ./a.out",
+        "source_file": "main.f90"
+    },
+    "go": {
+        "compile": "GOCACHE=/tmp/.cache/go-build /usr/local/go-1.13.5/bin/go build %s main.go",
+        "run": "./main",
+        "source_file": "main.go"
+    },
+    "groovy": {
+        "compile": "/usr/local/groovy-3.0.3/bin/groovyc %s script.groovy",
+        "run": "/usr/local/bin/java -cp \".:/usr/local/groovy-3.0.3/lib/*\" script",
+        "source_file": "script.groovy"
+    },
+    "hs": {
+        "compile": "/usr/local/ghc-8.8.1/bin/ghc %s main.hs",
+        "run": "./main",
+        "source_file": "main.hs"
+    },
+    "java": {
+        "compile": "/usr/local/openjdk13/bin/javac %s Main.java",
+        "run": "/usr/local/openjdk13/bin/java Main",
+        "source_file": "Main.java"
+    },
+    "js": {
+        "compile": null,
+        "run": "/usr/local/node-12.14.0/bin/node script.js",
+        "source_file": "script.js"
+    },
+    "kt": {
+        "compile": "/usr/local/kotlin-1.3.70/bin/kotlinc %s Main.kt",
+        "run": "/usr/local/kotlin-1.3.70/bin/kotlin MainKt",
+        "source_file": "Main.kt"
+    },
+    "lua": {
+        "compile": "/usr/local/lua-5.3.5/luac53 %s script.lua",
+        "run": "/usr/local/lua-5.3.5/lua53 ./luac.out",
+        "source_file": "script.lua"
+    },
+    "m": {
+        "compile": null,
+        "run": "/usr/local/octave-5.1.0/bin/octave-cli -q --no-gui --no-history script.m",
+        "source_file": "script.m"
+    },
+    "ml": {
+        "compile": "/usr/local/ocaml-4.09.0/bin/ocamlc %s main.ml",
+        "run": "./a.out",
+        "source_file": "main.ml"
+    },
+    "pas": {
+        "compile": "/usr/local/fpc-3.0.4/bin/fpc %s main.pas",
+        "run": "./main",
+        "source_file": "main.pas"
+    },
+    "pl": {
+        "compile": null,
+        "run": "/usr/bin/perl script.pl",
+        "source_file": "script.pl"
+    },
+    "php": {
+        "compile": null,
+        "run": "/usr/local/php-7.4.1/bin/php script.php",
+        "source_file": "script.php"
+    },
+    "txt": {
+        "compile": null,
+        "run": "/bin/cat text.txt",
+        "source_file": "text.txt"
+    },
+    "pro": {
+        "compile": "PATH=\"/usr/local/gprolog-1.4.5/gprolog-1.4.5/bin:$PATH\" /usr/local/gprolog-1.4.5/gprolog-1.4.5/bin/gplc --no-top-level %s main.pro",
+        "run": "./main",
+        "source_file": "main.pro"
+    },
+    "py": {
+        "compile": null,
+        "run": "/usr/local/python-3.8.1/bin/python3 script.py",
+        "source_file": "script.py"
+    },
+    "r": {
+        "compile": null,
+        "run": "/usr/local/r-4.0.0/bin/Rscript script.r",
+        "source_file": "script.r"
+    },
+    "rb": {
+        "compile": null,
+        "run": "/usr/local/ruby-2.7.0/bin/ruby script.rb",
+        "source_file": "script.rb"
+    },
+    "rs": {
+        "compile": "/usr/local/rust-1.40.0/bin/rustc %s main.rs",
+        "run": "./main",
+        "source_file": "main.rs"
+    },
+    "scala": {
+        "compile": "/usr/local/scala-2.13.2/bin/scalac %s Main.scala",
+        "run": "/usr/local/scala-2.13.2/bin/scala Main",
+        "source_file": "Main.scala"
+    },
+    "sql": {
+        "compile": null,
+        "run": "/bin/cat script.sql | /usr/bin/sqlite3 db.sqlite",
+        "source_file": "script.sql"
+    },
+    "swift": {
+        "compile": "/usr/local/swift-5.2.3/bin/swiftc %s Main.swift",
+        "run": "./Main",
+        "source_file": "Main.swift"
+    },
+    "ts": {
+        "compile": "/usr/bin/tsc %s script.ts",
+        "run": "/usr/local/node-12.14.0/bin/node script.js",
+        "source_file": "script.ts"
+    },
+    "vb": {
+        "compile": "/usr/bin/vbnc %s Main.vb",
+        "run": "/usr/bin/mono Main.exe",
+        "source_file": "Main.vb"
+    }
+}
