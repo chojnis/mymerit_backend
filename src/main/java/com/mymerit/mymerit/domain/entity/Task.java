@@ -91,6 +91,8 @@ public class Task {
         }
     }
 
+
+
     public void addSolution(Solution solution){
         if(getStatus() == TaskStatus.OPEN) {
             solutions.add(solution);

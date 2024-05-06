@@ -1,5 +1,6 @@
 package com.mymerit.mymerit.api.payload.response;
 
+import com.mymerit.mymerit.domain.entity.Task;
 import com.mymerit.mymerit.domain.entity.User;
 import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.models.TaskStatus;
@@ -46,4 +47,6 @@ public class JobOfferListResponse {
 
     @NotNull
     private TaskStatus status;
+
+
 }

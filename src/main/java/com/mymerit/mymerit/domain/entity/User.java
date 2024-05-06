@@ -21,4 +21,5 @@ public class User {
     private Integer credits = 0;
     private String description;
     private String role;
+
 }

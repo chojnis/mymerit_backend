@@ -7,12 +7,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
 
 @Data
+@Getter
+@Setter
 @Document("job_offers")
 public class JobOffer {
     @Id
@@ -42,7 +46,7 @@ public class JobOffer {
     @NotNull(message = "Task is required")
 
     @Valid
-    private Task task;
+    public Task task;
 
     @Valid
     private User company;
@@ -65,6 +69,10 @@ public class JobOffer {
         this.experience = experience;
         this.employmentType = employmentType;
         this.salary = salary;
+    }
+
+    public Task getTask(){
+        return task;
     }
 }
 
