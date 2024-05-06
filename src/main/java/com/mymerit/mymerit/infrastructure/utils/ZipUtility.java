@@ -58,7 +58,7 @@ public class ZipUtility {
 
 
 
-    public static ConfigFile getSourceFileForLanguage(String language, String mainFileName) {// porownac mianfile z mutlipart main i indeks wziac i guess
+    public static ConfigFile getSourceFileForLanguage(ProgrammingLanguage language, String mainFileName) {// porownac mianfile z mutlipart main i indeks wziac i guess
         JSONParser jsonParser = new JSONParser();
 
         try (FileReader reader = new FileReader("src/main/resources/extension-scripts-map.json")) {

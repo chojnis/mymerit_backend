@@ -7,6 +7,7 @@ import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
 import com.mymerit.mymerit.domain.entity.Feedback;
 import com.mymerit.mymerit.domain.entity.JobOffer;
 import com.mymerit.mymerit.domain.entity.Task;
+import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import com.mymerit.mymerit.domain.service.JobOfferService;
 import com.mymerit.mymerit.domain.service.TaskTestService;
