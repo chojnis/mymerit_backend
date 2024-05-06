@@ -1,17 +1,13 @@
 package com.mymerit.mymerit.domain.service;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mymerit.mymerit.api.payload.request.JudgeParams;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
 import com.mymerit.mymerit.api.payload.request.SolutionRequest;
 import com.mymerit.mymerit.api.payload.response.JudgeCompilationResponse;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenEntity;
-import com.mymerit.mymerit.domain.entity.DownloadFile;
+import com.mymerit.mymerit.domain.entity.GridFile;
 import com.mymerit.mymerit.domain.entity.SolutionFile;
 import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
-import com.mymerit.mymerit.infrastructure.utils.JudgeUtils;
-import org.bson.types.ObjectId;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,11 +26,11 @@ import static com.mymerit.mymerit.infrastructure.utils.ZipUtility.zipSolutionFil
 @Service
 public class JudgeService {
 
-    DownloadFileService downloadFileService;
+    GridFileService gridFileService;
 
 
-    JudgeService(DownloadFileService downloadFileService){
-        this.downloadFileService = downloadFileService;
+    JudgeService(GridFileService gridFileService){
+        this.gridFileService = gridFileService;
 
     }
 
@@ -122,9 +118,9 @@ public class JudgeService {
 
         for (MultipartFile file : files) {
 
-            String id = downloadFileService.addFile(file).toString();
+            String id = gridFileService.addFile(file).toString();
 
-            DownloadFile downloadFile =  downloadFileService.downloadFile(id);
+            GridFile downloadFile =  gridFileService.gridFile(id);
 
             byte[] bytes = downloadFile.getFile();
 

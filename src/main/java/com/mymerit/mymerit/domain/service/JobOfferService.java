@@ -7,7 +7,6 @@ import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import com.mymerit.mymerit.infrastructure.repository.*;
-import com.mymerit.mymerit.infrastructure.utils.ZipUtility;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
 import org.springframework.mock.web.MockMultipartFile;
@@ -32,10 +31,10 @@ public class JobOfferService {
     JobOfferHistoryRepository jobOfferHistoryRepository;
     SolutionRepository solutionRepository; //nah co tu sie dzieje xd troche duzo tego
     FeedbackRepository feedbackRepository;
-    DownloadFileService downloadFileService;
+    GridFileService gridFileService;
 
     JobOfferService(
-            DownloadFileService downloadFileService,
+            GridFileService gridFileService,
             JudgeService judgeService,
             TaskTestService taskTestService,
             JobOfferRepository jobOfferRepository,
@@ -48,7 +47,7 @@ public class JobOfferService {
             FeedbackRepository feedbackRepository
     ) {
         this.taskTestService = taskTestService;
-        this.downloadFileService = downloadFileService;
+        this.gridFileService = gridFileService;
         this.judgeService = judgeService;
         this.jobOfferRepository = jobOfferRepository;
         this.userRepository = userRepository;
@@ -242,7 +241,7 @@ public class JobOfferService {
 
 
 
-    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment) {
+    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment, String companyId) {
         Solution solution = solutionRepository.findById(solutionId)
                 .orElseThrow(() -> new RuntimeException("Solution not found for id " + solutionId));
         User company = userRepository.findById(companyId)
