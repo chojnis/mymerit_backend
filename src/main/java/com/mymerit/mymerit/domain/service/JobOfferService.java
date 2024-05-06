@@ -216,9 +216,15 @@ public class JobOfferService {
 
     public void executeTests(String userId, Task task, ProgrammingLanguage language, List<MultipartFile> files) throws IOException {
        Solution solution =  task.findSolutionByUserId(userId);
-        String testFileBase64 = task.getTestByLanguage(language)
-                .map(CodeTest::getTestFileBase64)
-                .orElseThrow(() -> new IllegalStateException("Test file not available for language: " + language));
+        Optional<String> optionalTestFileBase64 = task.getTestByLanguage(language)
+                .map(CodeTest::getTestFileBase64);
+
+        if (optionalTestFileBase64.isEmpty()) {
+            System.out.println("Test file not available for language: " + language);
+            return; 
+        }
+
+        String testFileBase64 = optionalTestFileBase64.get();
 
        String mainFileName = "MainTestFile" + language.getExtension();
        files.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
