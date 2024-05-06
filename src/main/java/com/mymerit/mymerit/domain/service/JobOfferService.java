@@ -1,16 +1,12 @@
 package com.mymerit.mymerit.domain.service;
 
 import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
-import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
 import com.mymerit.mymerit.api.payload.response.*;
 import com.mymerit.mymerit.domain.entity.*;
-import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import com.mymerit.mymerit.infrastructure.repository.*;
-import com.mymerit.mymerit.infrastructure.utils.ZipUtility;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,8 +19,6 @@ import java.util.stream.Collectors;
 @Service
 public class JobOfferService {
     JobOfferRepository jobOfferRepository;
-    JudgeService judgeService;
-    TaskTestService taskTestService;
     UserRepository userRepository;
     GridFileService fileService;
     TaskRepository taskRepository;
@@ -32,12 +26,8 @@ public class JobOfferService {
     JobOfferHistoryRepository jobOfferHistoryRepository;
     SolutionRepository solutionRepository; //nah co tu sie dzieje xd troche duzo tego
     FeedbackRepository feedbackRepository;
-    DownloadFileService downloadFileService;
 
     JobOfferService(
-            DownloadFileService downloadFileService,
-            JudgeService judgeService,
-            TaskTestService taskTestService,
             JobOfferRepository jobOfferRepository,
             UserRepository userRepository,
             GridFileService fileService,
@@ -47,9 +37,6 @@ public class JobOfferService {
             JobOfferHistoryRepository jobOfferHistoryRepository,
             FeedbackRepository feedbackRepository
     ) {
-        this.taskTestService = taskTestService;
-        this.downloadFileService = downloadFileService;
-        this.judgeService = judgeService;
         this.jobOfferRepository = jobOfferRepository;
         this.userRepository = userRepository;
         this.fileService = fileService;
@@ -199,50 +186,19 @@ public class JobOfferService {
     }
 
 
-    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId,ProgrammingLanguage language,String mainFileName) throws IOException {
+    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId){
         JobOffer jobOffer = getJobOfferOrThrow(jobOfferId);
         Task task = jobOffer.getTask();
 
-
         if (userAlreadySubmittedSolution(task, userId)) {
-            updateExistingSolution(task, files, userId,mainFileName, language);
+            updateExistingSolution(task, files, userId);
         } else {
-            createNewSolution(task, files, userId,mainFileName, language);
+            createNewSolution(task, files, userId);
         }
-
-        executeTests(userId,task,language,files);
-
         return jobOfferRepository.save(jobOffer);
     }
 
-    public void executeTests(String userId, Task task, ProgrammingLanguage language, List<MultipartFile> files) throws IOException {
-       Solution solution =  task.findSolutionByUserId(userId);
-        String testFileBase64 = task.getTestByLanguage(language)
-                .map(CodeTest::getTestFileBase64)
-                .orElseThrow(() -> new IllegalStateException("Test file not available for language: " + language));
-
-       String mainFileName = "MainTestFile" + language.getExtension();
-       files.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
-       String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
-       JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles);
-       List<TestResponse> testResponse = taskTestService.testResults(judgeTokenRequest,task.getId(),language);
-       solution.setTestResults(testResponse);
-       solutionRepository.save(solution);
-    }
-
-    private MultipartFile convertBase64ToMultipartFile(String fileName, String base64Data) {
-        byte[] fileContent = Base64.getDecoder().decode(base64Data);
-        return new MockMultipartFile(//narazie tak, pewnie zmienie
-                "file",
-                fileName,
-                "text/plain",
-                fileContent
-        );
-    }
-
-
-
-    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment) {
+    public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment, String companyId) {
         Solution solution = solutionRepository.findById(solutionId)
                 .orElseThrow(() -> new RuntimeException("Solution not found for id " + solutionId));
         User company = userRepository.findById(companyId)
@@ -331,7 +287,7 @@ public class JobOfferService {
                 .anyMatch(solution -> solution.getUser().getId().equals(userId));
     }
 
-    private void updateExistingSolution(Task task, List<MultipartFile> files, String userId,String mainFileName, ProgrammingLanguage language){
+    private void updateExistingSolution(Task task, List<MultipartFile> files, String userId){
         Solution existingSolution = task.getSolutions().stream()
                 .filter(solution -> solution.getUser().getId().equals(userId))
                 .findFirst()
@@ -345,10 +301,8 @@ public class JobOfferService {
             }
         });
 
-        List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
-        existingSolution.setFiles(fileIDs);
-        existingSolution.setLanguage(language);
-        existingSolution.setMainFileId(fileIDs.get(findFileIndexByName(files, mainFileName)));
+        List<ObjectId> fileIDs = addFiles(files);
+        existingSolution.setFiles(fileIDs.stream().map(ObjectId::toString).toList());
         solutionRepository.save(existingSolution);
         System.out.println("Existing solution updated: " + existingSolution);
 
@@ -356,7 +310,7 @@ public class JobOfferService {
         if( !taskHistoryList.isPresent()){
             throw new IllegalStateException("Task history record not found for the user");
         }
-        TaskHistory taskHistory = taskHistoryList.get().stream().
+        TaskHistory taskHistory = taskHistoryList.get().stream(). 
         filter(taskhist -> taskhist.getTask().getId().equals(task.getId()))
         .findFirst()
         .orElseThrow(() -> new IllegalStateException("Solution not found for the user"));
@@ -364,26 +318,14 @@ public class JobOfferService {
         taskHistoryRepository.save(taskHistory);
     }
 
-    private void createNewSolution(Task task, List<MultipartFile> files, String userId,String mainFileName, ProgrammingLanguage language){
+    private void createNewSolution(Task task, List<MultipartFile> files, String userId){
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         Solution solution = new Solution(task, getUser(userId), fileIDs);
-
-        solution.setMainFileId(fileIDs.get(findFileIndexByName(files, mainFileName)));
-        solution.setLanguage(language);
-
         solutionRepository.save(solution);
         task.addSolution(solution);
         taskRepository.save(task);
         TaskHistory taskHistory = new TaskHistory(task, userId, LocalDateTime.now());
         taskHistoryRepository.save(taskHistory);
-    }
-
-    public int findFileIndexByName(List<MultipartFile> files, String filename) {
-        return files.stream()
-                .filter(file -> file.getOriginalFilename().equals(filename))
-                .findFirst()
-                .map(files::indexOf)
-                .orElseThrow(() -> new RuntimeException("Failed to find main file"));
     }
 
     private List<ObjectId> addFiles(List<MultipartFile> files) {

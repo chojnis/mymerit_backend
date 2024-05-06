@@ -2,41 +2,19 @@ package com.mymerit.mymerit.domain.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mymerit.mymerit.api.payload.request.JudgeParams;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
-import com.mymerit.mymerit.api.payload.request.SolutionRequest;
 import com.mymerit.mymerit.api.payload.response.JudgeCompilationResponse;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenEntity;
-import com.mymerit.mymerit.domain.entity.DownloadFile;
-import com.mymerit.mymerit.domain.entity.SolutionFile;
-import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.infrastructure.utils.JudgeUtils;
-import org.bson.types.ObjectId;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Objects;
-
-import static com.mymerit.mymerit.infrastructure.utils.ZipUtility.zipSolutionFilesAsBase64;
 
 @Service
 public class JudgeService {
-
-    DownloadFileService downloadFileService;
-
-
-    JudgeService(DownloadFileService downloadFileService){
-        this.downloadFileService = downloadFileService;
-
-    }
 
     public String generateTokenRequest(JudgeTokenRequest judgeTokenRequest) {
         RestTemplate restTemplate = new RestTemplate();
@@ -114,50 +92,6 @@ public class JudgeService {
 
         return requestBodyBuilder.toString();
     }
-
-    public String encodeFromMultifile(List<MultipartFile> files, String mainName, ProgrammingLanguage language) throws IOException {
-        SolutionRequest solutionRequest = new SolutionRequest(mainName);
-        StringBuilder encodedData = new StringBuilder();
-        String result = "";
-
-        for (MultipartFile file : files) {
-
-            String id = downloadFileService.addFile(file).toString();
-
-            DownloadFile downloadFile =  downloadFileService.downloadFile(id);
-
-            byte[] bytes = downloadFile.getFile();
-
-            String s = new String(bytes, StandardCharsets.UTF_8);
-
-            boolean isMain = Objects.equals(downloadFile.getFilename(), mainName);
-
-            SolutionFile solutionFile = new SolutionFile(downloadFile.getFilename(),s,isMain);
-            solutionRequest.addToFiles(solutionFile);
-
-
-        }
-            result = zipSolutionFilesAsBase64(solutionRequest,language);
-
-            return result;
-    }
-
-     public JudgeCompilationResponse getResponseFromMultipartFiles(List<MultipartFile> multipartFiles,String mainName,JudgeParams judgeParams,ProgrammingLanguage language) throws IOException {
-        String zippedContent = encodeFromMultifile(multipartFiles,mainName,language);
-
-        JudgeTokenRequest jtr = new JudgeTokenRequest(zippedContent,judgeParams.getStdin(),judgeParams.command_line_arguments,
-                judgeParams.cpu_time_limit,judgeParams.memory_limit,judgeParams.stdin,judgeParams.expected_output);
-
-
-        String token = generateTokenRequest(jtr);
-
-        JudgeCompilationResponse judgeCompilationResponse = generateRequestResponse(token);
-
-        return judgeCompilationResponse;
-
-    }
-
-
 }
 
 

@@ -1,7 +1,6 @@
 package com.mymerit.mymerit.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -12,7 +11,7 @@ import java.util.List;
 
 public class CodeTest {
 
-    private ProgrammingLanguage language;
+    private String language;
 
     @DBRef
     @JsonIgnore

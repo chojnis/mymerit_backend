@@ -6,10 +6,7 @@ import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
 import com.mymerit.mymerit.domain.entity.Feedback;
 import com.mymerit.mymerit.domain.entity.JobOffer;
-import com.mymerit.mymerit.domain.entity.Task;
-import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.service.JobOfferService;
-import com.mymerit.mymerit.domain.service.TaskTestService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.security.CurrentUser;
 import jakarta.validation.Valid;
@@ -25,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,11 +30,9 @@ import java.util.Set;
 @Controller
 public class JobOfferController {
     private final JobOfferService jobOfferService;
-    private  TaskTestService taskTestService;
 
-    JobOfferController(JobOfferService jobOfferService, TaskTestService taskTestService) {
+    JobOfferController(JobOfferService jobOfferService) {
         this.jobOfferService = jobOfferService;
-        this.taskTestService = taskTestService;
     }
 
     @GetMapping("/job/{id}")
@@ -73,8 +67,8 @@ public class JobOfferController {
     }
 
     @PostMapping("/job/{jobOfferId}/solution")
-    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam List<MultipartFile> files, @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam ProgrammingLanguage language, String mainFileName) throws IOException {
-        return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId(),language, mainFileName))
+    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam List<MultipartFile> files, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId()))
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + jobOfferId));
     }

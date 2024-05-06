@@ -1,6 +1,5 @@
 package com.mymerit.mymerit.domain.entity;
 
-import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -36,20 +35,17 @@ public class Task {
     private Integer reward;
 
     @NotEmpty(message = "Allowed languages are required")
-    private Set<ProgrammingLanguage> allowedLanguages;
-
-    private Map<ProgrammingLanguage, List<String>> templateFiles;// [language : {fileId1, fileId2},.. ]
+    private Set<String> allowedLanguages;
 
     private Integer memoryLimit;
 
     private Float timeLimit;
 
     public List<CodeTest> tests;
-
     @DBRef
     private List<Solution> solutions = new ArrayList<>();
 
-    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<ProgrammingLanguage> allowedLanguages, String testSolution,
+    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<String> allowedLanguages, String testSolution,
                 String input, String output) {
         this.title = title;
         this.instructions = instructions;
@@ -59,19 +55,6 @@ public class Task {
         this.allowedLanguages = allowedLanguages;
 
 
-    }
-
-    public Solution findSolutionByUserId(String userId){
-        for(Solution solution : solutions) {
-            if (solution.getUser().getId().equals(userId)) {
-                return solution;
-            }
-        }
-        return null;
-    }
-
-    public Optional<CodeTest> getTestByLanguage(ProgrammingLanguage language){
-        return tests.stream().filter(t->t.getLanguage().equals(language)).findFirst();
     }
 
     public Integer getSolutionCount() {
