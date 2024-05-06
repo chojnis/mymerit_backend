@@ -22,7 +22,7 @@ public interface JobOfferRepository extends MongoRepository<JobOffer, String> {
 
     Optional<JobOffer> findById(String id);
 
-    Page<JobOffer> findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskOpensAtBetween(
+    Page<JobOffer> findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskClosesAtBetween(
             String jobTitle,
             Range<Integer> salaryRange,
             Range<Integer> creditsRange,
@@ -30,7 +30,7 @@ public interface JobOfferRepository extends MongoRepository<JobOffer, String> {
             Pageable pageable
     );
 
-    Page<JobOffer> findByJobTitleContainingIgnoreCaseAndTaskAllowedLanguagesInIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskOpensAtBetween(
+    Page<JobOffer> findByJobTitleContainingIgnoreCaseAndTaskAllowedLanguagesInIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskClosesAtBetween(
             String jobTitle,
             Set<String> languages,
             Range<Integer> salaryRange,

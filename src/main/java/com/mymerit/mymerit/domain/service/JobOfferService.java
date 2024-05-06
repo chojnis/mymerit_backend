@@ -177,10 +177,10 @@ public class JobOfferService {
         PageRequest pageRequest = PageRequest.of(page, 3, sort);
 
         if (languages.isEmpty()) {
-            return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskOpensAtBetween(q, salaryRange, creditsRange, dateRange, pageRequest)
+            return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskClosesAtBetween(q, salaryRange, creditsRange, dateRange, pageRequest)
                     .map(this::createJobOfferListResponse);
         } else {
-            return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndTaskAllowedLanguagesInIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskOpensAtBetween(q, languages, salaryRange, creditsRange, dateRange, pageRequest)
+            return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndTaskAllowedLanguagesInIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskClosesAtBetween(q, languages, salaryRange, creditsRange, dateRange, pageRequest)
                     .map(this::createJobOfferListResponse);
         }
     }
