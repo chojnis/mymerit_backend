@@ -4,6 +4,7 @@ import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
 import com.mymerit.mymerit.api.payload.response.JudgeCompilationResponse;
 import com.mymerit.mymerit.api.payload.response.TestResponse;
 import com.mymerit.mymerit.domain.entity.*;
+import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class TaskTestService {
         this.taskRepository = taskRepository;
     }
 
-    public List<TestResponse> testResults(JudgeTokenRequest userRequest, String taskId,String language){
+    public List<TestResponse> testResults(JudgeTokenRequest userRequest, String taskId, ProgrammingLanguage language){
         List<TestResponse> result = new ArrayList<>();
         List<CodeTest> tests = taskRepository.findById(taskId).get().getTests();
 

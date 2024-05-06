@@ -4,6 +4,7 @@ package com.mymerit.mymerit.infrastructure.utils;
 import com.mymerit.mymerit.api.payload.request.SolutionRequest;
 import com.mymerit.mymerit.domain.entity.ConfigFile;
 import com.mymerit.mymerit.domain.entity.SolutionFile;
+import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import lombok.Data;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
@@ -22,7 +23,7 @@ public class ZipUtility {
 
 
 
-    public static String zipSolutionFilesAsBase64(SolutionRequest solutionRequest, String language) throws IOException {
+    public static String zipSolutionFilesAsBase64(SolutionRequest solutionRequest, ProgrammingLanguage language) throws IOException {
         if (solutionRequest == null || solutionRequest.getFiles() == null || solutionRequest.getFiles().isEmpty()) {
             throw new IllegalArgumentException("Solution request is null or empty.");
         }
@@ -57,7 +58,7 @@ public class ZipUtility {
 
 
 
-    public static ConfigFile getSourceFileForLanguage(String language, String mainFileName) {// porownac mianfile z mutlipart main i indeks wziac i guess 
+    public static ConfigFile getSourceFileForLanguage(ProgrammingLanguage language, String mainFileName) {// porownac mianfile z mutlipart main i indeks wziac i guess
         JSONParser jsonParser = new JSONParser();
 
         try (FileReader reader = new FileReader("src/main/resources/extension-scripts-map.json")) {
@@ -66,7 +67,7 @@ public class ZipUtility {
             JSONObject jsonObject = (JSONObject) obj;
 
 
-            JSONObject languageConfig = (JSONObject) jsonObject.get(language);
+            JSONObject languageConfig = (JSONObject) jsonObject.get(language.toString().toLowerCase());
             if (languageConfig != null) {
 
                 String compile = (String) languageConfig.get("compile");

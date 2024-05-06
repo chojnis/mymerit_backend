@@ -4,6 +4,7 @@ import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
 import com.mymerit.mymerit.api.payload.response.*;
 import com.mymerit.mymerit.domain.entity.*;
+import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import com.mymerit.mymerit.infrastructure.repository.*;
 import org.bson.types.ObjectId;
@@ -186,7 +187,7 @@ public class JobOfferService {
     }
 
 
-    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId,String language,String mainFileName) throws IOException {
+    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId,ProgrammingLanguage language,String mainFileName) throws IOException {
         JobOffer jobOffer = getJobOfferOrThrow(jobOfferId);
         Task task = jobOffer.getTask();
 
@@ -202,7 +203,7 @@ public class JobOfferService {
         return jobOfferRepository.save(jobOffer);
     }
 
-    public void executeTests(String userId,Task task,String language, List<MultipartFile> files) throws IOException {
+    public void executeTests(String userId, Task task, ProgrammingLanguage language, List<MultipartFile> files) throws IOException {
 
        Solution solution =  task.findSolutionByUserId(userId);
 
@@ -211,16 +212,10 @@ public class JobOfferService {
        String mainFileName = downloadFileService.downloadFile(solution.getMainFileId()).getFilename();
        String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
 
-       JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles,language);
+       JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles);
 
        List<TestResponse> testResponse = taskTestService.testResults(judgeTokenRequest,task.getId(),language);
-
-        for(TestResponse x : testResponse){
-
-            solution.addTestResponse(x);
-
-        }
-
+        solution.setTestResults(testResponse);
         solutionRepository.save(solution);
 
     }
@@ -306,7 +301,7 @@ public class JobOfferService {
                 .anyMatch(solution -> solution.getUser().getId().equals(userId));
     }
 
-    private void updateExistingSolution(Task task, List<MultipartFile> files, String userId,String mainFileId){
+    private void updateExistingSolution(Task task, List<MultipartFile> files, String userId,String mainFileName){
         Solution existingSolution = task.getSolutions().stream()
                 .filter(solution -> solution.getUser().getId().equals(userId))
                 .findFirst()
@@ -320,9 +315,9 @@ public class JobOfferService {
             }
         });
 
-        List<ObjectId> fileIDs = addFiles(files);
-        existingSolution.setFiles(fileIDs.stream().map(ObjectId::toString).toList());
-        existingSolution.setMainFileId(mainFileId);
+        List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
+        existingSolution.setFiles(fileIDs);
+        existingSolution.setMainFileId(fileIDs.get(findFileIndexByName(files, mainFileName)));
         solutionRepository.save(existingSolution);
         System.out.println("Existing solution updated: " + existingSolution);
     }
@@ -330,10 +325,20 @@ public class JobOfferService {
     private void createNewSolution(Task task, List<MultipartFile> files, String userId,String mainFileName){
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         Solution solution = new Solution(task, getUser(userId), fileIDs);
-        solution.setMainFileId(mainFileName);
+
+        solution.setMainFileId(fileIDs.get(findFileIndexByName(files, mainFileName)));
+
         solutionRepository.save(solution);
         task.addSolution(solution);
         taskRepository.save(task);
+    }
+
+    public int findFileIndexByName(List<MultipartFile> files, String filename) {
+        return files.stream()
+                .filter(file -> file.getOriginalFilename().equals(filename))
+                .findFirst()
+                .map(files::indexOf)
+                .orElseThrow(() -> new RuntimeException("Failed to find main file"));
     }
 
     private List<ObjectId> addFiles(List<MultipartFile> files) {
