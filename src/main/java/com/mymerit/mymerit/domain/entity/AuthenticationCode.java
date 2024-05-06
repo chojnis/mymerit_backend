@@ -12,6 +12,6 @@ public class AuthenticationCode {
     @Id
     private String id;
     private String email;
-    private int code;
+    private String code;
     private LocalDateTime expiration;
 }
