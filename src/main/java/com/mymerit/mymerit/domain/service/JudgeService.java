@@ -9,6 +9,7 @@ import com.mymerit.mymerit.api.payload.response.JudgeCompilationResponse;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenEntity;
 import com.mymerit.mymerit.domain.entity.DownloadFile;
 import com.mymerit.mymerit.domain.entity.SolutionFile;
+import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.infrastructure.utils.JudgeUtils;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 
 import static com.mymerit.mymerit.infrastructure.utils.ZipUtility.zipSolutionFilesAsBase64;
 
@@ -113,7 +115,7 @@ public class JudgeService {
         return requestBodyBuilder.toString();
     }
 
-    public String encodeFromMultifile(List<MultipartFile> files, String mainName, String language) throws IOException {
+    public String encodeFromMultifile(List<MultipartFile> files, String mainName, ProgrammingLanguage language) throws IOException {
         SolutionRequest solutionRequest = new SolutionRequest(mainName);
         StringBuilder encodedData = new StringBuilder();
         String result = "";
@@ -128,10 +130,7 @@ public class JudgeService {
 
             String s = new String(bytes, StandardCharsets.UTF_8);
 
-            boolean isMain = false;
-            if(downloadFile.getFilename() == mainName){
-                isMain = true;
-            }
+            boolean isMain = Objects.equals(downloadFile.getFilename(), mainName);
 
             SolutionFile solutionFile = new SolutionFile(downloadFile.getFilename(),s,isMain);
             solutionRequest.addToFiles(solutionFile);
@@ -143,7 +142,7 @@ public class JudgeService {
             return result;
     }
 
-     public JudgeCompilationResponse getResponseFromMultipartFiles(List<MultipartFile> multipartFiles,String mainName,JudgeParams judgeParams,String language) throws IOException {
+     public JudgeCompilationResponse getResponseFromMultipartFiles(List<MultipartFile> multipartFiles,String mainName,JudgeParams judgeParams,ProgrammingLanguage language) throws IOException {
         String zippedContent = encodeFromMultifile(multipartFiles,mainName,language);
 
         JudgeTokenRequest jtr = new JudgeTokenRequest(zippedContent,judgeParams.getStdin(),judgeParams.command_line_arguments,
@@ -157,6 +156,8 @@ public class JudgeService {
         return judgeCompilationResponse;
 
     }
+
+
 }
 
 

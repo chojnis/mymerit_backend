@@ -5,6 +5,7 @@ import com.mymerit.mymerit.api.payload.request.JudgeTokenRequest;
 import com.mymerit.mymerit.api.payload.request.SolutionRequest;
 import com.mymerit.mymerit.api.payload.response.JudgeCompilationResponse;
 import com.mymerit.mymerit.api.payload.response.TestResponse;
+import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.service.JudgeService;
 import com.mymerit.mymerit.domain.service.TaskTestService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
@@ -32,7 +33,7 @@ public class JudgeController {
 
 
     @PostMapping("/test/task/{taskId}/language/{language}")
-    private List<TestResponse> testAllCases(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @PathVariable String language){
+    private List<TestResponse> testAllCases(@RequestBody JudgeTokenRequest judgeTokenRequest, @PathVariable String taskId, @PathVariable ProgrammingLanguage language){
         return taskTestService.testResults(judgeTokenRequest, taskId,language);
 
     }
@@ -42,9 +43,8 @@ public class JudgeController {
         return Collections.singletonList(taskTestService.singleTest(judgeTokenRequest, taskId, language, testIndex));
     }
 
-    @PostMapping("/token/{jobOfferId}")
-    private String getToken(@RequestBody JudgeTokenRequest fileRequest, UserDetailsImpl userDetails){
-
+    @PostMapping("/token")
+    private String getToken(@RequestBody JudgeTokenRequest fileRequest){
         return judgeService.generateTokenRequest(fileRequest);
     }
 
@@ -54,13 +54,13 @@ public class JudgeController {
     }
 
     @PostMapping("/generateZipBaseEncode/{language}")
-    private ResponseEntity<?> generateEncoded(@RequestBody SolutionRequest solutionRequest, @PathVariable String language) throws IOException, IOException {
+    private ResponseEntity<?> generateEncoded(@RequestBody SolutionRequest solutionRequest, @PathVariable ProgrammingLanguage language) throws IOException, IOException {
 
         return ResponseEntity.ok(ZipUtility.zipSolutionFilesAsBase64(solutionRequest,language));
     }
 
     @GetMapping("/xdxd")
-        private ResponseEntity<?> gxed(@RequestParam String language, @RequestParam String mainName, @RequestBody List<MultipartFile>files,
+        private ResponseEntity<?> gxed(@RequestParam ProgrammingLanguage language, @RequestParam String mainName, @RequestBody List<MultipartFile>files,
                                        @RequestBody JudgeParams judgeParams) throws IOException {
 
         return ResponseEntity.ok(judgeService.getResponseFromMultipartFiles(files,mainName,judgeParams,language));

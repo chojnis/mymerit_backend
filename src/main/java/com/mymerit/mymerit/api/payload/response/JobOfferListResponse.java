@@ -2,6 +2,7 @@ package com.mymerit.mymerit.api.payload.response;
 
 import com.mymerit.mymerit.domain.entity.Task;
 import com.mymerit.mymerit.domain.entity.User;
+import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -26,7 +27,7 @@ public class JobOfferListResponse {
     private Set<String> workLocations;
 
     @NotEmpty
-    private Set<String> technologies;
+    private Set<ProgrammingLanguage> technologies;
 
     @NotNull
     private Integer reward;
