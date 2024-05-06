@@ -30,7 +30,7 @@ public class TaskTestService {
         CodeTest test = tests.stream()
                 .filter(l-> Objects.equals(l.getLanguage(), language))
                 .findFirst()
-                .orElseThrow(()->new RuntimeException("error"));
+                .orElseThrow(()->new RuntimeException("Couldn't fidn test for language"+ language));
 
         //userRequest.setFileContentBase64(test.getTestFileBase64());
 

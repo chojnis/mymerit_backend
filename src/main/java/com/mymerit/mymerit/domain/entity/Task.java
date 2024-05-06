@@ -70,6 +70,10 @@ public class Task {
         return null;
     }
 
+    public Optional<CodeTest> getTestByLanguage(ProgrammingLanguage language){
+        return tests.stream().filter(t->t.getLanguage().equals(language)).findFirst();
+    }
+
     public Integer getSolutionCount() {
         return solutions.size();
     }

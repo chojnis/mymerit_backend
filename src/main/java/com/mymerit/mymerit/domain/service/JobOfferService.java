@@ -7,8 +7,10 @@ import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import com.mymerit.mymerit.infrastructure.repository.*;
+import com.mymerit.mymerit.infrastructure.utils.ZipUtility;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.*;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -193,9 +195,9 @@ public class JobOfferService {
 
 
         if (userAlreadySubmittedSolution(task, userId)) {
-            updateExistingSolution(task, files, userId,mainFileName);
+            updateExistingSolution(task, files, userId,mainFileName, language);
         } else {
-            createNewSolution(task, files, userId,mainFileName);
+            createNewSolution(task, files, userId,mainFileName, language);
         }
 
         executeTests(userId,task,language,files);
@@ -204,21 +206,31 @@ public class JobOfferService {
     }
 
     public void executeTests(String userId, Task task, ProgrammingLanguage language, List<MultipartFile> files) throws IOException {
-
        Solution solution =  task.findSolutionByUserId(userId);
+        String testFileBase64 = task.getTestByLanguage(language)
+                .map(CodeTest::getTestFileBase64)
+                .orElseThrow(() -> new IllegalStateException("Test file not available for language: " + language));
 
-
-
-       String mainFileName = downloadFileService.downloadFile(solution.getMainFileId()).getFilename();
+       String mainFileName = "MainTestFile" + language.getExtension();
+       files.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
        String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
-
        JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles);
-
        List<TestResponse> testResponse = taskTestService.testResults(judgeTokenRequest,task.getId(),language);
-        solution.setTestResults(testResponse);
-        solutionRepository.save(solution);
-
+       solution.setTestResults(testResponse);
+       solutionRepository.save(solution);
     }
+
+    private MultipartFile convertBase64ToMultipartFile(String fileName, String base64Data) {
+        byte[] fileContent = Base64.getDecoder().decode(base64Data);
+        return new MockMultipartFile(//narazie tak, pewnie zmienie
+                "file",
+                fileName,
+                "text/plain",
+                fileContent
+        );
+    }
+
+
 
     public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment) {
         Solution solution = solutionRepository.findById(solutionId)
@@ -301,7 +313,7 @@ public class JobOfferService {
                 .anyMatch(solution -> solution.getUser().getId().equals(userId));
     }
 
-    private void updateExistingSolution(Task task, List<MultipartFile> files, String userId,String mainFileName){
+    private void updateExistingSolution(Task task, List<MultipartFile> files, String userId,String mainFileName, ProgrammingLanguage language){
         Solution existingSolution = task.getSolutions().stream()
                 .filter(solution -> solution.getUser().getId().equals(userId))
                 .findFirst()
@@ -317,16 +329,18 @@ public class JobOfferService {
 
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         existingSolution.setFiles(fileIDs);
+        existingSolution.setLanguage(language);
         existingSolution.setMainFileId(fileIDs.get(findFileIndexByName(files, mainFileName)));
         solutionRepository.save(existingSolution);
         System.out.println("Existing solution updated: " + existingSolution);
     }
 
-    private void createNewSolution(Task task, List<MultipartFile> files, String userId,String mainFileName){
+    private void createNewSolution(Task task, List<MultipartFile> files, String userId,String mainFileName, ProgrammingLanguage language){
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         Solution solution = new Solution(task, getUser(userId), fileIDs);
 
         solution.setMainFileId(fileIDs.get(findFileIndexByName(files, mainFileName)));
+        solution.setLanguage(language);
 
         solutionRepository.save(solution);
         task.addSolution(solution);
