@@ -1,5 +1,6 @@
 package com.mymerit.mymerit.domain.service;
 
+import com.mymerit.mymerit.api.payload.response.GridFileResponse;
 import com.mymerit.mymerit.domain.entity.GridFile;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -57,6 +58,21 @@ public class GridFileService {
         }
 
         return gridFile;
+    }
+
+    public List<GridFileResponse> downloadFiles(List<String> fileIDS) {
+        List<GridFileResponse> downloadedFiles = new ArrayList<>();
+        for (String fileId : fileIDS) {
+            try {
+                GridFile downloadFile = gridFile(fileId);
+                GridFileResponse downloadFileResponse = new GridFileResponse(downloadFile.getFilename(), downloadFile.getFileType(), downloadFile.getFile());
+                downloadedFiles.add(downloadFileResponse);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return downloadedFiles;
     }
 
     public void DeleteFile(String id) throws IOException {

@@ -51,6 +51,8 @@ public class UserTaskDetailsResponse {
     private Solution userSolution;
 
     private Feedback companyFeedback;
+    private Map<ProgrammingLanguage, List<String>> templateFiles;
+
 
     private List<CodeTest> tests;
 

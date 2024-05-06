@@ -1,5 +1,6 @@
 package com.mymerit.mymerit.api.controller;
 
+import com.mymerit.mymerit.api.payload.request.FileListRequest;
 import com.mymerit.mymerit.api.payload.response.GridFileResponse;
 import com.mymerit.mymerit.domain.entity.GridFile;
 import com.mymerit.mymerit.domain.entity.Solution;
@@ -42,12 +43,18 @@ public class GridFileController {
                 .body(response);
     }
 
-
+    @PostMapping("/download/")
+    public ResponseEntity<List<GridFileResponse>> download(@RequestBody FileListRequest request){
+        return ResponseEntity.ok()
+                .body(fileService.downloadFiles(request.getFileIDS()));
+    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable String id) throws IOException {
         fileService.DeleteFile(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
 
 }
