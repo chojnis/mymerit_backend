@@ -165,6 +165,7 @@ public class JobOfferService {
                 task.getStatus(),
                 userSolution,
                 companyFeedback,
+                task.getTemplateFiles(),
                 task.getTests()
         );
     }
@@ -221,7 +222,7 @@ public class JobOfferService {
 
         if (optionalTestFileBase64.isEmpty()) {
             System.out.println("Test file not available for language: " + language);
-            return; 
+            return;
         }
 
         String testFileBase64 = optionalTestFileBase64.get();
@@ -244,8 +245,6 @@ public class JobOfferService {
                 fileContent
         );
     }
-
-
 
     public Feedback addFeedback(String solutionId, List<MultipartFile> files, Integer credits, String comment, String companyId) {
         Solution solution = solutionRepository.findById(solutionId)
@@ -283,20 +282,20 @@ public class JobOfferService {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         Optional<Feedback> feedback = jobOffer.getTask().getSolutionForUser(user).map(Solution::getFeedback);
         if(feedback.isPresent()){
-            return downloadFiles(feedback.get().getFiles());
+            return gridFileService.downloadFiles(feedback.get().getFiles());
         }else{
             return Collections.emptyList();
         }
     }
 
-    public List<GridFileResponse> downloadFeedbackForSolution(String solutionId, String userId){
+    public List<GridFileResponse> downloadFeedbackForSolution(String solutionId){
         Solution solution = solutionRepository.findById(solutionId).orElseThrow();
         /*if(!userId.equals(solution.getUser().getId())){
             throw new RuntimeException("Unauthorized");
         }*/
         Feedback feedback = solution.getFeedback();
         if(feedback != null){
-            return downloadFiles(feedback.getFiles());
+            return gridFileService.downloadFiles(feedback.getFiles());
         }else{
             return Collections.emptyList();
         }
@@ -307,24 +306,8 @@ public class JobOfferService {
         Solution solution = solutionRepository.findById(solutionId).
                 orElseThrow();
 
-        return downloadFiles(solution.getFiles());
+        return gridFileService.downloadFiles(solution.getFiles());
     }
-
-    public List<GridFileResponse> downloadFiles(List<String> fileIDS) {
-        List<GridFileResponse> downloadedFiles = new ArrayList<>();
-        for (String fileId : fileIDS) {
-            try {
-                GridFile downloadFile = fileService.gridFile(fileId);
-                GridFileResponse downloadFileResponse = new GridFileResponse(downloadFile.getFilename(), downloadFile.getFileType(), downloadFile.getFile());
-                downloadedFiles.add(downloadFileResponse);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return downloadedFiles;
-    }
-
 
     private JobOffer getJobOfferOrThrow(String jobOfferId) {
         return jobOfferRepository.findById(jobOfferId)

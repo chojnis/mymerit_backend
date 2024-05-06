@@ -50,8 +50,8 @@ public class JobOfferDetailsSolutionsResponse extends JobOfferDetailsResponse{
                 task.getStatus(),
                 null,
                 null,
+                task.getTemplateFiles(),
                 task.getTests()
-
         );
     }
 }

@@ -34,12 +34,10 @@ import java.util.Set;
 @Controller
 public class JobOfferController {
     private final JobOfferService jobOfferService;
-    private  TaskTestService taskTestService;
 
     JobOfferController(JobOfferService jobOfferService, TaskTestService taskTestService) {
         this.jobOfferService = jobOfferService;
-        this.taskTestService = taskTestService;
-    }
+   }
 
     @GetMapping("/job/{id}")
     ResponseEntity<JobOfferDetailsResponse> getJobOfferById(@PathVariable String id, @CurrentUser UserDetailsImpl user) {
@@ -100,8 +98,8 @@ public class JobOfferController {
     }
 
     @GetMapping("/solution/{solutionId}/feedback")
-    public ResponseEntity<List<GridFileResponse>> downloadFeedback(@PathVariable String solutionId, @CurrentUser UserDetailsImpl userDetails) {
-        List<GridFileResponse> downloadedFiles = jobOfferService.downloadFeedbackForSolution(solutionId, userDetails.getId());
+    public ResponseEntity<List<GridFileResponse>> downloadFeedback(@PathVariable String solutionId) {
+        List<GridFileResponse> downloadedFiles = jobOfferService.downloadFeedbackForSolution(solutionId);
         return ResponseEntity.ok(downloadedFiles);
     }
 
