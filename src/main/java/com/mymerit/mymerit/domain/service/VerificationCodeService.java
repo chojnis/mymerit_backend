@@ -20,16 +20,17 @@ public class VerificationCodeService {
     }
 
     public ResponseEntity<?> processVerificationCode(String code, String email) {
+        int codeInt = Integer.parseInt(code);
 
         List<AuthenticationCode> codes = authenticationCodeRepository.findAllByEmail(email);
 
-        if (codes.stream().noneMatch(c -> c.getCode() == code)) {
+        if (codes.stream().noneMatch(c -> c.getCode() == codeInt)) {
             return ResponseEntity
                     .badRequest()
                     .body(new ApiResponse(false, "The verification code is invalid"));
         }
 
-        if (LocalDateTime.now().isAfter(authenticationCodeRepository.findByCode(code).getExpiration())) {
+        if (LocalDateTime.now().isAfter(authenticationCodeRepository.findByCode(codeInt).getExpiration())) {
             return ResponseEntity
                     .badRequest()
                     .body(new ApiResponse(false, "Verification code expired"));
@@ -60,7 +61,7 @@ public class VerificationCodeService {
         authenticationCode.setEmail(email);
 
         do {
-            authenticationCode.setCode(Integer.toString(mailSenderService.generateVerificationCode()));
+            authenticationCode.setCode(mailSenderService.generateVerificationCode());
         } while (authenticationCodeRepository.existsByCode(authenticationCode.getCode()));
 
         authenticationCode.setExpiration(LocalDateTime.now().plusMinutes(30));

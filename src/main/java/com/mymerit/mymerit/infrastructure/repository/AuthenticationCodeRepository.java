@@ -10,9 +10,9 @@ import java.util.List;
 public interface AuthenticationCodeRepository extends MongoRepository<AuthenticationCode, String> {
     AuthenticationCode findByEmail(String email);
     List<AuthenticationCode> findAllByEmail(String email);
-    AuthenticationCode findByCode(String code);
+    AuthenticationCode findByCode(int code);
     Boolean existsByEmail(String email);
-    Boolean existsByCode(String code);
+    Boolean existsByCode(int code);
     void deleteByEmail(String email);
-    void deleteByCode(String code);
+    void deleteByCode(int code);
 }

@@ -60,16 +60,16 @@ public class SignUpController {
                     .body(new ApiResponse(false, "Email address already in use"));
         }
 
-        String code = signUpRequest.getCode();
+        int codeInt = Integer.parseInt(signUpRequest.getCode());
 
-        if (!authenticationCodeRepository.existsByCode(code)) {
+        if (!authenticationCodeRepository.existsByCode(codeInt)) {
             return ResponseEntity
                     .badRequest()
                     .body(new ApiResponse(false, "The verification code is invalid"));
         }
 
-        if (authenticationCodeRepository.findByCode(code).getEmail().equals(signUpRequest.getEmail())) {
-            if (LocalDateTime.now().isAfter(authenticationCodeRepository.findByCode(signUpRequest.getCode()).getExpiration())) {
+        if (authenticationCodeRepository.findByCode(codeInt).getEmail().equals(signUpRequest.getEmail())) {
+            if (LocalDateTime.now().isAfter(authenticationCodeRepository.findByCode(Integer.parseInt(signUpRequest.getCode())).getExpiration())) {
                 return ResponseEntity
                         .badRequest()
                         .body(new ApiResponse(false, "Verification code expired"));
