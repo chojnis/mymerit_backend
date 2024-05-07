@@ -10,10 +10,13 @@
 ### Database
 
 Go to the `database` directory
+
 ```
 cd database
 ```
+
 Create and start a container
+
 ```
 docker-compose up -d
 ```
@@ -24,10 +27,15 @@ To populate the database with data, run the `restore` script depending on the pl
 ### Judge0
 
 Go to the `judge0` directory
+
 ```
 cd judge0
 ```
+
+**Important:** Make sure the `judge0.conf` file has the control characters set to LF.
+
 Create and start a container
+
 ```
 docker-compose up -d
 ```
@@ -39,10 +47,13 @@ docker-compose up -d
 ### Windows
 
 Assemble and test this project
+
 ```
 .\gradlew.bat build
 ```
+
 Run this project as a Spring Boot application
+
 ```
 .\gradlew.bat bootRun
 ```
@@ -50,10 +61,13 @@ Run this project as a Spring Boot application
 ### Linux / macOS
 
 Assemble and test this project
+
 ```
 ./gradlew build
 ```
+
 Run this project as a Spring Boot application
+
 ```
 ./gradlew bootRun
 ```
