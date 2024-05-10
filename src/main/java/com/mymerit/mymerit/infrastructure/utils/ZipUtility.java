@@ -37,10 +37,10 @@ public class ZipUtility {
 
             System.out.println(solutionRequest.getMainName());
             ConfigFile configFile = getSourceFileForLanguage(language, solutionRequest.getMainName());
-            if (configFile != null) {
-                addToZip(zos, configFile.getCompile().getBytes(), "compile");
-                addToZip(zos, configFile.getRun().getBytes(), "run");
-            }
+        
+            addToZip(zos, configFile.getCompile().getBytes(), "compile");
+            addToZip(zos, configFile.getRun().getBytes(), "run");
+
         }
         return Base64.getEncoder().encodeToString(baos.toByteArray());
     }
@@ -65,8 +65,6 @@ public class ZipUtility {
 
             Object obj = jsonParser.parse(reader);
             JSONObject jsonObject = (JSONObject) obj;
-
-
             JSONObject languageConfig = (JSONObject) jsonObject.get(language.toString().toLowerCase());
             if (languageConfig != null) {
 
@@ -74,11 +72,8 @@ public class ZipUtility {
                 String run = (String) languageConfig.get("run");
                 String source_file_name = (String) languageConfig.get("source_file");
 
-                 String compileScriptContent = compile != null ? compile.replace(source_file_name, " *." + getFileExtension(mainFileName)).replace(" %s ", "") : null;
-                 String runScriptContent = run != null ? run.replace(getFileNameWithoutExtension(source_file_name), getFileNameWithoutExtension(mainFileName)) : null;
-
-
-
+                String compileScriptContent = compile != null ? compile.replace(source_file_name, " *." + getFileExtension(mainFileName)).replace(" %s ", "") : null;
+                String runScriptContent = run != null ? run.replace(getFileNameWithoutExtension(source_file_name), getFileNameWithoutExtension(mainFileName)) : null;
 
                 return new ConfigFile(compileScriptContent, runScriptContent);
             } else {

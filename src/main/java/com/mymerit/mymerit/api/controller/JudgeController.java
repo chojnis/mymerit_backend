@@ -28,6 +28,14 @@ public class JudgeController {
     }
 
 
+    @PostMapping("/compile-code")
+    private ResponseEntity<JudgeCompilationResponse> compileCode(@RequestParam ProgrammingLanguage language, @RequestParam String mainFileName, @RequestBody List<MultipartFile>files,
+                                                                  JudgeParams judgeParams) throws IOException {
+        System.out.println(judgeParams);
+        return ResponseEntity.ok(judgeService.getResponseFromMultipartFiles(files,mainFileName,judgeParams,language));
+    }
+
+
     @PostMapping("/test/task/{taskId}/language/{language}")
     private List<TestResponse> testAllCases(@RequestParam List<MultipartFile>files, @PathVariable String taskId, @PathVariable ProgrammingLanguage language) throws IOException {
         return taskTestService.executeAllTests(files, taskId,language);
@@ -38,6 +46,8 @@ public class JudgeController {
     private List<TestResponse> testSingleCase(@RequestParam List<MultipartFile>files, @PathVariable String taskId, @PathVariable ProgrammingLanguage language, @PathVariable Integer testIndex) throws IOException {
         return Collections.singletonList(taskTestService.executeSingleTest(taskId, language, files, testIndex));
     }
+
+
 
     @PostMapping("/token")
     private String getToken(@RequestBody JudgeTokenRequest fileRequest){
@@ -52,12 +62,5 @@ public class JudgeController {
     @PostMapping("/generateZipBaseEncode/{language}")
     private ResponseEntity<?> generateEncoded(@RequestBody SolutionRequest solutionRequest, @PathVariable ProgrammingLanguage language) throws IOException, IOException {
         return ResponseEntity.ok(ZipUtility.zipSolutionFilesAsBase64(solutionRequest,language));
-    }
-
-    @GetMapping("/xdxd")
-        private ResponseEntity<?> gxed(@RequestParam ProgrammingLanguage language, @RequestParam String mainName, @RequestBody List<MultipartFile>files,
-                                       @RequestBody JudgeParams judgeParams) throws IOException {
-
-        return ResponseEntity.ok(judgeService.getResponseFromMultipartFiles(files,mainName,judgeParams,language));
     }
 }

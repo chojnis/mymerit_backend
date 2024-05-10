@@ -71,12 +71,7 @@ public class JudgeService {
                     .append(89)
                     .append("\",\n");
         }
-        if (judgeTokenRequest.getCommandLineArguments() != null) {
-            requestBodyBuilder
-                    .append("  \"command_line_arguments\": \"")
-                    .append(judgeTokenRequest.getCommandLineArguments())
-                    .append("\",\n");
-        }
+
         if (judgeTokenRequest.getTimeLimit() != null) {
             requestBodyBuilder
                     .append("  \"cpu_time_limit\": ")
@@ -113,11 +108,9 @@ public class JudgeService {
 
     public String encodeFromMultifile(List<MultipartFile> files, String mainName, ProgrammingLanguage language) throws IOException {
         SolutionRequest solutionRequest = new SolutionRequest(mainName);
-        StringBuilder encodedData = new StringBuilder();
         String result = "";
 
         for (MultipartFile file : files) {
-
             String id = gridFileService.addFile(file).toString();
 
             GridFile downloadFile =  gridFileService.gridFile(id);
@@ -130,26 +123,22 @@ public class JudgeService {
 
             SolutionFile solutionFile = new SolutionFile(downloadFile.getFilename(),s,isMain);
             solutionRequest.addToFiles(solutionFile);
-
-
         }
-            result = zipSolutionFilesAsBase64(solutionRequest,language);
+        result = zipSolutionFilesAsBase64(solutionRequest,language);
 
-            return result;
+        return result;
     }
 
      public JudgeCompilationResponse getResponseFromMultipartFiles(List<MultipartFile> multipartFiles,String mainName,JudgeParams judgeParams,ProgrammingLanguage language) throws IOException {
         String zippedContent = encodeFromMultifile(multipartFiles,mainName,language);
 
-        JudgeTokenRequest jtr = new JudgeTokenRequest(zippedContent,judgeParams.getStdin(),judgeParams.command_line_arguments,
-                judgeParams.cpu_time_limit,judgeParams.memory_limit,judgeParams.stdin,judgeParams.expected_output);
+        JudgeTokenRequest jtr = new JudgeTokenRequest(mainName, zippedContent,judgeParams.cpu_time_limit,judgeParams.memory_limit,judgeParams.stdin,
+                judgeParams.expected_output);
 
 
         String token = generateTokenRequest(jtr);
 
-        JudgeCompilationResponse judgeCompilationResponse = generateRequestResponse(token);
-
-        return judgeCompilationResponse;
+         return generateRequestResponse(token);
 
     }
 
