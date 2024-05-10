@@ -37,9 +37,14 @@ public class ZipUtility {
 
             System.out.println(solutionRequest.getMainName());
             ConfigFile configFile = getSourceFileForLanguage(language, solutionRequest.getMainName());
-        
-            addToZip(zos, configFile.getCompile().getBytes(), "compile");
-            addToZip(zos, configFile.getRun().getBytes(), "run");
+
+            if(configFile.getCompile() != null)
+                addToZip(zos, configFile.getCompile().getBytes(), "compile");
+
+            if(configFile.getRun() != null)
+                addToZip(zos, configFile.getRun().getBytes(), "run");
+
+
 
         }
         return Base64.getEncoder().encodeToString(baos.toByteArray());
@@ -65,7 +70,7 @@ public class ZipUtility {
 
             Object obj = jsonParser.parse(reader);
             JSONObject jsonObject = (JSONObject) obj;
-            JSONObject languageConfig = (JSONObject) jsonObject.get(language.toString().toLowerCase());
+            JSONObject languageConfig = (JSONObject) jsonObject.get(language.getExtension());
             if (languageConfig != null) {
 
                 String compile = (String) languageConfig.get("compile");

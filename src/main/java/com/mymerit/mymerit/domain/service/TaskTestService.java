@@ -89,7 +89,7 @@ public class TaskTestService {
 
         String testFileBase64 = optionalTestFileBase64.get();
 
-        String mainFileName = "MainTestFile" + language.getExtension();
+        String mainFileName = "MainTestFile." + language.getExtension();
         files.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
         String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
         JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles);
@@ -109,7 +109,7 @@ public class TaskTestService {
 
         String testFileBase64 = optionalTestFileBase64.get();
 
-        String mainFileName = "MainTestFile" + language.getExtension();
+        String mainFileName = "MainTestFile." + language.getExtension();
         files.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
         String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
         JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles);
