@@ -199,15 +199,15 @@ public class JobOfferService {
     }
 
 
-    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId,ProgrammingLanguage language,String mainFileName) throws IOException {
+    public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId,ProgrammingLanguage language) throws IOException {
         JobOffer jobOffer = getJobOfferOrThrow(jobOfferId);
         Task task = jobOffer.getTask();
 
 
         if (userAlreadySubmittedSolution(task, userId)) {
-            updateExistingSolution(task, files, userId,mainFileName, language);
+            updateExistingSolution(task, files, userId, language);
         } else {
-            createNewSolution(task, files, userId,mainFileName, language);
+            createNewSolution(task, files, userId, language);
         }
 
         executeTests(userId,task,language,files);
@@ -217,24 +217,11 @@ public class JobOfferService {
 
     public void executeTests(String userId, Task task, ProgrammingLanguage language, List<MultipartFile> files) throws IOException {
        Solution solution =  task.findSolutionByUserId(userId);
-        Optional<String> optionalTestFileBase64 = task.getTestByLanguage(language)
-                .map(CodeTest::getTestFileBase64);
-
-        if (optionalTestFileBase64.isEmpty()) {
-            System.out.println("Test file not available for language: " + language);
-            return;
-        }
-
-        String testFileBase64 = optionalTestFileBase64.get();
-
-       String mainFileName = "MainTestFile" + language.getExtension();
-       files.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
-       String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
-       JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles);
-       List<TestResponse> testResponse = taskTestService.testResults(judgeTokenRequest,task.getId(),language);
-       solution.setTestResults(testResponse);
+       solution.setTestResults(taskTestService.executeAllTests(files, task.getId(), language));
        solutionRepository.save(solution);
     }
+
+
 
     private MultipartFile convertBase64ToMultipartFile(String fileName, String base64Data) {
         byte[] fileContent = Base64.getDecoder().decode(base64Data);
@@ -301,7 +288,6 @@ public class JobOfferService {
         }
     }
 
-
     public List<GridFileResponse> downloadSolutionFiles(String solutionId) {
         Solution solution = solutionRepository.findById(solutionId).
                 orElseThrow();
@@ -319,7 +305,7 @@ public class JobOfferService {
                 .anyMatch(solution -> solution.getUser().getId().equals(userId));
     }
 
-    private void updateExistingSolution(Task task, List<MultipartFile> files, String userId,String mainFileName, ProgrammingLanguage language){
+    private void updateExistingSolution(Task task, List<MultipartFile> files, String userId, ProgrammingLanguage language){
         Solution existingSolution = task.getSolutions().stream()
                 .filter(solution -> solution.getUser().getId().equals(userId))
                 .findFirst()
@@ -336,27 +322,29 @@ public class JobOfferService {
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         existingSolution.setFiles(fileIDs);
         existingSolution.setLanguage(language);
-        existingSolution.setMainFileId(fileIDs.get(findFileIndexByName(files, mainFileName)));
+        //existingSolution.setMainFileId(fileIDs.get(findFileIndexByName(files, mainFileName)));
         solutionRepository.save(existingSolution);
         System.out.println("Existing solution updated: " + existingSolution);
 
         Optional<List<TaskHistory>> taskHistoryList = taskHistoryRepository.findByUserId(userId);
-        if( !taskHistoryList.isPresent()){
+        if(taskHistoryList.isEmpty()){
             throw new IllegalStateException("Task history record not found for the user");
         }
-        TaskHistory taskHistory = taskHistoryList.get().stream().
-        filter(taskhist -> taskhist.getTask().getId().equals(task.getId()))
-        .findFirst()
-        .orElseThrow(() -> new IllegalStateException("Solution not found for the user"));
+        TaskHistory taskHistory = taskHistoryList.get()
+                .stream()
+                .filter(taskhist -> taskhist.getTask().getId().equals(task.getId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Solution not found for the user"));
+
         taskHistory.setDateLastModified(LocalDateTime.now());
         taskHistoryRepository.save(taskHistory);
     }
 
-    private void createNewSolution(Task task, List<MultipartFile> files, String userId,String mainFileName, ProgrammingLanguage language){
+    private void createNewSolution(Task task, List<MultipartFile> files, String userId, ProgrammingLanguage language){
         List<String> fileIDs = addFiles(files).stream().map(ObjectId::toString).toList();
         Solution solution = new Solution(task, getUser(userId), fileIDs);
 
-        solution.setMainFileId(fileIDs.get(findFileIndexByName(files, mainFileName)));
+        //solution.setMainFileId(fileIDs.get(findFileIndexByName(files, mainFileName)));
         solution.setLanguage(language);
 
         solutionRepository.save(solution);

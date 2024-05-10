@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 public class JobOfferController {
     private final JobOfferService jobOfferService;
 
-    JobOfferController(JobOfferService jobOfferService, TaskTestService taskTestService) {
+    JobOfferController(JobOfferService jobOfferService) {
         this.jobOfferService = jobOfferService;
    }
 
@@ -72,8 +72,8 @@ public class JobOfferController {
         return ResponseEntity.ok(jobOffersPage);
     }
     @PostMapping("/job/{jobOfferId}/solution")
-    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam List<MultipartFile> files, @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam ProgrammingLanguage language, String mainFileName) throws IOException {
-        return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId(),language, mainFileName))
+    ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam List<MultipartFile> files, @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam ProgrammingLanguage language) throws IOException {
+        return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId(),language))
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + jobOfferId));
     }
