@@ -47,9 +47,9 @@ public class JobOfferController {
     @PostMapping("/job")
     ResponseEntity<ApiResponse> addJobOffer(@RequestBody @Valid JobOfferRequest jobOfferRequest, @CurrentUser UserDetailsImpl user) {
         try {
-            jobOfferService.addJobOffer(jobOfferRequest, user);
+            JobOffer added = jobOfferService.addJobOffer(jobOfferRequest, user);
 
-            return ResponseEntity.ok(new ApiResponse(true, "Job offer added successfully", null));
+            return ResponseEntity.ok(new ApiResponse(true, "Job offer added successfully", added));
         }
         catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage()));
