@@ -36,7 +36,3 @@ dependencies {
 	implementation 'org.springframework:spring-test:5.3.18'
 
 }
-
-tasks.named('test') {
-	useJUnitPlatform()
-}

@@ -1,16 +1,14 @@
 package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
+import com.mymerit.mymerit.api.payload.response.ApiResponse;
 import com.mymerit.mymerit.api.payload.response.GridFileResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
 import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
 import com.mymerit.mymerit.domain.entity.Feedback;
 import com.mymerit.mymerit.domain.entity.JobOffer;
-import com.mymerit.mymerit.domain.entity.Task;
 import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
-import com.mymerit.mymerit.domain.models.TaskStatus;
 import com.mymerit.mymerit.domain.service.JobOfferService;
-import com.mymerit.mymerit.domain.service.TaskTestService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.security.CurrentUser;
 import jakarta.validation.Valid;
@@ -31,7 +29,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 public class JobOfferController {
@@ -48,8 +45,15 @@ public class JobOfferController {
     }
 
     @PostMapping("/job")
-    ResponseEntity<JobOffer> addJobOffer(@RequestBody @Valid JobOfferRequest jobOfferRequest, @CurrentUser UserDetailsImpl user) {
-        return ResponseEntity.ok(jobOfferService.addJobOffer(jobOfferRequest, user));
+    ResponseEntity<ApiResponse> addJobOffer(@RequestBody @Valid JobOfferRequest jobOfferRequest, @CurrentUser UserDetailsImpl user) {
+        try {
+            JobOffer added = jobOfferService.addJobOffer(jobOfferRequest, user);
+
+            return ResponseEntity.ok(new ApiResponse(true, "Job offer added successfully", added));
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, e.getMessage()));
+        }
     }
 
     @GetMapping("/jobs")
@@ -103,5 +107,4 @@ public class JobOfferController {
         List<GridFileResponse> downloadedFiles = jobOfferService.downloadFeedbackForSolution(solutionId);
         return ResponseEntity.ok(downloadedFiles);
     }
-
 }
