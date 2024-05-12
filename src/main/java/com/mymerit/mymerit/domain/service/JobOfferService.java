@@ -70,7 +70,7 @@ public class JobOfferService {
         }
 
         user.setCredits(userCredits - taskReward);
-        taskRepository.save(jobOfferRequest.getTask());
+        Task createdTask = taskRepository.save(jobOfferRequest.getTask());
 
         JobOffer jobOffer = new JobOffer(
                 jobOfferRequest.getJobTitle(),
@@ -80,16 +80,25 @@ public class JobOfferService {
                 jobOfferRequest.getWorkLocations(),
                 jobOfferRequest.getTechnologies(),
                 user,
-                jobOfferRequest.getTask(),
+                createdTask,
                 jobOfferRequest.getExperience(),
                 jobOfferRequest.getEmploymentType(),
                 jobOfferRequest.getSalary()
         );
         JobOffer createdJobOffer = jobOfferRepository.save(jobOffer);
+        createdJobOffer.getTask().setJob(createdJobOffer);
+        jobOfferRepository.save(jobOffer);
+        createdTask.setJob(createdJobOffer);
+        taskRepository.save(createdTask);
         JobOfferHistory jobOfferHistory = new JobOfferHistory(createdJobOffer, jobOffer.getCompany().getId(), LocalDateTime.now());
         jobOfferHistoryRepository.save(jobOfferHistory);
 
         return createdJobOffer;
+    }
+
+    public Task getTaskForJobOffer(String jobOfferId){
+        JobOffer jobOffer = jobOfferRepository.findById(jobOfferId).orElseThrow(()->new RuntimeException("Job offer not found"));
+        return taskRepository.findById(jobOffer.getTask().getId()).orElseThrow(()->new RuntimeException("Task not found"));
     }
 
     public JobOfferDetailsResponse getJobOfferDetailsResponse(String id, UserDetailsImpl userDetails) {
@@ -217,7 +226,14 @@ public class JobOfferService {
 
     public void executeTests(String userId, Task task, ProgrammingLanguage language, List<MultipartFile> files) throws IOException {
        Solution solution =  task.findSolutionByUserId(userId);
-       solution.setTestResults(taskTestService.executeAllTests(files, task.getId(), language));
+
+        Optional<String> optionalTestFileBase64 = task.getTestByLanguage(language)
+                .map(CodeTest::getTestFileBase64);
+
+        if (optionalTestFileBase64.isPresent()) {
+            solution.setTestResults(taskTestService.executeAllTests(files, task.getId(), language));
+        }
+
        solutionRepository.save(solution);
     }
 

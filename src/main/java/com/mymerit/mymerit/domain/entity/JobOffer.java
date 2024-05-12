@@ -9,7 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
@@ -18,6 +20,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Document("job_offers")
+@ToString
 public class JobOffer {
     @Id
     private String id;

@@ -1,26 +1,11 @@
 package com.mymerit.mymerit.api.controller;
 
-import com.mymerit.mymerit.api.payload.response.RewardHistoryResponse;
-import com.mymerit.mymerit.domain.entity.Reward;
-import com.mymerit.mymerit.domain.entity.RewardHistory;
-import com.mymerit.mymerit.domain.entity.User;
-import com.mymerit.mymerit.domain.entity.JobOffer;
-import com.mymerit.mymerit.domain.entity.JobOfferHistory;
-import com.mymerit.mymerit.domain.entity.Socials;
-import com.mymerit.mymerit.domain.entity.Task;
-import com.mymerit.mymerit.domain.entity.TaskHistory;
+import com.mymerit.mymerit.api.payload.response.*;
+import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.service.MailSenderService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
-import com.mymerit.mymerit.infrastructure.repository.RewardHistoryRepository;
-import com.mymerit.mymerit.infrastructure.repository.RewardRepository;
-import com.mymerit.mymerit.infrastructure.repository.UserRepository;
-import com.mymerit.mymerit.infrastructure.repository.JobOfferHistoryRepository;
-import com.mymerit.mymerit.infrastructure.repository.SocialRepository;
-import com.mymerit.mymerit.infrastructure.repository.TaskHistoryRepository;
+import com.mymerit.mymerit.infrastructure.repository.*;
 import com.mymerit.mymerit.infrastructure.security.CurrentUser;
-import com.mymerit.mymerit.api.payload.response.ApiResponse;
-import com.mymerit.mymerit.api.payload.response.JobOfferHistoryResponse;
-import com.mymerit.mymerit.api.payload.response.TaskHistoryResponse;
 import com.mymerit.mymerit.api.payload.request.UpdateUserRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,14 +15,18 @@ import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SocialRepository socialRepository;
+    private final SolutionRepository solutionRepository;
+
     private final TaskHistoryRepository taskHistoryRepository;
     private final JobOfferHistoryRepository jobOfferHistoryRepository;
     private final RewardHistoryRepository rewardHistoryRepository;
@@ -46,7 +35,7 @@ public class UserController {
 
     public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialRepository socialRepository, 
     TaskHistoryRepository taskHistoryRepository, JobOfferHistoryRepository jobOfferHistoryRepository,
-    RewardHistoryRepository rewardHistoryRepository, RewardRepository rewardRepository, MailSenderService mailSenderService) {
+    RewardHistoryRepository rewardHistoryRepository, RewardRepository rewardRepository, MailSenderService mailSenderService, SolutionRepository solutionRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.socialRepository = socialRepository;
@@ -55,6 +44,7 @@ public class UserController {
         this.rewardHistoryRepository = rewardHistoryRepository;
         this.rewardRepository = rewardRepository;
         this.mailSenderService = mailSenderService;
+        this.solutionRepository = solutionRepository;
     }
 
     @GetMapping("/me")
@@ -179,6 +169,27 @@ public class UserController {
         }
 
         return ResponseEntity.ok(taskHistoryResponse);
+    }
+
+    @GetMapping("/me/solutions")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<SolutionListResponse>> getCurrentUserSolutionHistory(@CurrentUser UserDetailsImpl userDetailsImpl) {
+        User user = userRepository.findById(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " not found"));
+
+        List<SolutionListResponse> solutionResponses = solutionRepository.findAllByUserId(user.getId())
+                .stream()
+                .map(solution -> new SolutionListResponse(
+                        solution.getTask().getJob().getId(),
+                        solution.getTask().getTitle(),
+                        solution.getSubmitDate(),
+                        solution.getFeedback(),
+                        solution.getLanguage(),
+                        solution.getTask().getJob().getCompany().getImageBase64()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(solutionResponses);
     }
 
     @GetMapping("/company")
