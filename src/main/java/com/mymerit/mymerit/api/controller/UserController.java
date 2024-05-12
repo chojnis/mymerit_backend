@@ -2,6 +2,7 @@ package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.api.payload.response.*;
 import com.mymerit.mymerit.domain.entity.*;
+import com.mymerit.mymerit.domain.service.JobOfferService;
 import com.mymerit.mymerit.domain.service.MailSenderService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.*;
@@ -29,13 +30,17 @@ public class UserController {
 
     private final TaskHistoryRepository taskHistoryRepository;
     private final JobOfferHistoryRepository jobOfferHistoryRepository;
+    private final JobOfferRepository jobOfferRepository;
+    private final BookmarkRepository bookmarkRepository;
+
+
     private final RewardHistoryRepository rewardHistoryRepository;
     private final RewardRepository rewardRepository;
     private final MailSenderService mailSenderService;
 
     public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialRepository socialRepository, 
     TaskHistoryRepository taskHistoryRepository, JobOfferHistoryRepository jobOfferHistoryRepository,
-    RewardHistoryRepository rewardHistoryRepository, RewardRepository rewardRepository, MailSenderService mailSenderService, SolutionRepository solutionRepository) {
+    RewardHistoryRepository rewardHistoryRepository, RewardRepository rewardRepository, MailSenderService mailSenderService, SolutionRepository solutionRepository, JobOfferRepository jobOfferRepository, BookmarkRepository bookmarkRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.socialRepository = socialRepository;
@@ -45,6 +50,8 @@ public class UserController {
         this.rewardRepository = rewardRepository;
         this.mailSenderService = mailSenderService;
         this.solutionRepository = solutionRepository;
+        this.jobOfferRepository = jobOfferRepository;
+        this.bookmarkRepository = bookmarkRepository;
     }
 
     @GetMapping("/me")
@@ -185,11 +192,29 @@ public class UserController {
                         solution.getSubmitDate(),
                         solution.getFeedback(),
                         solution.getLanguage(),
-                        solution.getTask().getJob().getCompany().getImageBase64()
+                        jobOfferRepository.findById(solution.getTask().getJob().getId())
+                            .map(JobOffer::getCompany)
+                            .map(User::getImageBase64)
+                            .orElse("")
                 ))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(solutionResponses);
+    }
+
+    @GetMapping("/me/bookmarks")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<JobOfferListResponse>> getCurrentUserBookmarks(@CurrentUser UserDetailsImpl userDetailsImpl) {
+        User user = userRepository.findById(userDetailsImpl.getId())
+                .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " not found"));
+
+        List<JobOfferListResponse> bookmarkedJobOffers = bookmarkRepository.findByUserId(user.getId())
+                .stream()
+                .map(Bookmark::getJobOffer)
+                .map(JobOfferService::createJobOfferListResponse)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(bookmarkedJobOffers);
     }
 
     @GetMapping("/company")

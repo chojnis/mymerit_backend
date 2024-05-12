@@ -1,5 +1,6 @@
 package com.mymerit.mymerit.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import jakarta.validation.constraints.*;
@@ -22,6 +23,7 @@ public class Task {
     private String id;
 
     @DBRef
+    @JsonIgnoreProperties("task")
     private JobOffer job;
 
     @NotBlank(message = "Title is required")

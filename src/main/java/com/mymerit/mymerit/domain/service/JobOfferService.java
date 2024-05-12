@@ -145,7 +145,7 @@ public class JobOfferService {
         );
     }
 
-    private JobOfferListResponse createJobOfferListResponse(JobOffer jobOffer){
+    public static JobOfferListResponse createJobOfferListResponse(JobOffer jobOffer){
         return new JobOfferListResponse(
                 jobOffer.getId(),
                 jobOffer.getJobTitle(),
@@ -200,10 +200,10 @@ public class JobOfferService {
 
         if (languages.isEmpty()) {
             return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskClosesAtBetween(q, salaryRange, creditsRange, dateRange, pageRequest)
-                    .map(this::createJobOfferListResponse);
+                    .map(JobOfferService::createJobOfferListResponse);
         } else {
             return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndTaskAllowedLanguagesInIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskClosesAtBetween(q, languages, salaryRange, creditsRange, dateRange, pageRequest)
-                    .map(this::createJobOfferListResponse);
+                    .map(JobOfferService::createJobOfferListResponse);
         }
     }
 
