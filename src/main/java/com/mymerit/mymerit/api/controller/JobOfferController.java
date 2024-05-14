@@ -48,7 +48,6 @@ public class JobOfferController {
     ResponseEntity<ApiResponse> addJobOffer(@RequestBody @Valid JobOfferRequest jobOfferRequest, @CurrentUser UserDetailsImpl user) {
         try {
             JobOffer added = jobOfferService.addJobOffer(jobOfferRequest, user);
-
             return ResponseEntity.ok(new ApiResponse(true, "Job offer added successfully", added));
         }
         catch (Exception e) {

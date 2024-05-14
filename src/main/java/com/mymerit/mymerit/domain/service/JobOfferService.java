@@ -32,6 +32,7 @@ public class JobOfferService {
     SolutionRepository solutionRepository; //nah co tu sie dzieje xd troche duzo tego
     FeedbackRepository feedbackRepository;
     GridFileService gridFileService;
+    BookmarkRepository bookmarkRepository;
 
     JobOfferService(
             GridFileService gridFileService,
@@ -44,7 +45,8 @@ public class JobOfferService {
             SolutionRepository solutionRepository,
             TaskHistoryRepository taskHistoryRepository,
             JobOfferHistoryRepository jobOfferHistoryRepository,
-            FeedbackRepository feedbackRepository
+            FeedbackRepository feedbackRepository,
+            BookmarkRepository bookmarkRepository
     ) {
         this.taskTestService = taskTestService;
         this.gridFileService = gridFileService;
@@ -57,6 +59,7 @@ public class JobOfferService {
         this.taskHistoryRepository = taskHistoryRepository;
         this.jobOfferHistoryRepository = jobOfferHistoryRepository;
         this.feedbackRepository = feedbackRepository;
+        this.bookmarkRepository = bookmarkRepository;
     }
 
     public JobOffer addJobOffer(JobOfferRequest jobOfferRequest, UserDetailsImpl userDetails){
@@ -114,12 +117,12 @@ public class JobOfferService {
 
         Optional<Solution> userSolution = jobOffer.getTask().getSolutionForUser(user);
 
-        return createJobOfferDetailsResponse(jobOffer, userSolution.orElse(null), userSolution.map(Solution::getFeedback).orElse(null));
+        return createJobOfferDetailsResponse(jobOffer, userSolution.orElse(null), userSolution.map(Solution::getFeedback).orElse(null), bookmarkRepository.findByUserIdAndJobOfferId(userDetails.getId(),id).isPresent());
 
     }
 
 
-    private JobOfferDetailsResponse createJobOfferDetailsResponse(JobOffer jobOffer, Solution userSolution, Feedback companyFeedback) {
+    private JobOfferDetailsResponse createJobOfferDetailsResponse(JobOffer jobOffer, Solution userSolution, Feedback companyFeedback, Boolean isBookmarked) {
         return new JobOfferDetailsResponse(
                 jobOffer.getId(),
                 jobOffer.getJobTitle(),
@@ -135,7 +138,8 @@ public class JobOfferService {
                 jobOffer.getEmploymentType(),
                 jobOffer.getTask().getOpensAt(),
                 jobOffer.getTask().getClosesAt(),
-                jobOffer.getTask().getStatus()
+                jobOffer.getTask().getStatus(),
+                isBookmarked
         );
     }
 

@@ -20,7 +20,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Document("job_offers")
-@ToString
+
 public class JobOffer {
     @Id
     private String id;

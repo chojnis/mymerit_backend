@@ -67,4 +67,7 @@ public class JobOfferDetailsResponse {
 
     @NotNull
     private TaskStatus status;
+
+    @NotNull
+    private Boolean isBookmarked;
 }

@@ -47,6 +47,4 @@ public class JobOfferListResponse {
 
     @NotNull
     private TaskStatus status;
-
-
 }
