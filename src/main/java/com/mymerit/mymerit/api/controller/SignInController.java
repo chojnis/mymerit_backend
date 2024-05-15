@@ -4,6 +4,8 @@ import com.mymerit.mymerit.api.payload.request.SignInRequest;
 import com.mymerit.mymerit.api.payload.response.ApiResponse;
 import com.mymerit.mymerit.api.payload.response.JwtResponse;
 import com.mymerit.mymerit.infrastructure.utils.JwtUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "SignInController")
 public class SignInController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
@@ -26,6 +29,9 @@ public class SignInController {
         this.jwtUtils = jwtUtils;
     }
 
+    @Operation(
+            summary = "sign in account"
+    )
     @PostMapping("/sign-in")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody SignInRequest signInRequest) {
         Authentication authentication = authenticationManager.authenticate(

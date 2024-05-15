@@ -9,6 +9,8 @@ import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.service.JudgeService;
 import com.mymerit.mymerit.domain.service.TaskTestService;
 import com.mymerit.mymerit.infrastructure.utils.ZipUtility;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+@Tag(name = "JudgeController")
 @RestController
 public class JudgeController {
     JudgeService judgeService;
@@ -28,6 +31,10 @@ public class JudgeController {
     }
 
 
+    @Operation(
+
+            summary = "Creates a request to Judge0 and receives response with compilation details"
+    )
     @PostMapping("/compile-code")
     private ResponseEntity<JudgeCompilationResponse> compileCode(@RequestParam ProgrammingLanguage language, @RequestParam String mainFileName, @RequestBody List<MultipartFile>files,
                                                                   JudgeParams judgeParams) throws IOException {
@@ -36,12 +43,20 @@ public class JudgeController {
     }
 
 
+    @Operation(
+
+            summary = "Compiles the code with the test arguments provided by the company"
+    )
     @PostMapping("/test/task/{taskId}/language/{language}")
     private List<TestResponse> testAllCases(@RequestParam List<MultipartFile>files, @PathVariable String taskId, @PathVariable ProgrammingLanguage language) throws IOException {
         return taskTestService.executeAllTests(files, taskId,language);
 
     }
 
+    @Operation(
+
+            summary = "Compiles the code with singular test instance provided by the company"
+    )
     @PostMapping("/test/task/{taskId}/language/{language}/{testIndex}")
     private List<TestResponse> testSingleCase(@RequestParam List<MultipartFile>files, @PathVariable String taskId, @PathVariable ProgrammingLanguage language, @PathVariable Integer testIndex) throws IOException {
         return Collections.singletonList(taskTestService.executeSingleTest(taskId, language, files, testIndex));
@@ -49,16 +64,29 @@ public class JudgeController {
 
 
 
+
+    @Operation(
+
+            summary = "Creates a Judge0 token used for compilation"
+    )
     @PostMapping("/token")
     private String getToken(@RequestBody JudgeTokenRequest fileRequest){
         return judgeService.generateTokenRequest(fileRequest);
     }
 
+    @Operation(
+
+            summary = "Generates response from Judge0 from the token"
+    )
     @GetMapping("/token/{token}")
     private JudgeCompilationResponse requestHandler(@PathVariable String token){
         return judgeService.generateRequestResponse(token);
     }
 
+    @Operation(
+
+            summary = "Converts a zip file to Base64 so it can be used to create a token"
+    )
     @PostMapping("/generateZipBaseEncode/{language}")
     private ResponseEntity<?> generateEncoded(@RequestBody SolutionRequest solutionRequest, @PathVariable ProgrammingLanguage language) throws IOException, IOException {
         return ResponseEntity.ok(ZipUtility.zipSolutionFilesAsBase64(solutionRequest,language));

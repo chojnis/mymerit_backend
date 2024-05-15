@@ -5,19 +5,32 @@ import com.mymerit.mymerit.domain.entity.Bookmark;
 import com.mymerit.mymerit.domain.service.BookmarkService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.security.CurrentUser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+
+
 @RestController
 @RequestMapping("/bookmark")
+@Tag(name = "BookmarkController")
 public class BookmarkController {
+
+
     private final BookmarkService bookmarkService;
     BookmarkController(BookmarkService bookmarkService){
         this.bookmarkService = bookmarkService;
     }
 
+
+
+    @Operation(
+            description = "Adds job offer to users bookmarks"
+    )
     @PostMapping("/{jobId}")
     public ResponseEntity<ApiResponse> addToBookmarks(@PathVariable String jobId, @CurrentUser UserDetailsImpl userDetails){
         try{
@@ -28,6 +41,9 @@ public class BookmarkController {
         }
     }
 
+    @Operation(
+            description = "Removes job offer from users bookmarks"
+    )
     @DeleteMapping("/{jobId}")
     public ResponseEntity<ApiResponse> removeFromBookmarks(@PathVariable String jobId, @CurrentUser UserDetailsImpl userDetails){
         try{
@@ -38,6 +54,9 @@ public class BookmarkController {
         }
     }
 
+    @Operation(
+            description = "Lists users bookmarks"
+    )
     @GetMapping("")
     public List<Bookmark> getBookmarksForUser(@CurrentUser UserDetailsImpl userDetails){
         return bookmarkService.getBookmarksForUser(userDetails.getId());

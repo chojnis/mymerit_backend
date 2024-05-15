@@ -5,6 +5,8 @@ import com.mymerit.mymerit.api.payload.response.GridFileResponse;
 import com.mymerit.mymerit.domain.entity.GridFile;
 import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.service.GridFileService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -22,15 +24,25 @@ import java.util.List;
 
 @RestController 
 @RequestMapping("file/")
+@Tag(name = "GridFileController")
 public class GridFileController {
 
     @Autowired
     private GridFileService fileService;
 
+    @Operation(
+            summary = "upload file to mongodb gridfile")
+
+
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) throws IOException {
         return new ResponseEntity<>(fileService.addFile(file), HttpStatus.OK);
     }
+
+    @Operation(
+            summary = "download one file from mongodb gridfile"
+    )
+
 
     @GetMapping("/download/{id}")
     public ResponseEntity<GridFileResponse> download(@PathVariable String id) throws IOException {
@@ -43,11 +55,21 @@ public class GridFileController {
                 .body(response);
     }
 
+    @Operation
+            (summary = "download multiple files from mongodb gridfile"
+            )
+
+
     @PostMapping("/download/")
     public ResponseEntity<List<GridFileResponse>> download(@RequestBody FileListRequest request){
         return ResponseEntity.ok()
                 .body(fileService.downloadFiles(request.getFileIDS()));
     }
+
+    @Operation(
+            summary = "delete file from mongodb gridfile"
+    )
+
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable String id) throws IOException {

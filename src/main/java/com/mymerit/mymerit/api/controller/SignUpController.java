@@ -9,6 +9,8 @@ import com.mymerit.mymerit.domain.models.Role;
 import com.mymerit.mymerit.domain.service.VerificationCodeService;
 import com.mymerit.mymerit.infrastructure.repository.AuthenticationCodeRepository;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "SignUpController")
 public class SignUpController {
     private final UserRepository userRepository;
     private final AuthenticationCodeRepository authenticationCodeRepository;
@@ -34,6 +37,9 @@ public class SignUpController {
         this.verificationCodeService = verificationCodeService;
     }
 
+    @Operation(
+            summary = "Handles code verification"
+    )
     @PostMapping("/code")
     public ResponseEntity<?> emailVerification(@RequestParam(name="verify", required = false) String code, @Valid @RequestBody EmailVerification emailVerification) {
         if (userRepository.existsByEmail(emailVerification.getEmail())) {
@@ -52,6 +58,10 @@ public class SignUpController {
 
         return verificationCodeService.generateAndSendVerificationCode(emailVerification.getEmail());
     }
+
+    @Operation(
+            summary = "Signs up an user account"
+    )
 
     @PostMapping("/sign-up")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
@@ -104,6 +114,9 @@ public class SignUpController {
                 .body(new ApiResponse(true, "User registered successfully"));
     }
 
+    @Operation(
+            summary = "Signs up a company (Can only be accessed by administrators)"
+    )
     @PostMapping("/sign-up-company")
     public ResponseEntity<?> registerCompany(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
