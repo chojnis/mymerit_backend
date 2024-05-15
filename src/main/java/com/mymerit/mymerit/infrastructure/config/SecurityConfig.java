@@ -50,10 +50,11 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new RestAuthenticationEntryPoint()))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/", "/auth/sign-up", "/auth/sign-in", "/auth/code","/tasks","**")
-                            .permitAll()
+                        .requestMatchers("/", "/auth/sign-up", "/auth/sign-in", "/auth/code","/tasks","**"
+                                ,"/v2/api-docs")
+                        .permitAll()
                         .anyRequest()
-                            .authenticated())
+                        .authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authorization -> authorization
                                 .baseUri("/oauth2/authorize")

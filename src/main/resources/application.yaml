@@ -62,6 +62,6 @@ mymerit:
     jwtExpirationMs: "172800000"
 
 app:
-    oauth2:
-      authorizedRedirectUris:
-        - http://localhost:5173/oauth2/redirect
+  oauth2:
+    authorizedRedirectUris:
+      - http://localhost:5173/oauth2/redirect
