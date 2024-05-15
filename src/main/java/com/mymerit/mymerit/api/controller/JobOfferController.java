@@ -1,12 +1,10 @@
 package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.api.payload.request.JobOfferRequest;
-import com.mymerit.mymerit.api.payload.response.ApiResponse;
-import com.mymerit.mymerit.api.payload.response.GridFileResponse;
-import com.mymerit.mymerit.api.payload.response.JobOfferDetailsResponse;
-import com.mymerit.mymerit.api.payload.response.JobOfferListResponse;
+import com.mymerit.mymerit.api.payload.response.*;
 import com.mymerit.mymerit.domain.entity.Feedback;
 import com.mymerit.mymerit.domain.entity.JobOffer;
+import com.mymerit.mymerit.domain.entity.Solution;
 import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.service.JobOfferService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
@@ -96,9 +94,8 @@ public class JobOfferController {
 
 
     @GetMapping("/solution/{solutionId}")
-    public ResponseEntity<List<GridFileResponse>> downloadSolution(@PathVariable String solutionId) {
-        List<GridFileResponse> downloadedFiles = jobOfferService.downloadSolutionFiles(solutionId);
-        return ResponseEntity.ok(downloadedFiles);
+    public ResponseEntity<SolutionDetailsResponse> downloadSolution(@PathVariable String solutionId) {
+        return ResponseEntity.ok(jobOfferService.downloadSolutionFiles(solutionId));
     }
 
     @GetMapping("/solution/{solutionId}/feedback")

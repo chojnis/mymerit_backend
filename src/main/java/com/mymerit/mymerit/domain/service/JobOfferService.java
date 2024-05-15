@@ -279,7 +279,7 @@ public class JobOfferService {
             JobOffer jobOffer = jobOfferOptional.get();
             User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
             Optional<Solution> solution = jobOffer.getTask().getSolutionForUser(user);
-            solution.ifPresent(value -> downloadedFiles.addAll(downloadSolutionFiles(value.getId())));
+            solution.ifPresent(value -> downloadedFiles.addAll(downloadSolutionFiles(value.getId()).getFiles()));
         }
         return downloadedFiles;
     }
@@ -308,12 +308,13 @@ public class JobOfferService {
         }
     }
 
-    public List<GridFileResponse> downloadSolutionFiles(String solutionId) {
+    public SolutionDetailsResponse downloadSolutionFiles(String solutionId) {
         Solution solution = solutionRepository.findById(solutionId).
                 orElseThrow();
+        return  new SolutionDetailsResponse(solution.getUser(), solution.getLanguage(), solution.getTestResults(), gridFileService.downloadFiles(solution.getFiles()), solution.getFeedback() != null);
 
-        return gridFileService.downloadFiles(solution.getFiles());
     }
+
 
     private JobOffer getJobOfferOrThrow(String jobOfferId) {
         return jobOfferRepository.findById(jobOfferId)

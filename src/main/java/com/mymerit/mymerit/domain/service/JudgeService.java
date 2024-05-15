@@ -42,7 +42,7 @@ public class JudgeService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         String requestBody = toJsonString(judgeTokenRequest);
-
+        System.out.println(requestBody);
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
         ResponseEntity<JudgeTokenEntity> response = restTemplate.postForEntity(apiUrl, request, JudgeTokenEntity.class);
 
