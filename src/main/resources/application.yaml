@@ -3,8 +3,6 @@ server:
     8080
   tomcat:
     max-swallow-size : 500MB
-  servlet:
-    context-path: /api
 
 spring:
   data:
