@@ -11,6 +11,8 @@ import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.service.JobOfferService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.security.CurrentUser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -31,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Controller
+@Tag(name = "JobOfferController")
 public class JobOfferController {
     private final JobOfferService jobOfferService;
 
@@ -38,12 +41,20 @@ public class JobOfferController {
         this.jobOfferService = jobOfferService;
    }
 
+    @Operation(
+
+            summary = "Returns job offer based on it's id"
+    )
     @GetMapping("/job/{id}")
     ResponseEntity<JobOfferDetailsResponse> getJobOfferById(@PathVariable String id, @CurrentUser UserDetailsImpl user) {
         return ResponseEntity.ok(jobOfferService.getJobOfferDetailsResponse(id, user));
 
     }
 
+    @Operation(
+
+            summary = "Adds job offer (For company)"
+    )
     @PostMapping("/job")
     ResponseEntity<ApiResponse> addJobOffer(@RequestBody @Valid JobOfferRequest jobOfferRequest, @CurrentUser UserDetailsImpl user) {
         try {
@@ -55,6 +66,10 @@ public class JobOfferController {
         }
     }
 
+    @Operation(
+
+            summary = "Lists all available job offers"
+    )
     @GetMapping("/jobs")
     ResponseEntity<Page<JobOfferListResponse>> jobOffers(
             @RequestParam(defaultValue = "") Set<String> languages,
@@ -74,6 +89,10 @@ public class JobOfferController {
 
         return ResponseEntity.ok(jobOffersPage);
     }
+    @Operation(
+
+            summary = "Adds solution to job offer"
+    )
     @PostMapping("/job/{jobOfferId}/solution")
     ResponseEntity<JobOffer> addSolution(@PathVariable String jobOfferId, @RequestParam List<MultipartFile> files, @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam ProgrammingLanguage language) throws IOException {
         return Optional.ofNullable(jobOfferService.addSolution(jobOfferId, files, userDetails.getId(),language))
@@ -81,6 +100,10 @@ public class JobOfferController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + jobOfferId));
     }
 
+    @Operation(
+
+            summary = "Adds  feedback to specific solution (For company)"
+    )
     @PostMapping("/solution/{solutionId}")
     ResponseEntity<Feedback> addFeedback(@PathVariable String solutionId, @RequestParam List<MultipartFile> files, @RequestParam Integer reward, @RequestParam String comment, @CurrentUser UserDetailsImpl userDetails) {
         return Optional.ofNullable(jobOfferService.addFeedback(solutionId, files, reward, comment, userDetails.getId()))
@@ -88,6 +111,10 @@ public class JobOfferController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job offer not found for id: " + solutionId));
     }
 
+    @Operation(
+
+            summary = "Downloads solution files for specific job offer"
+    )
     @GetMapping("/job/{jobOfferId}/solution")
     public ResponseEntity<List<GridFileResponse>> downloadSolutionFilesForUserAndJobOffer(@PathVariable String jobOfferId, @CurrentUser UserDetailsImpl userDetails) {
         List<GridFileResponse> downloadedFiles = jobOfferService.downloadSolutionFilesForUser(jobOfferId, userDetails.getId());
@@ -95,12 +122,20 @@ public class JobOfferController {
     }
 
 
+    @Operation(
+
+            summary = "Downloads solution file based on it's id"
+    )
     @GetMapping("/solution/{solutionId}")
     public ResponseEntity<List<GridFileResponse>> downloadSolution(@PathVariable String solutionId) {
         List<GridFileResponse> downloadedFiles = jobOfferService.downloadSolutionFiles(solutionId);
         return ResponseEntity.ok(downloadedFiles);
     }
 
+    @Operation(
+
+            summary = "Downloads feedback for solution"
+    )
     @GetMapping("/solution/{solutionId}/feedback")
     public ResponseEntity<List<GridFileResponse>> downloadFeedback(@PathVariable String solutionId) {
         List<GridFileResponse> downloadedFiles = jobOfferService.downloadFeedbackForSolution(solutionId);
