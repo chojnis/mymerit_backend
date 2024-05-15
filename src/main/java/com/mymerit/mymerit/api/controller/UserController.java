@@ -8,6 +8,8 @@ import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.*;
 import com.mymerit.mymerit.infrastructure.security.CurrentUser;
 import com.mymerit.mymerit.api.payload.request.UpdateUserRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -55,9 +57,9 @@ public class UserController {
         this.bookmarkRepository = bookmarkRepository;
     }
 
-    @Operation(){
-        summary = "get current user"
-    }
+    @Operation(summary = "get current user")
+
+
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public User getCurrentUser(@CurrentUser UserDetailsImpl userDetailsImpl) {
@@ -65,9 +67,9 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("User " + userDetailsImpl.getId() + " not found"));
     }
 
-    @Operation(){
-        summary = "purchase a reward"
-    }
+    @Operation(summary = "purchase a reward")
+
+
     @PostMapping("/me/purchase/{idReward}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Reward> purchaseReward(@CurrentUser UserDetailsImpl userDetailsImpl, @PathVariable String idReward) {
@@ -98,9 +100,7 @@ public class UserController {
         return ResponseEntity.ok(reward.get());
     }
 
-    @Operation(){
-        summary = "get current user reward history"
-    }
+    @Operation( summary = "get current user reward history")
     @GetMapping("/me/rewards")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<RewardHistoryResponse>> getCurrentUserRewards(@CurrentUser UserDetailsImpl userDetailsImpl) {
@@ -119,18 +119,14 @@ public class UserController {
         return ResponseEntity.ok(rewardHistoryResponse);
     }
 
-    @Operation(){
-        summary = "get all users"
-    }
+    @Operation(summary = "Lists all users")
     @GetMapping("/users")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
-    @Operation(){
-        summary = "update user data"
-    }
+    @Operation(summary = "Updates user data")
     @PostMapping("/me/update")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> updateUserProfileInfo(@CurrentUser UserDetailsImpl userDetailsImpl, @Valid @RequestBody UpdateUserRequest updateUserRequest){
@@ -168,9 +164,7 @@ public class UserController {
         return ResponseEntity.badRequest().body(new ApiResponse(false, "failed to update account data"));
     }
 
-    @Operation(){
-        summary = "get user socials"
-    }
+    @Operation(  summary = "Lists user socials")
     @GetMapping("/me/socials")
     @PreAuthorize("hasRole('USER')")
     public Socials getUserSocials(@CurrentUser UserDetailsImpl userDetailsImpl){
@@ -179,9 +173,7 @@ public class UserController {
 
     }
 
-    @Operation(){
-        summary = "get user tasks"
-    }
+    @Operation(summary = "Lists users task history")
     @GetMapping("/me/mytasks")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<TaskHistoryResponse>> getCurrentUserTaskHistory(@CurrentUser UserDetailsImpl userDetailsImpl) {
@@ -200,9 +192,7 @@ public class UserController {
         return ResponseEntity.ok(taskHistoryResponse);
     }
 
-    @Operation(){
-        summary = "get user solutions"
-    }
+    @Operation( summary = "Lists users solutions")
     @GetMapping("/me/solutions")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<SolutionListResponse>> getCurrentUserSolutionHistory(@CurrentUser UserDetailsImpl userDetailsImpl) {
@@ -226,10 +216,7 @@ public class UserController {
 
         return ResponseEntity.ok(solutionResponses);
     }
-
-    @Operation(){
-        summary = "get user bookmarks"
-    }
+    @Operation( summary = "Lists users bookmarks")
     @GetMapping("/me/bookmarks")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<JobOfferListResponse>> getCurrentUserBookmarks(@CurrentUser UserDetailsImpl userDetailsImpl) {
@@ -245,9 +232,7 @@ public class UserController {
         return ResponseEntity.ok(bookmarkedJobOffers);
     }
 
-    @Operation(){
-        summary = "get company user"
-    }
+    @Operation( summary = "Gets company user")
     @GetMapping("/company")
     @PreAuthorize("hasRole('COMPANY')")
     public User getCurrentCompanyUser(@CurrentUser UserDetailsImpl userDetailsImpl) {
@@ -255,9 +240,7 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("Company user " + userDetailsImpl.getId() + " not found"));
     }
 
-    @Operation(){
-        summary = "update company user data"
-    }
+    @Operation( summary = "Updates users data")
     @PostMapping("/company/update")
     @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<?> updateCompanyUserProfileInfo(@CurrentUser UserDetailsImpl userDetailsImpl, @Valid @RequestBody UpdateUserRequest updateUserRequest){
@@ -295,9 +278,7 @@ public class UserController {
         return ResponseEntity.badRequest().body(new ApiResponse(false, "failed to update account data"));
     }
 
-    @Operation(){
-        summary = "get company user socials"
-    }
+    @Operation(  summary = "Lists company's socials")
     @GetMapping("/company/socials")
     @PreAuthorize("hasRole('COMPANY')")
     public Socials getCompanyUserSocials(@CurrentUser UserDetailsImpl userDetailsImpl){
@@ -305,10 +286,7 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("Company user " + userDetailsImpl.getId() + " social media not found"));
 
     }
-
-    @Operation(){
-        summary = "get company job offers"
-    }
+    @Operation( summary = "Lists company's job offer history")
     @GetMapping("/company/myjoboffers")
     @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<List<JobOfferHistoryResponse>> getCurrentCompanyUserJobOfferHistory(@CurrentUser UserDetailsImpl userDetailsImpl) {
