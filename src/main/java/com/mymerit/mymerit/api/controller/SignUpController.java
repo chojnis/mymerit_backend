@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "SignUpController")
 public class SignUpController {
     private final UserRepository userRepository;
     private final AuthenticationCodeRepository authenticationCodeRepository;
@@ -34,6 +35,9 @@ public class SignUpController {
         this.verificationCodeService = verificationCodeService;
     }
 
+    @Operation(){
+        summary = "handle code verifycation"
+    }
     @PostMapping("/code")
     public ResponseEntity<?> emailVerification(@RequestParam(name="verify", required = false) String code, @Valid @RequestBody EmailVerification emailVerification) {
         if (userRepository.existsByEmail(emailVerification.getEmail())) {
@@ -53,6 +57,9 @@ public class SignUpController {
         return verificationCodeService.generateAndSendVerificationCode(emailVerification.getEmail());
     }
 
+    @Operation(){
+        summary = "sign up account"
+    }
     @PostMapping("/sign-up")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
