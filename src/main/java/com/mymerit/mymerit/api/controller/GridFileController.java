@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController 
+@RestController
 @RequestMapping("file/")
 @Tag(name = "GridFileController")
 public class GridFileController {
