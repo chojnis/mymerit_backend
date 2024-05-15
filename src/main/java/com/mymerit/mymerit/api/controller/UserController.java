@@ -41,9 +41,9 @@ public class UserController {
     private final RewardRepository rewardRepository;
     private final MailSenderService mailSenderService;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialRepository socialRepository, 
-    TaskHistoryRepository taskHistoryRepository, JobOfferHistoryRepository jobOfferHistoryRepository,
-    RewardHistoryRepository rewardHistoryRepository, RewardRepository rewardRepository, MailSenderService mailSenderService, SolutionRepository solutionRepository, JobOfferRepository jobOfferRepository, BookmarkRepository bookmarkRepository) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialRepository socialRepository,
+                          TaskHistoryRepository taskHistoryRepository, JobOfferHistoryRepository jobOfferHistoryRepository,
+                          RewardHistoryRepository rewardHistoryRepository, RewardRepository rewardRepository, MailSenderService mailSenderService, SolutionRepository solutionRepository, JobOfferRepository jobOfferRepository, BookmarkRepository bookmarkRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.socialRepository = socialRepository;
@@ -139,27 +139,27 @@ public class UserController {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "user doesnt exist"));
         }
         boolean changed = false;
-        
+
         if( updateUserRequest.getImageBase64() != null ){
-                user.setImageBase64(updateUserRequest.getImageBase64());
-                changed = true;
+            user.setImageBase64(updateUserRequest.getImageBase64());
+            changed = true;
         }
         if( updateUserRequest.getDescription() != null ){
-                user.setDescription(updateUserRequest.getDescription());
-                changed = true;
+            user.setDescription(updateUserRequest.getDescription());
+            changed = true;
         }
         if( updateUserRequest.getPassword() != null ){
-                user.setPassword(updateUserRequest.getPassword());
-                user.setPassword(passwordEncoder.encode(user.getPassword()));
-                changed = true;
+            user.setPassword(updateUserRequest.getPassword());
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            changed = true;
         }
         if( updateUserRequest.getUsername() != null ){
-                user.setUsername(updateUserRequest.getUsername());
-                changed = true;
+            user.setUsername(updateUserRequest.getUsername());
+            changed = true;
         }
         if( changed == true ){
-                userRepository.save(user);
-                return ResponseEntity.ok( ).body(new ApiResponse(true, "account data updated"));
+            userRepository.save(user);
+            return ResponseEntity.ok( ).body(new ApiResponse(true, "account data updated"));
         }
         return ResponseEntity.badRequest().body(new ApiResponse(false, "failed to update account data"));
     }
@@ -208,9 +208,9 @@ public class UserController {
                         solution.getFeedback(),
                         solution.getLanguage(),
                         jobOfferRepository.findById(solution.getTask().getJob().getId())
-                            .map(JobOffer::getCompany)
-                            .map(User::getImageBase64)
-                            .orElse("")
+                                .map(JobOffer::getCompany)
+                                .map(User::getImageBase64)
+                                .orElse("")
                 ))
                 .collect(Collectors.toList());
 
@@ -253,27 +253,27 @@ public class UserController {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "company user doesnt exist"));
         }
         boolean changed = false;
-        
+
         if( updateUserRequest.getImageBase64() != null ){
-                user.setImageBase64(updateUserRequest.getImageBase64());
-                changed = true;
+            user.setImageBase64(updateUserRequest.getImageBase64());
+            changed = true;
         }
         if( updateUserRequest.getDescription() != null ){
-                user.setDescription(updateUserRequest.getDescription());
-                changed = true;
+            user.setDescription(updateUserRequest.getDescription());
+            changed = true;
         }
         if( updateUserRequest.getPassword() != null ){
-                user.setPassword(updateUserRequest.getPassword());
-                user.setPassword(passwordEncoder.encode(user.getPassword()));
-                changed = true;
+            user.setPassword(updateUserRequest.getPassword());
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            changed = true;
         }
         if( updateUserRequest.getUsername() != null ){
-                user.setUsername(updateUserRequest.getUsername());
-                changed = true;
+            user.setUsername(updateUserRequest.getUsername());
+            changed = true;
         }
         if( changed == true ){
-                userRepository.save(user);
-                return ResponseEntity.ok( ).body(new ApiResponse(true, "account data updated"));
+            userRepository.save(user);
+            return ResponseEntity.ok( ).body(new ApiResponse(true, "account data updated"));
         }
         return ResponseEntity.badRequest().body(new ApiResponse(false, "failed to update account data"));
     }
