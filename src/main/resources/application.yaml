@@ -3,8 +3,6 @@ server:
     8080
   tomcat:
     max-swallow-size : 500MB
-  servlet:
-    context-path: /api
 
 spring:
   data:
@@ -33,7 +31,6 @@ spring:
             scope:
               - email
               - profile
-
   mail:
     host: smtp.gmail.com
     port: 587
