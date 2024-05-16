@@ -215,12 +215,14 @@ public class JobOfferService {
     public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId,ProgrammingLanguage language) throws IOException {
         JobOffer jobOffer = getJobOfferOrThrow(jobOfferId);
         Task task = jobOffer.getTask();
-
+        User user = userRepository.findById(userId).get();
 
         if (userAlreadySubmittedSolution(task, userId)) {
             updateExistingSolution(task, files, userId, language);
         } else {
             createNewSolution(task, files, userId, language);
+            user.addBadgeOrIncrementExisting(language);
+            userRepository.save(user);
         }
 
         executeTests(userId,task,language,files);
