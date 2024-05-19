@@ -28,11 +28,17 @@ public class JudgeController {
     }
 
 
-    @PostMapping("/compile-code")
-    private ResponseEntity<JudgeCompilationResponse> compileCode(@RequestParam ProgrammingLanguage language, @RequestParam String mainFileName, @RequestBody List<MultipartFile>files,
-                                                                  JudgeParams judgeParams) throws IOException {
-        System.out.println(judgeParams);
-        return ResponseEntity.ok(judgeService.getResponseFromMultipartFiles(files,mainFileName,judgeParams,language));
+
+    @PostMapping("compile-code")
+    public ResponseEntity<JudgeCompilationResponse> compileCode(
+            @RequestParam ProgrammingLanguage language,
+            @RequestParam String mainFileName,
+            @RequestParam String stdin,
+            @RequestParam int memoryLimit,
+            @RequestParam float cpuTimeLimit,
+            @RequestPart List<MultipartFile> files) throws IOException {
+        System.out.println(stdin);
+        return ResponseEntity.ok(judgeService.getResponseFromMultipartFiles(files,mainFileName,new JudgeParams(stdin, memoryLimit, cpuTimeLimit),language));
     }
 
 
