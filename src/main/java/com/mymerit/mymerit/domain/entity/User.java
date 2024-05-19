@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -31,6 +32,8 @@ public class User {
     private String role;
     private List<Achievement> achievements = new ArrayList<>();
     private AchievementProgress achievementProgress = new AchievementProgress();
+    private Integer logInStreak = 0;
+    private Date lastLoginDate = new Date();
 
     public void checkSolutionAchievementStatus(){
         this.achievements = this.achievementProgress.updateUserSolutionAchievements();
@@ -39,6 +42,9 @@ public class User {
         this.achievements = this.achievementProgress.updateCreditAchievements(credits);
     }
 
+    public void setLastLoginDate(){
+        this.lastLoginDate = new Date();
+    }
 
 }
 
