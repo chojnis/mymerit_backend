@@ -18,5 +18,6 @@ public class SolutionListResponse {
     private Feedback feedback;
     private ProgrammingLanguage solutionLanguage;
     private String imageBase64;
+    private Boolean isRecentActivity;
 
 }

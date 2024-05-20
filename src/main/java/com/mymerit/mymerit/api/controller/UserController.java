@@ -10,13 +10,16 @@ import com.mymerit.mymerit.infrastructure.security.CurrentUser;
 import com.mymerit.mymerit.api.payload.request.UpdateUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.validation.Valid;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -202,19 +205,19 @@ public class UserController {
         List<SolutionListResponse> solutionResponses = solutionRepository.findAllByUserId(user.getId())
                 .stream()
                 .map(solution -> {
-                    Task task = solution.getTask();
-                    JobOffer job = (task != null) ? task.getJob() : null;
+                    boolean isFeedbackToday = solution.getFeedback() != null &&  solution.getFeedback().getSubmitDate().toLocalDate().isEqual(LocalDate.now());
 
                     return new SolutionListResponse(
-                            (job != null) ? job.getId() : null,
-                            (task != null) ? task.getTitle() : "Deleted Task",
+                            solution.getTask() != null ? solution.getTask().getJob().getId() : null,
+                            solution.getTask() != null ? solution.getTask().getTitle() : null,
                             solution.getSubmitDate(),
                             solution.getFeedback(),
                             solution.getLanguage(),
-                            (job != null) ? jobOfferRepository.findById(job.getId())
+                            solution.getTask() != null ? jobOfferRepository.findById(solution.getTask().getJob().getId())
                                     .map(JobOffer::getCompany)
                                     .map(User::getImageBase64)
-                                    .orElse("") : ""
+                                    .orElse("") : "",
+                            isFeedbackToday
                     );
                 })
                 .collect(Collectors.toList());
