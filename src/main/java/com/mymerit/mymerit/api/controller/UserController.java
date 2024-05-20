@@ -201,17 +201,22 @@ public class UserController {
 
         List<SolutionListResponse> solutionResponses = solutionRepository.findAllByUserId(user.getId())
                 .stream()
-                .map(solution -> new SolutionListResponse(
-                        solution.getTask().getJob().getId(),
-                        solution.getTask().getTitle(),
-                        solution.getSubmitDate(),
-                        solution.getFeedback(),
-                        solution.getLanguage(),
-                        jobOfferRepository.findById(solution.getTask().getJob().getId())
-                                .map(JobOffer::getCompany)
-                                .map(User::getImageBase64)
-                                .orElse("")
-                ))
+                .map(solution -> {
+                    Task task = solution.getTask();
+                    JobOffer job = (task != null) ? task.getJob() : null;
+
+                    return new SolutionListResponse(
+                            (job != null) ? job.getId() : null,
+                            (task != null) ? task.getTitle() : "Deleted Task",
+                            solution.getSubmitDate(),
+                            solution.getFeedback(),
+                            solution.getLanguage(),
+                            (job != null) ? jobOfferRepository.findById(job.getId())
+                                    .map(JobOffer::getCompany)
+                                    .map(User::getImageBase64)
+                                    .orElse("") : ""
+                    );
+                })
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(solutionResponses);
