@@ -273,8 +273,10 @@ public class JobOfferService {
         if(company.getCredits() < credits){
             throw new RuntimeException("Not enought credits");
         }
+        Integer averageRank = solution.getTask().calculateAverageRanking();
         Feedback feedback = new Feedback(solution, fileIDs, credits, comment);
         User user = solution.getUser();
+        user.calculateRanking(averageRank,credits);
         user.setCredits(user.getCredits() + credits);
         user.checkCreditsAchievementStatus(credits);
         feedbackRepository.save(feedback);

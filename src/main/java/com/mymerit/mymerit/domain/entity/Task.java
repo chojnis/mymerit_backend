@@ -120,4 +120,17 @@ public class Task {
         result.put(encodedInput, encodedOutput);
         return result;
     }
+
+    public Integer calculateAverageRanking(){
+        Integer ranking = 0;
+
+        for(Solution solution: solutions){
+            ranking +=solution.getUser().getUserRanking();
+        }
+
+        ranking = ranking/solutions.size();
+        return ranking;
+
+    }
+
 }
