@@ -115,7 +115,11 @@ public class JobOfferService {
             return createJobOfferDetailsSolutionsResponse(jobOffer);
         }
 
-        Optional<Solution> userSolution = jobOffer.getTask().getSolutionForUser(user);
+        System.out.println("1");
+        Task task = taskRepository.findById(jobOffer.getTask().getId()).orElseThrow(()->new RuntimeException("Task could not be found"));
+        System.out.println(task.getSolutions());
+        Optional<Solution> userSolution = task.getSolutionForUser(user.getId());
+        System.out.println(userSolution);
 
         return createJobOfferDetailsResponse(jobOffer, userSolution.orElse(null), userSolution.map(Solution::getFeedback).orElse(null), bookmarkRepository.findByUserIdAndJobOfferId(userDetails.getId(),id).isPresent());
 
@@ -219,22 +223,22 @@ public class JobOfferService {
             User user = userRepository.findById(userId).get();
 
 
-        if (userAlreadySubmittedSolution(task, userId)) {
-            updateExistingSolution(task, files, userId, language);
-        } else {
-            createNewSolution(task, files, userId, language);
-            user.addBadgeOrIncrementExisting(language);
+            if (userAlreadySubmittedSolution(task, userId)) {
+                updateExistingSolution(task, files, userId, language);
+            } else {
+                createNewSolution(task, files, userId, language);
+                user.addBadgeOrIncrementExisting(language);
+                userRepository.save(user);
+            }
+
+            executeTests(userId,task,language,files);
+
             userRepository.save(user);
-        }
 
-        executeTests(userId,task,language,files);
-
-        userRepository.save(user);
-
-        System.out.println(user.getAchievementProgress());
+            System.out.println(user.getAchievementProgress());
 
 
-        return jobOfferRepository.save(jobOffer);
+            return jobOfferRepository.save(jobOffer);
         }
 
     else throw new RuntimeException("No user found");
@@ -295,7 +299,7 @@ public class JobOfferService {
         if (jobOfferOptional.isPresent()) {
             JobOffer jobOffer = jobOfferOptional.get();
             User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-            Optional<Solution> solution = jobOffer.getTask().getSolutionForUser(user);
+            Optional<Solution> solution = jobOffer.getTask().getSolutionForUser(user.getId());
             solution.ifPresent(value -> downloadedFiles.addAll(downloadSolutionFiles(value.getId()).getFiles()));
         }
         return downloadedFiles;
@@ -304,7 +308,7 @@ public class JobOfferService {
     public List<GridFileResponse> downloadFeedbackFilesForUser(String jobId, String userId){
         JobOffer jobOffer = jobOfferRepository.findById(jobId).orElseThrow();
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-        Optional<Feedback> feedback = jobOffer.getTask().getSolutionForUser(user).map(Solution::getFeedback);
+        Optional<Feedback> feedback = jobOffer.getTask().getSolutionForUser(user.getId()).map(Solution::getFeedback);
         if(feedback.isPresent()){
             return gridFileService.downloadFiles(feedback.get().getFiles());
         }else{

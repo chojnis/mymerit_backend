@@ -105,8 +105,8 @@ public class Task {
         }
     }
 
-    public Optional<Solution> getSolutionForUser(User user){
-        return this.solutions.stream().filter(solution -> solution.getUser().equals(user))
+    public Optional<Solution> getSolutionForUser(String userId){
+        return this.solutions.stream().filter(solution -> solution.getUser().getId().equals(userId))
                 .findFirst();
 
     }
