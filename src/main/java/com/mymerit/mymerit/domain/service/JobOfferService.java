@@ -115,9 +115,7 @@ public class JobOfferService {
             return createJobOfferDetailsSolutionsResponse(jobOffer);
         }
 
-        System.out.println("1");
         Task task = taskRepository.findById(jobOffer.getTask().getId()).orElseThrow(()->new RuntimeException("Task could not be found"));
-        System.out.println(task.getSolutions());
         Optional<Solution> userSolution = task.getSolutionForUser(user.getId());
         System.out.println(userSolution);
 

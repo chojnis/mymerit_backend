@@ -20,10 +20,7 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -204,6 +201,7 @@ public class UserController {
 
         List<SolutionListResponse> solutionResponses = solutionRepository.findAllByUserId(user.getId())
                 .stream()
+                .sorted(Comparator.comparing(Solution::getSubmitDate).reversed())
                 .map(solution -> {
                     boolean isFeedbackToday = solution.getFeedback() != null &&  solution.getFeedback().getSubmitDate().toLocalDate().isEqual(LocalDate.now());
 

@@ -8,6 +8,7 @@ import com.mymerit.mymerit.domain.entity.Task;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,7 @@ public class JobOfferDetailsSolutionsResponse extends JobOfferDetailsResponse{
         super.setClosesAt(jobOffer.getTask().getClosesAt());
         super.setStatus(jobOffer.getTask().getStatus());
 
-        this.solutions = jobOffer.getTask().getSolutions();
+        this.solutions = jobOffer.getTask().getSolutions().stream().sorted(Comparator.comparing(Solution::getSubmitDate).reversed()).toList();
     }
 
     public  UserTaskDetailsResponse createTaskResponse(Task task){
