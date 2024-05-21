@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RankingService {
@@ -30,11 +31,9 @@ public class RankingService {
             response.add(rankingResponse);
         }
 
-
         response.sort(Comparator.comparingInt(RankingResponse::getRanking).reversed());
 
-
-        return response;
+        return  response.stream().limit(50).collect(Collectors.toList());
     }
     public List<RankingResponse> getAllTimeRanking(){
 
@@ -52,7 +51,7 @@ public class RankingService {
         response.sort(Comparator.comparingInt(RankingResponse::getRanking).reversed());
 
 
-        return response;
+        return  response.stream().limit(50).collect(Collectors.toList());
 
     }
 }
