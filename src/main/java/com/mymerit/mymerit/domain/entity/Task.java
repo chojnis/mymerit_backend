@@ -125,7 +125,7 @@ public class Task {
         Integer ranking = 0;
 
         for(Solution solution: solutions){
-            ranking +=solution.getUser().getRanking().getRanking();
+            ranking +=solution.getUser().getRanking().getAllTimeRanking();
         }
 
         ranking = ranking/solutions.size();

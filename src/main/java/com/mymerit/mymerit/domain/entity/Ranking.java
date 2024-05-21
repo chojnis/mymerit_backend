@@ -6,6 +6,10 @@ import com.mymerit.mymerit.domain.models.RankingPair;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,46 +19,41 @@ import java.util.List;
 @NoArgsConstructor
 public class Ranking {
 
- public List<RankingPair> rankingHistory = new ArrayList<>();
+     public List<RankingPair> rankingHistory = new ArrayList<>();
 
- public void addRanking(Integer points ){
-     rankingHistory.add(new RankingPair(points));
- }
+     public void addRanking(Integer points ){
+         rankingHistory.add(new RankingPair(points));
+     }
 
     public Integer getWeeklyRanking() {
-        Integer sum = 0;
+        LocalDate today = LocalDate.now();
+        LocalDate lastSunday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
 
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-
-
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-
-        int daysToLastSunday = (dayOfWeek == Calendar.SUNDAY) ? 0 : dayOfWeek;
-
-        calendar.add(Calendar.DAY_OF_YEAR, -daysToLastSunday);
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MILLISECOND, 999);
-
-
-        Date lastSunday = calendar.getTime();
-
-
-        for (RankingPair pair : rankingHistory) {
-
-            if (pair.getDate().after(lastSunday)) {
-                sum += pair.getPoints();
-                System.out.println(pair.getPoints());
-            }
-        }
-        return sum;
+        return calculateRanking(lastSunday);
     }
 
- public Integer getRanking(){
+    public Integer getMonthlyRanking() {
+        LocalDate today = LocalDate.now();
+        LocalDate firstDayOfMonth = today.withDayOfMonth(1);
+
+        return calculateRanking(firstDayOfMonth);
+    }
+
+    public Integer getYearlyRanking() {
+        LocalDate today = LocalDate.now();
+        LocalDate firstDayOfYear = today.withDayOfYear(1);
+
+        return calculateRanking(firstDayOfYear);
+    }
+
+    private Integer calculateRanking(LocalDate startDate) {
+        return rankingHistory.stream()
+                .filter(pair -> pair.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(startDate))
+                .mapToInt(RankingPair::getPoints)
+                .sum();
+    }
+
+ public Integer getAllTimeRanking(){
      Integer rankingSum = 0;
      for(RankingPair pair : rankingHistory){
          rankingSum += pair.getPoints();

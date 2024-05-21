@@ -25,6 +25,16 @@ public class RankingController {
         return ResponseEntity.ok(rankingService.getWeeklyRanking());
     }
 
+    @GetMapping("/yearly")
+    public ResponseEntity<List<RankingResponse>> getYearalyRanking(){
+        return ResponseEntity.ok(rankingService.getYearlyRanking());
+    }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<List<RankingResponse>> getMonthlyRanking(){
+        return ResponseEntity.ok(rankingService.getMonthlyRanking());
+    }
+
     @GetMapping("/allTime")
     public ResponseEntity<List<RankingResponse>> getAllTimeRanking(){
         return ResponseEntity.ok(rankingService.getAllTimeRanking());

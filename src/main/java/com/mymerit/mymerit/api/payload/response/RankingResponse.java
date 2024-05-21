@@ -5,10 +5,25 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 public class RankingResponse {
-    private User user;
-    private Integer ranking;
+    private String id;
+    private int rank;
+    private int meritPoints;
+    private String username;
+    private String profileImageBase64;
+    private List<String> languages;
+    public RankingResponse(User user, int meritPoints, int rank) {
+        this.id = user.getId();
+        this.rank = rank;
+        this.meritPoints = meritPoints;
+        this.username = user.getUsername();
+        this.profileImageBase64 = user.getImageBase64();
+        this.languages = new ArrayList<>();
+    }
 }

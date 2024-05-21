@@ -49,11 +49,11 @@ public class User {
 
 
     public void calculateRanking(Integer averageRanking, Integer credits) {
-        int difference = Math.abs(ranking.getRanking() - averageRanking) + credits / 10;
+        int difference = Math.abs(ranking.getAllTimeRanking() - averageRanking) + credits / 10;
 
-        if (ranking.getRanking() < averageRanking) {
+        if (ranking.getAllTimeRanking() < averageRanking) {
             getRanking().addRanking((100+difference)/5);
-        } else if (ranking.getRanking() > averageRanking) {
+        } else if (ranking.getAllTimeRanking() > averageRanking) {
             getRanking().addRanking((100 - difference) / 5);
         } else {
             getRanking().addRanking(20);
