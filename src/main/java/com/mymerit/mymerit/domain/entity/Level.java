@@ -1,5 +1,8 @@
 package com.mymerit.mymerit.domain.entity;
 
+import lombok.Data;
+
+@Data
 public class Level {
     private Integer level;
     private Integer modifier ;
