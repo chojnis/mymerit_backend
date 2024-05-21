@@ -215,18 +215,30 @@ public class JobOfferService {
     public JobOffer addSolution(String jobOfferId, List<MultipartFile> files, String userId,ProgrammingLanguage language) throws IOException {
         JobOffer jobOffer = getJobOfferOrThrow(jobOfferId);
         Task task = jobOffer.getTask();
+        if(userRepository.findById(userId).isPresent()) {
+            User user = userRepository.findById(userId).get();
 
 
         if (userAlreadySubmittedSolution(task, userId)) {
             updateExistingSolution(task, files, userId, language);
         } else {
             createNewSolution(task, files, userId, language);
+            user.addBadgeOrIncrementExisting(language);
+            userRepository.save(user);
         }
 
         executeTests(userId,task,language,files);
 
+        userRepository.save(user);
+
+        System.out.println(user.getAchievementProgress());
+
+
         return jobOfferRepository.save(jobOffer);
-    }
+        }
+
+    else throw new RuntimeException("No user found");
+}
 
     public void executeTests(String userId, Task task, ProgrammingLanguage language, List<MultipartFile> files) throws IOException {
        Solution solution =  task.findSolutionByUserId(userId);
@@ -262,13 +274,18 @@ public class JobOfferService {
         if(company.getCredits() < credits){
             throw new RuntimeException("Not enought credits");
         }
+        Integer averageRank = solution.getTask().calculateAverageRanking();
         Feedback feedback = new Feedback(solution, fileIDs, credits, comment);
-        User user = solution.getUser();
+        User user = userRepository.findById(solution.getUser().getId()).get();
+        user.calculateRanking(averageRank,credits);
         user.setCredits(user.getCredits() + credits);
+        user.checkCreditsAchievementStatus(credits);
+        company.setCredits(company.getCredits() - credits);
         feedbackRepository.save(feedback);
         solution.setFeedback(feedback);
         solutionRepository.save(solution);
         userRepository.save(user);
+        userRepository.save(company);
         return feedback;
     };
 

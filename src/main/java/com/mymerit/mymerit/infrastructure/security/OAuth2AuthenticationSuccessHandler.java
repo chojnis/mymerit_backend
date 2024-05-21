@@ -1,7 +1,9 @@
 package com.mymerit.mymerit.infrastructure.security;
 
+import com.mymerit.mymerit.domain.entity.User;
 import com.mymerit.mymerit.infrastructure.config.AppConfig;
 import com.mymerit.mymerit.infrastructure.repository.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import com.mymerit.mymerit.infrastructure.utils.CookieUtils;
 import com.mymerit.mymerit.infrastructure.utils.JwtUtils;
 import jakarta.servlet.http.Cookie;
@@ -9,7 +11,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -22,6 +26,11 @@ import static com.mymerit.mymerit.infrastructure.repository.HttpCookieOAuth2Auth
 
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+    @Autowired
+    private UserRepository userRepository;
+
+
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final JwtUtils jwtUtils;
     private final AppConfig appConfig;
@@ -39,12 +48,19 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         if (response.isCommitted()) {
             logger.debug("Response has already been committed. Unable to redirect to " + targetUrl);
-
             return;
         }
 
-        clearAuthenticationAttributes(request, response);
+        String userEmail = ((UserDetails) authentication.getPrincipal()).getUsername();
+        Optional<User> userOptional = userRepository.findByEmail(userEmail);
 
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setLastLoginDate();
+            userRepository.save(user);
+        }
+
+        clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
