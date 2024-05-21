@@ -24,6 +24,7 @@ public class RankingService {
     public List<RankingResponse> getWeeklyRanking() {
         AtomicInteger rank = new AtomicInteger(1);
         return userRepository.findAll().stream()
+                .filter(user -> user.getRole().equals("user"))
                 .sorted(Comparator.<User, Integer>comparing(
                         user -> user.getRanking().getWeeklyRanking()).reversed())
                 .map(user -> new RankingResponse(
@@ -38,6 +39,7 @@ public class RankingService {
     public List<RankingResponse> getMonthlyRanking() {
         AtomicInteger rank = new AtomicInteger(1);
         return userRepository.findAll().stream()
+                .filter(user -> user.getRole().equals("user"))
                 .sorted(Comparator.<User, Integer>comparing(
                         user -> user.getRanking().getMonthlyRanking()).reversed())
                 .map(user -> new RankingResponse(
@@ -51,6 +53,7 @@ public class RankingService {
     public List<RankingResponse> getYearlyRanking() {
         AtomicInteger rank = new AtomicInteger(1);
         return userRepository.findAll().stream()
+                .filter(user -> user.getRole().equals("user"))
                 .sorted(Comparator.<User, Integer>comparing(
                         user -> user.getRanking().getYearlyRanking()).reversed())
                 .map(user -> new RankingResponse(
