@@ -34,7 +34,7 @@ public class User {
     private AchievementProgress achievementProgress = new AchievementProgress();
     private Integer logInStreak = 0;
     private Date lastLoginDate = new Date();
-    private Integer userRanking = 0;
+    private Ranking ranking = new Ranking();
 
     public void checkSolutionAchievementStatus(){
         this.achievements = this.achievementProgress.updateUserSolutionAchievements();
@@ -47,18 +47,17 @@ public class User {
         this.lastLoginDate = new Date();
     }
 
-    public void calculateRanking(Integer averageRanking,Integer credits){
 
-        int difference = Math.abs(userRanking - averageRanking) + credits/10;
+    public void calculateRanking(Integer averageRanking, Integer credits) {
+        int difference = Math.abs(ranking.getRanking() - averageRanking) + credits / 10;
 
-        if (userRanking < averageRanking) {
-            userRanking += (100 + difference)/5;
-        } else if (userRanking > averageRanking) {
-            userRanking += (100 - difference)/5;
+        if (ranking.getRanking() < averageRanking) {
+            getRanking().addRanking((100+difference)/5);
+        } else if (ranking.getRanking() > averageRanking) {
+            getRanking().addRanking((100 - difference) / 5);
         } else {
-            userRanking += 10;
+            getRanking().addRanking(20);
         }
-
     }
 
 }

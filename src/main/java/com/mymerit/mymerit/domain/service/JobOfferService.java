@@ -275,14 +275,16 @@ public class JobOfferService {
         }
         Integer averageRank = solution.getTask().calculateAverageRanking();
         Feedback feedback = new Feedback(solution, fileIDs, credits, comment);
-        User user = solution.getUser();
+        User user = userRepository.findById(solution.getUser().getId()).get();
         user.calculateRanking(averageRank,credits);
         user.setCredits(user.getCredits() + credits);
         user.checkCreditsAchievementStatus(credits);
+        company.setCredits(company.getCredits() - credits);
         feedbackRepository.save(feedback);
         solution.setFeedback(feedback);
         solutionRepository.save(solution);
         userRepository.save(user);
+        userRepository.save(company);
         return feedback;
     };
 
