@@ -223,7 +223,8 @@ public class JobOfferService {
             updateExistingSolution(task, files, userId, language);
         } else {
             createNewSolution(task, files, userId, language);
-            user.checkSolutionAchievementStatus();
+            user.addBadgeOrIncrementExisting(language);
+            userRepository.save(user);
         }
 
         executeTests(userId,task,language,files);

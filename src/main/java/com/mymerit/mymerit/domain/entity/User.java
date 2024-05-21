@@ -3,6 +3,7 @@ package com.mymerit.mymerit.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mymerit.mymerit.domain.models.AuthProvider;
 import lombok.AllArgsConstructor;
+import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -59,7 +60,23 @@ public class User {
             getRanking().addRanking(20);
         }
     }
+    private List<Badge> badges = new ArrayList<>();
 
+    public void addBadgeOrIncrementExisting(ProgrammingLanguage language) {
+        boolean badgeExists = false;
+
+        for (Badge x : badges) {
+            if (x.getLanguage() == language) {
+                x.incrementTasksCounter();
+                badgeExists = true;
+                break;
+            }
+        }
+        if (!badgeExists) {
+            Badge badge = new Badge(language);
+            badge.incrementTasksCounter();
+            badges.add(badge);
+
+        }
+    }
 }
-
-
