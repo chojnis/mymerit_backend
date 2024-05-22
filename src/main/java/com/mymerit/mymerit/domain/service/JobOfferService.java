@@ -162,7 +162,8 @@ public class JobOfferService {
                 jobOffer.getTask().getClosesAt(),
                 jobOffer.getCompany(),
                 jobOffer.getSalary(),
-                jobOffer.getTask().getStatus()
+                jobOffer.getTask().getStatus(),
+                jobOffer.getExperience()
         );
     }
 

@@ -2,6 +2,7 @@ package com.mymerit.mymerit.api.payload.response;
 
 import com.mymerit.mymerit.domain.entity.Task;
 import com.mymerit.mymerit.domain.entity.User;
+import com.mymerit.mymerit.domain.models.Experience1;
 import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import jakarta.validation.Valid;
@@ -47,4 +48,7 @@ public class JobOfferListResponse {
 
     @NotNull
     private TaskStatus status;
+
+    @NotNull
+    private Experience1 experience;
 }
