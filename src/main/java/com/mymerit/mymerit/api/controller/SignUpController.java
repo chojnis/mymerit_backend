@@ -102,6 +102,14 @@ public class SignUpController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setProvider(AuthProvider.local);
         user.setRole(Role.user.name());
+        //
+        user.setSocialLink1("");
+        user.setSocialLink2("");
+        user.setSocialLink3("");
+        user.setSocialName1("");
+        user.setSocialName2("");
+        user.setSocialName3("");
+        //
 
         User result = userRepository.insert(user);
 
