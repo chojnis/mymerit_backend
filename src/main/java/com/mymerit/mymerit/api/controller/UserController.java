@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class UserController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final SocialRepository socialRepository;
     private final SolutionRepository solutionRepository;
 
     private final TaskHistoryRepository taskHistoryRepository;
@@ -41,12 +40,11 @@ public class UserController {
     private final RewardRepository rewardRepository;
     private final MailSenderService mailSenderService;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialRepository socialRepository,
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, 
                           TaskHistoryRepository taskHistoryRepository, JobOfferHistoryRepository jobOfferHistoryRepository,
                           RewardHistoryRepository rewardHistoryRepository, RewardRepository rewardRepository, MailSenderService mailSenderService, SolutionRepository solutionRepository, JobOfferRepository jobOfferRepository, BookmarkRepository bookmarkRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.socialRepository = socialRepository;
         this.taskHistoryRepository = taskHistoryRepository;
         this.jobOfferHistoryRepository = jobOfferHistoryRepository;
         this.rewardHistoryRepository = rewardHistoryRepository;
