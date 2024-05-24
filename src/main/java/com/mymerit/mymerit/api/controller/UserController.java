@@ -294,6 +294,32 @@ public class UserController {
             user.setUsername(updateUserRequest.getUsername());
             changed = true;
         }
+        //
+        if( updateUserRequest.getSocialLink1() != null ){
+            user.setSocialLink1(updateUserRequest.getSocialLink1());
+            changed = true;
+        }
+        if( updateUserRequest.getSocialName1() != null ){
+            user.setSocialName1(updateUserRequest.getSocialName1());
+            changed = true;
+        }
+        if( updateUserRequest.getSocialLink2() != null ){
+            user.setSocialLink2(updateUserRequest.getSocialLink2());
+            changed = true;
+        }
+        if( updateUserRequest.getSocialName2() != null ){
+            user.setSocialName2(updateUserRequest.getSocialName2());
+            changed = true;
+        }
+        if( updateUserRequest.getSocialLink3() != null ){
+            user.setSocialLink3(updateUserRequest.getSocialLink3());
+            changed = true;
+        }
+        if( updateUserRequest.getSocialName3() != null ){
+            user.setSocialName3(updateUserRequest.getSocialName3());
+            changed = true;
+        }
+        //
         if( changed == true ){
             userRepository.save(user);
             return ResponseEntity.ok( ).body(new ApiResponse(true, "account data updated"));
