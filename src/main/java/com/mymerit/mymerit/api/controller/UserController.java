@@ -11,6 +11,7 @@ import com.mymerit.mymerit.api.payload.request.UpdateUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -57,9 +58,29 @@ public class UserController {
         this.bookmarkRepository = bookmarkRepository;
     }
 
+
+    @Operation(summary = "Find user by their ID")
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getUserById(@PathVariable String userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (!userOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        User user = userOptional.get();
+
+        Optional<Socials> socialsOptional = socialRepository.findByUserId(userId);
+        Socials socials;
+
+        socials = socialsOptional.orElseGet(Socials::new);
+
+        UserResponse userResponse = new UserResponse(user, socials);
+
+        return ResponseEntity.ok(userResponse);
+    }
+
+
     @Operation(summary = "get current user")
-
-
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public User getCurrentUser(@CurrentUser UserDetailsImpl userDetailsImpl) {
