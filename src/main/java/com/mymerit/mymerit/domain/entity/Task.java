@@ -11,6 +11,8 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.util.Pair;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -44,7 +46,8 @@ public class Task {
     @NotEmpty(message = "Allowed languages are required")
     private Set<ProgrammingLanguage> allowedLanguages;
 
-    private Map<ProgrammingLanguage, List<String>> templateFiles;// [language : {fileId1, fileId2},.. ]
+    // [language : [{name: "main.java" , contentBase64: "dsfsdfsdf"}, {}], language2... ]
+    private Map<ProgrammingLanguage, List<TemplateFile>> templateFiles;
 
     private Integer memoryLimit;
 
