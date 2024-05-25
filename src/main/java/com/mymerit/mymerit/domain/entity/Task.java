@@ -50,22 +50,12 @@ public class Task {
 
     private Float timeLimit;
 
-    public List<CodeTest> tests;
+
+    public List<CodeTest> tests = new ArrayList<>();
 
     @DBRef
     private List<Solution> solutions = new ArrayList<>();
 
-    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<ProgrammingLanguage> allowedLanguages, String testSolution,
-                String input, String output) {
-        this.title = title;
-        this.instructions = instructions;
-        this.opensAt = opensAt;
-        this.closesAt = closesAt;
-        this.reward = reward;
-        this.allowedLanguages = allowedLanguages;
-
-
-    }
 
     public Solution findSolutionByUserId(String userId){
         for(Solution solution : solutions) {
