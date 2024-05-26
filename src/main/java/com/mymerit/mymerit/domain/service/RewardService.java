@@ -74,9 +74,11 @@ public class RewardService {
         StringBuilder keyBuilder = new StringBuilder();
         Random random = new Random();
 
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                keyBuilder.append((char) ('A' + random.nextInt(26)));
+                keyBuilder.append(characters.charAt(random.nextInt(characters.length())));
             }
 
             if (i < 3) {
