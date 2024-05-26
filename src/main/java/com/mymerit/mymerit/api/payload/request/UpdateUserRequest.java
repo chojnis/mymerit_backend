@@ -11,4 +11,11 @@ public class UpdateUserRequest {
     private String description;
     private String password;
     private String username;
+    //
+    private String socialName1;
+    private String socialLink1;
+    private String socialName2;
+    private String socialLink2;
+    private String socialName3;
+    private String socialLink3;
 }

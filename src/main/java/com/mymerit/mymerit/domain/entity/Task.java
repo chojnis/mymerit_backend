@@ -11,6 +11,8 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.util.Pair;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -44,28 +46,19 @@ public class Task {
     @NotEmpty(message = "Allowed languages are required")
     private Set<ProgrammingLanguage> allowedLanguages;
 
-    private Map<ProgrammingLanguage, List<String>> templateFiles;// [language : {fileId1, fileId2},.. ]
+    // [language : [{name: "main.java" , contentBase64: "dsfsdfsdf"}, {}], language2... ]
+    private Map<ProgrammingLanguage, List<TemplateFile>> templateFiles;
 
     private Integer memoryLimit;
 
     private Float timeLimit;
 
-    public List<CodeTest> tests;
+
+    public List<CodeTest> tests = new ArrayList<>();
 
     @DBRef
     private List<Solution> solutions = new ArrayList<>();
 
-    public Task(String title, String instructions, LocalDateTime opensAt, LocalDateTime closesAt, Integer reward, Set<ProgrammingLanguage> allowedLanguages, String testSolution,
-                String input, String output) {
-        this.title = title;
-        this.instructions = instructions;
-        this.opensAt = opensAt;
-        this.closesAt = closesAt;
-        this.reward = reward;
-        this.allowedLanguages = allowedLanguages;
-
-
-    }
 
     public Solution findSolutionByUserId(String userId){
         for(Solution solution : solutions) {

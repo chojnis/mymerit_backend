@@ -31,6 +31,14 @@ public class User {
     private Integer credits = 0;
     private String description;
     private String role;
+    //
+    private String socialName1;
+    private String socialLink1;
+    private String socialName2;
+    private String socialLink2;
+    private String socialName3;
+    private String socialLink3;
+    //
     private List<Achievement> achievements = new ArrayList<>();
     private AchievementProgress achievementProgress = new AchievementProgress();
     private Integer logInStreak = 0;

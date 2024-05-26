@@ -95,7 +95,7 @@ public class JobOfferService {
         taskRepository.save(createdTask);
         JobOfferHistory jobOfferHistory = new JobOfferHistory(createdJobOffer, jobOffer.getCompany().getId(), LocalDateTime.now());
         jobOfferHistoryRepository.save(jobOfferHistory);
-
+        userRepository.save(user);
         return createdJobOffer;
     }
 
@@ -162,7 +162,8 @@ public class JobOfferService {
                 jobOffer.getTask().getClosesAt(),
                 jobOffer.getCompany(),
                 jobOffer.getSalary(),
-                jobOffer.getTask().getStatus()
+                jobOffer.getTask().getStatus(),
+                jobOffer.getExperience()
         );
     }
 
