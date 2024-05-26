@@ -67,12 +67,9 @@ public class UserController {
 
         User user = userOptional.get();
 
-        Optional<Socials> socialsOptional = socialRepository.findByUserId(userId);
-        Socials socials;
 
-        socials = socialsOptional.orElseGet(Socials::new);
 
-        UserResponse userResponse = new UserResponse(user, socials);
+        UserResponse userResponse = new UserResponse(user);
 
         return ResponseEntity.ok(userResponse);
     }

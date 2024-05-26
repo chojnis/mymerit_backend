@@ -227,6 +227,7 @@ public class JobOfferService {
             } else {
                 createNewSolution(task, files, userId, language);
                 user.addBadgeOrIncrementExisting(language);
+                user.checkSolutionAchievementStatus();
                 userRepository.save(user);
             }
 
