@@ -3,6 +3,8 @@ package com.mymerit.mymerit.domain.service;
 import com.mymerit.mymerit.api.payload.response.ApiResponse;
 import com.mymerit.mymerit.domain.entity.AuthenticationCode;
 import com.mymerit.mymerit.infrastructure.repository.AuthenticationCodeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ import java.util.List;
 public class VerificationCodeService {
     private final AuthenticationCodeRepository authenticationCodeRepository;
     private final MailSenderService mailSenderService;
+    private final Logger logger = LoggerFactory.getLogger(VerificationCodeService.class);
 
     public VerificationCodeService(AuthenticationCodeRepository authenticationCodeRepository, MailSenderService mailSenderService) {
         this.authenticationCodeRepository = authenticationCodeRepository;
@@ -21,9 +24,9 @@ public class VerificationCodeService {
 
     public ResponseEntity<?> processVerificationCode(String code, String email) {
         int codeInt;
-        try{
+        try {
             codeInt = Integer.parseInt(code);
-        } catch(Exception exception){
+        } catch (Exception exception) {
             return ResponseEntity
                     .badRequest()
                     .body(new ApiResponse(false, "The verification code is invalid"));
@@ -74,11 +77,20 @@ public class VerificationCodeService {
         authenticationCode.setExpiration(LocalDateTime.now().plusMinutes(30));
 
         authenticationCodeRepository.insert(authenticationCode);
-        //mailSenderService.sendEmail(emailVerification.getEmail());
+
+        try {
+            mailSenderService.sendVerificationCode(email, authenticationCode.getCode());
+        } catch (Exception e) {
+            logger.info("Failed to send email", e);
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ApiResponse(false, "Failed to send email"));
+
+        }
 
         return ResponseEntity
                 .ok()
-                //.body(new ApiResponse(true, "Verification code was successfully sent"))
-                .body(new ApiResponse(true, "Verification code created successfully"));
+                .body(new ApiResponse(true, "Verification code sent successfully"));
     }
 }
