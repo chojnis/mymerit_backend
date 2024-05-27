@@ -2,8 +2,6 @@ server:
   port: 8080
   tomcat:
     max-swallow-size: 500MB
-  servlet:
-    context-path: /api
 spring:
   data:
     mongodb:
@@ -61,3 +59,6 @@ app:
   oauth2:
     authorizedRedirectUris:
       - http://localhost:5173/oauth2/redirect
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
