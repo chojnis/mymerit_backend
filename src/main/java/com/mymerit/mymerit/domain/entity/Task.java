@@ -47,8 +47,8 @@ public class Task {
     private Set<ProgrammingLanguage> allowedLanguages;
 
     // [language : [{name: "main.java" , contentBase64: "dsfsdfsdf"}, {}], language2... ]
-    private Map<ProgrammingLanguage, List<TemplateFile>> templateFiles;
-
+//    private Map<ProgrammingLanguage, List<TemplateFile>> templateFiles;
+    private List<TemplateFile> templateFiles = new ArrayList<>();
     private Integer memoryLimit;
 
     private Float timeLimit;

@@ -1,9 +1,6 @@
 package com.mymerit.mymerit.api.payload.response;
 
-import com.mymerit.mymerit.domain.entity.CodeTest;
-import com.mymerit.mymerit.domain.entity.Feedback;
-import com.mymerit.mymerit.domain.entity.Solution;
-import com.mymerit.mymerit.domain.entity.TemplateFile;
+import com.mymerit.mymerit.domain.entity.*;
 import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
 import com.mymerit.mymerit.domain.models.TaskStatus;
 import jakarta.validation.constraints.NotBlank;
@@ -52,8 +49,8 @@ public class UserTaskDetailsResponse {
     private Solution userSolution;
 
     private Feedback companyFeedback;
-    private Map<ProgrammingLanguage, List<TemplateFile>> templateFiles;
-
+//    private Map<ProgrammingLanguage, List<TemplateFile>> templateFiles;
+    private List<TemplateFile> templateFiles;
 
     private List<CodeTest> tests;
 
