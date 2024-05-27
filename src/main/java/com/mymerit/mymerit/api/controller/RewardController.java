@@ -2,6 +2,8 @@ package com.mymerit.mymerit.api.controller;
 
 import com.mymerit.mymerit.domain.entity.Reward;
 import com.mymerit.mymerit.infrastructure.repository.RewardRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Optional;
 
+@Tag(name = "RewardController")
 @RestController
 public class RewardController {
     private final RewardRepository rewardRepository;
@@ -18,6 +21,8 @@ public class RewardController {
         this.rewardRepository = rewardRepository;
     }
 
+    @Operation(
+            summary = "Lists available rewards")
     @GetMapping("/rewards")
     public ResponseEntity<List<Reward>> getRewards() {
         List<Reward> rewards = rewardRepository.findAll();
@@ -25,6 +30,9 @@ public class RewardController {
         return ResponseEntity.ok(rewards);
     }
 
+
+    @Operation(
+            summary = "Returns specific reward")
     @GetMapping("/rewards/{id}")
     public ResponseEntity<Reward> getRewardById(@PathVariable String id) {
         Optional<Reward> reward = rewardRepository.findById(id);
