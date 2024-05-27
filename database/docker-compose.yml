@@ -2,11 +2,11 @@ version: "3.8"
 
 services:
   mongo:
-    image: mongodb/mongodb-community-server:7.0.11-ubuntu2204
+    image: mongo
     container_name: mongo
     environment:
-      - MONGODB_INITDB_ROOT_USERNAME=root
-      - MONGODB_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
     restart: unless-stopped
     ports:
       - "27017:27017"
