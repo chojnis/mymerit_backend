@@ -203,7 +203,7 @@ public class JobOfferService {
         Range<Integer> creditsRange = Range.of(Range.Bound.inclusive(minCredits), Range.Bound.inclusive(maxCredits));
         Range<Date> dateRange = Range.of(Range.Bound.inclusive(minOpensIn), Range.Bound.inclusive(maxOpensIn));
 
-        PageRequest pageRequest = PageRequest.of(page, 3, sort);
+        PageRequest pageRequest = PageRequest.of(page, 6, sort);
 
         if (languages.isEmpty()) {
             return jobOfferRepository.findByJobTitleContainingIgnoreCaseAndSalaryBetweenAndTaskRewardBetweenAndTaskClosesAtBetween(q, salaryRange, creditsRange, dateRange, pageRequest)
