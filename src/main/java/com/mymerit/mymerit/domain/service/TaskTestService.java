@@ -50,7 +50,7 @@ public class TaskTestService {
                 testResponse.setErrorMessage(
                         response.getStderr() != null ? response.getStderr() :
                                 response.getCompile_output() != null ? response.getCompile_output() :
-                                        response.getStatus().getDescription()
+                                        Base64.getEncoder().encodeToString(response.getStatus().getDescription().getBytes())
                 );
             }
             result.add(testResponse);
@@ -81,10 +81,11 @@ public class TaskTestService {
         if(response.getStatus().getId() >= 4){
             testResult.setErrorMessage(
                     response.getStderr() != null ? response.getStderr() :
-                            response.getCompile_output() != null ? response.getCompile_output() :
-                                    response.getStatus().getDescription()
-            );        }
-
+                            (response.getCompile_output() != null ? response.getCompile_output() :
+                                    Base64.getEncoder().encodeToString(response.getStatus().getDescription().getBytes()))
+            );
+        }
+        System.out.println(testResult.errorMessage);
         return testResult;
     }
 
