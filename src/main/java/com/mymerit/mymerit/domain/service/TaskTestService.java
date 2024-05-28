@@ -102,9 +102,26 @@ public class TaskTestService {
 
         String testFileBase64 = optionalTestFileBase64.get();
 
+        List<MultipartFile> allowedFiles = new ArrayList<>();
+
+        List<String> allowedFileNamesList = task.getTemplateFiles().stream()
+                .filter(templateFile -> templateFile.getLanguage().equals(language))
+                .map(TemplateFile::getName)
+                .toList();
+
+        if(!allowedFileNamesList.isEmpty()){
+            allowedFiles.addAll(files.stream()
+                    .filter(file -> allowedFileNamesList.contains(file.getOriginalFilename()))
+                    .toList());
+
+        }else{
+            allowedFiles.addAll(files);
+        }
+
+
         String mainFileName = "MainTestFile." + language.getExtension();
-        files.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
-        String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
+        allowedFiles.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
+        String encodedFiles = judgeService.encodeFromMultifile(allowedFiles,mainFileName,language);
         JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles);
         return runSingleTest(judgeTokenRequest,task.getId(),language, testIndex);
     }
@@ -120,11 +137,30 @@ public class TaskTestService {
             throw new RuntimeException("Test file not available for language: " + language);
         }
 
+        List<MultipartFile> allowedFiles = new ArrayList<>();
+
+        List<String> allowedFileNamesList = task.getTemplateFiles().stream()
+                .filter(templateFile -> templateFile.getLanguage().equals(language))
+                .map(TemplateFile::getName)
+                .toList();
+
+        if(!allowedFileNamesList.isEmpty()){
+            allowedFiles.addAll(files.stream()
+                    .filter(file -> allowedFileNamesList.contains(file.getOriginalFilename()))
+                    .toList());
+
+        }else{
+            allowedFiles.addAll(files);
+        }
+
+
+
+        System.out.println(files.size());
         String testFileBase64 = optionalTestFileBase64.get();
 
         String mainFileName = "MainTestFile." + language.getExtension();
-        files.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
-        String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
+        allowedFiles.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
+        String encodedFiles = judgeService.encodeFromMultifile(allowedFiles,mainFileName,language);
         JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles);
         return runAllTests(judgeTokenRequest,task.getId(),language);
     }
