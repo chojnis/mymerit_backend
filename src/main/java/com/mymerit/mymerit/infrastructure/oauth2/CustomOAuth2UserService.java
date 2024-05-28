@@ -7,6 +7,8 @@ import com.mymerit.mymerit.domain.service.ImageService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
 import com.mymerit.mymerit.domain.models.OAuth2UserInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -22,6 +24,7 @@ import java.util.Optional;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
     private final ImageService imageService;
+    private final Logger logger = LoggerFactory.getLogger(CustomOAuth2UserService.class);
 
     public CustomOAuth2UserService(UserRepository userRepository, ImageService imageService) {
         this.userRepository = userRepository;
@@ -50,7 +53,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new RuntimeException("ID not found from OAuth2 provider");
         }
 
-        Optional<User> userOptional = userRepository.findByEmail(oAuth2UserInfo.getEmail());
+        Optional<User> userOptional = userRepository.findByProviderId(oAuth2UserInfo.getId());
 
         User user;
 
