@@ -7,7 +7,9 @@ import com.mymerit.mymerit.api.payload.response.JudgeCompilationResponse;
 import com.mymerit.mymerit.api.payload.request.JudgeTokenEntity;
 import com.mymerit.mymerit.domain.entity.GridFile;
 import com.mymerit.mymerit.domain.entity.SolutionFile;
+import com.mymerit.mymerit.domain.entity.Task;
 import com.mymerit.mymerit.domain.models.ProgrammingLanguage;
+import com.mymerit.mymerit.infrastructure.repository.TaskRepository;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,9 +29,11 @@ import static com.mymerit.mymerit.infrastructure.utils.ZipUtility.zipSolutionFil
 public class JudgeService {
 
     GridFileService gridFileService;
+    TaskRepository taskRepository;
 
 
-    JudgeService(GridFileService gridFileService){
+    JudgeService(GridFileService gridFileService,TaskRepository taskRepository){
+        this.taskRepository = taskRepository;
         this.gridFileService = gridFileService;
 
     }
@@ -106,31 +110,35 @@ public class JudgeService {
         return requestBodyBuilder.toString();
     }
 
-    public String encodeFromMultifile(List<MultipartFile> files, String mainName, ProgrammingLanguage language) throws IOException {
+    public String encodeFromMultifile(List<MultipartFile> files, String mainName, ProgrammingLanguage language,String taskId) throws IOException {
         SolutionRequest solutionRequest = new SolutionRequest(mainName);
         String result = "";
+        Task task = taskRepository.findById(taskId).get();
 
         for (MultipartFile file : files) {
             String id = gridFileService.addFile(file).toString();
 
             GridFile downloadFile =  gridFileService.gridFile(id);
 
-            byte[] bytes = downloadFile.getFile();
+            if(task.isInTempFile(file.getName())) {
 
-            String s = new String(bytes, StandardCharsets.UTF_8);
+                byte[] bytes = downloadFile.getFile();
 
-            boolean isMain = Objects.equals(downloadFile.getFilename(), mainName);
+                String s = new String(bytes, StandardCharsets.UTF_8);
 
-            SolutionFile solutionFile = new SolutionFile(downloadFile.getFilename(),s,isMain);
-            solutionRequest.addToFiles(solutionFile);
+                boolean isMain = Objects.equals(downloadFile.getFilename(), mainName);
+
+                SolutionFile solutionFile = new SolutionFile(downloadFile.getFilename(), s, isMain);
+                solutionRequest.addToFiles(solutionFile);
+            }
         }
         result = zipSolutionFilesAsBase64(solutionRequest,language);
 
         return result;
     }
 
-     public JudgeCompilationResponse getResponseFromMultipartFiles(List<MultipartFile> multipartFiles,String mainName,JudgeParams judgeParams,ProgrammingLanguage language) throws IOException {
-        String zippedContent = encodeFromMultifile(multipartFiles,mainName,language);
+     public JudgeCompilationResponse getResponseFromMultipartFiles(List<MultipartFile> multipartFiles,String mainName,JudgeParams judgeParams,ProgrammingLanguage language,String taskId) throws IOException {
+        String zippedContent = encodeFromMultifile(multipartFiles,mainName,language,taskId);
 
         JudgeTokenRequest jtr = new JudgeTokenRequest(mainName, zippedContent,judgeParams.cpu_time_limit,judgeParams.memory_limit,judgeParams.stdin,
                 judgeParams.expected_output);

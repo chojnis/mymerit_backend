@@ -104,12 +104,15 @@ public class TaskTestService {
 
         String mainFileName = "MainTestFile." + language.getExtension();
         files.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
-        String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
+        String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language,taskId);
         JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles);
         return runSingleTest(judgeTokenRequest,task.getId(),language, testIndex);
     }
 
     public List<TestResponse> executeAllTests(List<MultipartFile> files, String taskId, ProgrammingLanguage language) throws IOException {
+
+
+
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(()->new RuntimeException("Task for id " + taskId + " not found"));
 
@@ -124,7 +127,7 @@ public class TaskTestService {
 
         String mainFileName = "MainTestFile." + language.getExtension();
         files.add(convertBase64ToMultipartFile(mainFileName , testFileBase64));
-        String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language);
+        String encodedFiles = judgeService.encodeFromMultifile(files,mainFileName,language,taskId);
         JudgeTokenRequest judgeTokenRequest = new JudgeTokenRequest(mainFileName,encodedFiles);
         return runAllTests(judgeTokenRequest,task.getId(),language);
     }

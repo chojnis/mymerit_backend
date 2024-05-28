@@ -126,4 +126,17 @@ public class Task {
 
     }
 
+    public boolean isInTempFile(String name){
+
+
+        boolean isThere = false;
+        for(TemplateFile templateFile : templateFiles){
+
+            if(name == templateFile.getName()){
+                isThere = true;
+            }
+        }
+        return isThere;
+    }
+
 }
