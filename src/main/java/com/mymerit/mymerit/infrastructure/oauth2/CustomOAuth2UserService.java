@@ -2,13 +2,11 @@ package com.mymerit.mymerit.infrastructure.oauth2;
 
 import com.mymerit.mymerit.domain.entity.User;
 import com.mymerit.mymerit.domain.models.AuthProvider;
+import com.mymerit.mymerit.domain.models.OAuth2UserInfo;
 import com.mymerit.mymerit.domain.models.Role;
 import com.mymerit.mymerit.domain.service.ImageService;
 import com.mymerit.mymerit.domain.service.UserDetailsImpl;
 import com.mymerit.mymerit.infrastructure.repository.UserRepository;
-import com.mymerit.mymerit.domain.models.OAuth2UserInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -24,7 +22,6 @@ import java.util.Optional;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
     private final ImageService imageService;
-    private final Logger logger = LoggerFactory.getLogger(CustomOAuth2UserService.class);
 
     public CustomOAuth2UserService(UserRepository userRepository, ImageService imageService) {
         this.userRepository = userRepository;
@@ -37,11 +34,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         try {
             return processOAuth2User(oAuth2UserRequest, oAuth2User);
-        }
-        catch (AuthenticationException ex) {
+        } catch (AuthenticationException ex) {
             throw ex;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
         }
     }
@@ -65,9 +60,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         " account. Please use your " + user.getProvider() + " account to login.");
             }
 
-            user = updateExistingUser(user, oAuth2UserInfo);
-        }
-        else {
+//            user = updateExistingUser(user, oAuth2UserInfo);
+        } else {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
         }
 
@@ -88,10 +82,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return userRepository.save(user);
     }
 
-    private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
-        existingUser.setUsername(oAuth2UserInfo.getName());
-        existingUser.setImageBase64(imageService.getBase64ImageURL(oAuth2UserInfo.getImageUrl()));
-
-        return userRepository.save(existingUser);
-    }
+//    private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
+//        existingUser.setEmail(oAuth2UserInfo.getEmail());
+//
+//        return userRepository.save(existingUser);
+//    }
 }
