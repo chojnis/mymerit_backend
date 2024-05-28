@@ -43,10 +43,16 @@ public class TaskTestService {
 
             JudgeCompilationResponse response = judgeService.generateRequestResponse(judgeService.generateTokenRequest(userRequest));
             TestResponse testResponse = new TestResponse();
-            System.out.println(response);
             testResponse.setName(testCase.getName());
+            System.out.println(response);
             testResponse.setPassed(response.getStatus().getId() == 3);
-
+            if(response.getStatus().getId() >= 4) {
+                testResponse.setErrorMessage(
+                        response.getStderr() != null ? response.getStderr() :
+                                response.getCompile_output() != null ? response.getCompile_output() :
+                                        Base64.getEncoder().encodeToString(response.getStatus().getDescription().getBytes())
+                );
+            }
             result.add(testResponse);
         }
         return result;
@@ -72,7 +78,14 @@ public class TaskTestService {
 
         testResult.setName(testCase.getName());
         testResult.setPassed(response.getStatus().getId() == 3);
-
+        if(response.getStatus().getId() >= 4){
+            testResult.setErrorMessage(
+                    response.getStderr() != null ? response.getStderr() :
+                            (response.getCompile_output() != null ? response.getCompile_output() :
+                                    Base64.getEncoder().encodeToString(response.getStatus().getDescription().getBytes()))
+            );
+        }
+        System.out.println(testResult.errorMessage);
         return testResult;
     }
 
